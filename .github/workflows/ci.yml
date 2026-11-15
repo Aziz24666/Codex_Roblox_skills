@@ -1,0 +1,115 @@
+name: V13 Roblox toolkit CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-quality:
+    name: Python package quality
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.13'
+      - name: Extract cumulative V13 source
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/v13-source"
+          tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C "$RUNNER_TEMP/v13-source"
+          echo "SOURCE_ROOT=$RUNNER_TEMP/v13-source/roblox-codex-game-studio-kit-v13" >> "$GITHUB_ENV"
+      - name: Install pinned Python dependencies
+        run: python -m pip install --requirement "$SOURCE_ROOT/requirements-ci.txt"
+      - name: Run package preflight and regression suite
+        run: python "$SOURCE_ROOT/tools/v13_ci_preflight.py" "$SOURCE_ROOT"
+
+  roblox-build:
+    name: Luau compile and Rojo builds
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Extract cumulative V13 source
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/v13-source"
+          tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C "$RUNNER_TEMP/v13-source"
+          echo "SOURCE_ROOT=$RUNNER_TEMP/v13-source/roblox-codex-game-studio-kit-v13" >> "$GITHUB_ENV"
+      - name: Install pinned Luau CLI
+        env:
+          LUAU_VERSION: '0.746'
+          LUAU_SHA256: '30f11c9cde8be2dc0e3066d210705532aac3726a2db89a6c5078080b6faa6cf8'
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/luau-ubuntu.zip"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://github.com/luau-lang/luau/releases/download/${LUAU_VERSION}/luau-ubuntu.zip" \
+            --output "$archive"
+          echo "${LUAU_SHA256}  ${archive}" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/luau"
+          unzip -q "$archive" -d "$RUNNER_TEMP/luau"
+          compiler="$(find "$RUNNER_TEMP/luau" -type f -name luau-compile -print -quit)"
+          test -n "$compiler"
+          chmod +x "$compiler"
+          echo "LUAU_COMPILER=$compiler" >> "$GITHUB_ENV"
+          "$compiler" --version
+      - name: Compile all Lua and Luau source files
+        run: python "$SOURCE_ROOT/tools/compile_luau_sources.py" --root "$SOURCE_ROOT" --compiler "$LUAU_COMPILER" --min-files 50
+      - name: Install pinned Rojo CLI
+        env:
+          ROJO_VERSION: '7.7.1'
+          ROJO_SHA256: '00feb4fa0829a1dd72b49df2639da519a352bfe13cadcd83969e2ba2bb5693c4'
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/rojo-linux-x86_64.zip"
+          curl --fail --location --retry 3 --retry-delay 2 \
+            "https://github.com/rojo-rbx/rojo/releases/download/v${ROJO_VERSION}/rojo-${ROJO_VERSION}-linux-x86_64.zip" \
+            --output "$archive"
+          echo "${ROJO_SHA256}  ${archive}" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/rojo"
+          unzip -q "$archive" -d "$RUNNER_TEMP/rojo"
+          rojo_bin="$(find "$RUNNER_TEMP/rojo" -type f -name rojo -print -quit)"
+          test -n "$rojo_bin"
+          chmod +x "$rojo_bin"
+          echo "ROJO_BIN=$rojo_bin" >> "$GITHUB_ENV"
+          "$rojo_bin" --version
+      - name: Build sample Roblox experience
+        run: |
+          mkdir -p "$RUNNER_TEMP/roblox-builds"
+          "$ROJO_BIN" build "$SOURCE_ROOT/project-template/default.project.json" \
+            --output "$RUNNER_TEMP/roblox-builds/RobloxExperience.rbxlx"
+          test -s "$RUNNER_TEMP/roblox-builds/RobloxExperience.rbxlx"
+      - name: Build Content Factory Studio plugin
+        run: |
+          "$ROJO_BIN" build "$SOURCE_ROOT/studio-plugin/default.project.json" \
+            --output "$RUNNER_TEMP/roblox-builds/ContentFactoryPlugin.rbxmx"
+          test -s "$RUNNER_TEMP/roblox-builds/ContentFactoryPlugin.rbxmx"
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: roblox-build-artifacts
+          path: ${{ runner.temp }}/roblox-builds/
+          if-no-files-found: error
+          retention-days: 14
