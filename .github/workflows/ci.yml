@@ -74,7 +74,7 @@ jobs:
           test -n "$compiler"
           chmod +x "$compiler"
           echo "LUAU_COMPILER=$compiler" >> "$GITHUB_ENV"
-          "$compiler" --version
+          test -x "$compiler"
       - name: Compile all Lua and Luau source files
         run: python "$SOURCE_ROOT/tools/compile_luau_sources.py" --root "$SOURCE_ROOT" --compiler "$LUAU_COMPILER" --min-files 50
       - name: Install pinned Rojo CLI
