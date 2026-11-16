@@ -1,72 +1,83 @@
-# Codex Roblox Skills
+# Roblox Codex Game Studio Kit
 
 [![CI](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/ci.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A research-first, modular Roblox game-development toolkit for Codex. The cumulative V13 release includes specialist skills, reusable Luau patterns, data-driven NPC and gameplay architecture, schema-driven Roblox Studio editors, prefab factories, project templates, testing utilities, and GitHub Actions quality gates.
+A research-first, modular Roblox game-development toolkit for Codex. **The current cumulative release is V14**: 136 specialist skills, reusable Luau systems, data-driven gameplay architecture, schema-driven Studio content tools, and a scripted Studio testing harness.
 
-## Download the complete toolkit
+You do not need to download V1–V13 separately. V14 is cumulative and includes the earlier releases.
 
-**Download the complete V13 source archive:** [roblox-codex-game-studio-kit-v13.tar.xz](dist/roblox-codex-game-studio-kit-v13.tar.xz)
+## What's new in V14
 
-The archive contains all specialist skills, instructions, documentation, prompts, templates, schemas, examples, Studio plugin source, sample Rojo project, and validation tools. Extract it and open the extracted `roblox-codex-game-studio-kit-v13/` directory in Codex.
+- **136 specialist Codex skills**, including ten new skills for Studio scripted tests, multiplayer scenario engineering, device simulation, remote-contract testing, deterministic fixtures, test isolation, network-condition verification, failure replay, test-plugin engineering, and runtime evidence.
+- A separate **Studio Test Runner plugin** that orchestrates synthetic test scenarios through Studio's test APIs.
+- A **disposable Studio test fixture** with one-client and two-client server/client handshake examples.
+- JSON scenario and report schemas, deterministic catalog generation, scenario/report linters, evidence checks, and a package doctor.
+- CI now validates the cumulative package, compiles Luau, builds the sample experience and three Studio/test assets, and packages V14.
 
-You do not need older V1–V12 downloads. V13 is cumulative.
+## Get the full V14 package
 
-## Quick start
+A complete V14 ZIP and TAR.XZ archive are produced by the **V14 Roblox toolkit CI** workflow after the repository update. Open [Actions](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/ci.yml), select the latest successful run on `main`, and download the artifact named **`roblox-codex-game-studio-kit-v14`**.
 
-1. Download and extract the V13 source archive.
-2. Open the extracted folder in Codex.
-3. Read `AGENTS.md` and `INDEX_V13.md`.
-4. For an existing Roblox game, ask Codex to audit the current source of truth before copying or merging the sample project.
-5. Ask Codex to use `$roblox-game-builder` as the primary orchestrator.
+The repository stores the V14 change set as a compact overlay on the existing V13 source archive, avoiding a second copy of the entire project in Git history. The workflow verifies the overlay checksum, reconstructs the cumulative V14 source tree, and uploads the full archives as an Actions artifact.
+
+To reconstruct the package locally from a clone:
+
+```bash
+mkdir -p /tmp/roblox-v14
+tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C /tmp/roblox-v14
+mv /tmp/roblox-v14/roblox-codex-game-studio-kit-v13 /tmp/roblox-v14/roblox-codex-game-studio-kit-v14
+cat dist/v14-overlay-b64parts/part-*.b64 | base64 --decode > /tmp/roblox-v14/overlay.tar.xz
+echo "8ac5adfe3aaa54e33c674e979cf2814fc8f311933176f1890fadf0fa84b79158  /tmp/roblox-v14/overlay.tar.xz" | sha256sum --check
+tar -xJf /tmp/roblox-v14/overlay.tar.xz -C /tmp/roblox-v14/roblox-codex-game-studio-kit-v14
+```
+
+## Quick start with Codex
+
+1. Extract the full V14 archive.
+2. Open the extracted package root in Codex.
+3. Read `AGENTS.md` and `INDEX_V14.md`.
+4. Ask Codex to audit the existing game's architecture and source of truth before changing files.
+5. Use `$roblox-game-builder` as the main orchestrator and load specialist skills only as needed.
 
 Suggested first instruction:
 
 ```text
-Read AGENTS.md and INDEX_V13.md. Use $roblox-game-builder as the primary orchestrator.
-Audit this project and identify its source of truth before changing files. Research current official Roblox documentation before substantive API or tooling decisions. Create a prioritized roadmap, then implement one complete playable vertical slice at a time. Prefer reusable data-driven systems and clean, strictly typed Luau. Run available tests and builds, report actual evidence, and clearly identify Studio/runtime checks that were not available. Do not publish or modify live production data without explicit authorization.
+Read AGENTS.md and INDEX_V14.md. Use $roblox-game-builder as the primary orchestrator.
+Audit this project's source of truth before modifying files. Research current official Roblox
+documentation before substantive API decisions. Create a prioritized roadmap, then implement
+one complete playable vertical slice at a time. Prefer reusable, data-driven systems and
+strictly typed Luau. Run available tests and builds, report actual evidence, and clearly mark
+Studio/runtime checks that were not executed. Do not publish or modify live production data
+without explicit authorization.
 ```
 
-## Highlights
+## V14 Studio test harness
 
-- **126 specialist skills** with progressive disclosure and task-specific routing.
-- **Research-first engineering:** check current official Roblox documentation and compare reputable approaches before substantive technical implementation.
-- **Modular/data-driven architecture:** reusable NPCs, components, behaviors, inventories, progression, UI, and gameplay systems.
-- **Schema-generated Studio editors:** dynamic fields, validation, preview, and prefab generation.
-- **Engineering utilities:** Python audits, JSON Schemas, Luau examples, dependency checks, evidence reports, and release gates.
-- **CI:** Python quality checks, Luau source compilation, and Rojo builds for the sample experience and Studio plugin.
+The plugin and disposable fixture are built as separate assets. See `docs/V14_STUDIO_TEST_PLUGIN_RUNBOOK.md` and `docs/V14_STUDIO_TEST_HARNESS_ARCHITECTURE.md` for setup and limitations.
 
-## Repository contents
+A CI build does **not** execute Roblox Studio playtests. Install the plugin in a local Studio profile and run the disposable fixture to collect Studio-runtime evidence. Physical-device checks, published-service behavior, asset permissions, and production deployment still require their respective environments and approvals.
 
-The repository stores the complete V13 source in the versioned archive under `dist/`. The archive is the canonical source bundle for this release. The root contains repository-level documentation and CI configuration.
+## CI
 
-## GitHub Actions
+Every push to `main`, pull request, and manual workflow dispatch runs:
 
-On pushes to `main`, pull requests, and manual dispatch, CI:
+- Cumulative V13/V14 Python package preflight and regression tests.
+- V14 scenario/report validation and generated-catalog drift checks.
+- Pinned Luau CLI compilation with a SHA-256-verified binary.
+- Pinned Rojo builds for the sample experience, Content Factory plugin, V14 Test Runner plugin, and disposable test fixture.
+- Upload of build outputs and the complete V14 ZIP/TAR.XZ package as downloadable workflow artifacts.
 
-1. Extracts the full V13 source archive.
-2. Runs package preflight, skill metadata validation, schema checks, workflow audits, and the Python regression suite.
-3. Downloads the pinned official Luau CLI and verifies its SHA-256 checksum.
-4. Compiles the Lua/Luau source files.
-5. Downloads the pinned Rojo CLI and verifies its SHA-256 checksum.
-6. Builds the sample Roblox experience and Content Factory Studio plugin.
-7. Uploads the `.rbxlx` and `.rbxmx` artifacts.
+The workflow uses read-only repository permissions and does not publish anything to Roblox.
 
-The workflow uses least-privilege read-only repository permissions and does not publish to Roblox.
+## Repository documentation
 
-## What CI does not prove
-
-A green CI run does not replace Roblox Studio playtests, multiplayer testing, physical-device validation, asset permission checks, published-experience analytics validation, or production deployment checks. Those require their appropriate environments and explicit evidence.
-
-## Documentation
-
+- [V14 index](INDEX_V14.md)
+- [Cumulative README](README.md in the full package)
+- [V14 validation report](V14_TEST_RESULTS.md in the full package)
+- [Repository metadata suggestions](GITHUB_REPOSITORY_METADATA.md)
 - [MIT License](LICENSE)
-- [Contributing](CONTRIBUTING.md)
-- [Security policy](SECURITY.md)
-- [Code of Conduct](CODE_OF_CONDUCT.md)
-- [Repository metadata and topics](GITHUB_REPOSITORY_METADATA.md)
 
 ## License and affiliation
 
-Released under the [MIT License](LICENSE). Roblox, Roblox Studio, and Luau are trademarks or projects of their respective owners. This is an independent community toolkit and is not affiliated with or endorsed by Roblox Corporation or OpenAI.
+Released under the MIT License. Roblox, Roblox Studio, and Luau are trademarks or projects of their respective owners. This independent community toolkit is not affiliated with or endorsed by Roblox Corporation or OpenAI.

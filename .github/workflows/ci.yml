@@ -1,4 +1,4 @@
-name: V13 Roblox toolkit CI
+name: V14 Roblox toolkit CI
 
 on:
   push:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   python-quality:
-    name: Python package quality
+    name: V14 Python preflight and regression suite
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -29,34 +29,46 @@ jobs:
         uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: '3.13'
-      - name: Extract cumulative V13 source
+      - name: Reconstruct cumulative V14 source
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/v13-source"
-          tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C "$RUNNER_TEMP/v13-source"
-          echo "SOURCE_ROOT=$RUNNER_TEMP/v13-source/roblox-codex-game-studio-kit-v13" >> "$GITHUB_ENV"
+          work="$RUNNER_TEMP/v14-source"
+          mkdir -p "$work"
+          overlay="$RUNNER_TEMP/v14-overlay.tar.xz"
+          cat dist/v14-overlay-b64parts/part-*.b64 | base64 --decode > "$overlay"
+          echo "8ac5adfe3aaa54e33c674e979cf2814fc8f311933176f1890fadf0fa84b79158  $overlay" | sha256sum --check
+          tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C "$work"
+          mv "$work/roblox-codex-game-studio-kit-v13" "$work/roblox-codex-game-studio-kit-v14"
+          tar -xJf "$overlay" -C "$work/roblox-codex-game-studio-kit-v14"
+          echo "SOURCE_ROOT=$work/roblox-codex-game-studio-kit-v14" >> "$GITHUB_ENV"
       - name: Install pinned Python dependencies
         run: python -m pip install --requirement "$SOURCE_ROOT/requirements-ci.txt"
-      - name: Run package preflight and regression suite
-        run: python "$SOURCE_ROOT/tools/v13_ci_preflight.py" "$SOURCE_ROOT"
+      - name: Run V14 preflight and regression suite
+        run: python "$SOURCE_ROOT/tools/v14_ci_preflight.py" "$SOURCE_ROOT"
 
   roblox-build:
-    name: Luau compile and Rojo builds
+    name: Luau compile and four Rojo builds
     runs-on: ubuntu-24.04
     permissions:
       contents: read
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - name: Extract cumulative V13 source
+      - name: Reconstruct cumulative V14 source
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/v13-source"
-          tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C "$RUNNER_TEMP/v13-source"
-          echo "SOURCE_ROOT=$RUNNER_TEMP/v13-source/roblox-codex-game-studio-kit-v13" >> "$GITHUB_ENV"
+          work="$RUNNER_TEMP/v14-source"
+          mkdir -p "$work"
+          overlay="$RUNNER_TEMP/v14-overlay.tar.xz"
+          cat dist/v14-overlay-b64parts/part-*.b64 | base64 --decode > "$overlay"
+          echo "8ac5adfe3aaa54e33c674e979cf2814fc8f311933176f1890fadf0fa84b79158  $overlay" | sha256sum --check
+          tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C "$work"
+          mv "$work/roblox-codex-game-studio-kit-v13" "$work/roblox-codex-game-studio-kit-v14"
+          tar -xJf "$overlay" -C "$work/roblox-codex-game-studio-kit-v14"
+          echo "SOURCE_ROOT=$work/roblox-codex-game-studio-kit-v14" >> "$GITHUB_ENV"
       - name: Install pinned Luau CLI
         env:
           LUAU_VERSION: '0.746'
@@ -75,8 +87,8 @@ jobs:
           chmod +x "$compiler"
           echo "LUAU_COMPILER=$compiler" >> "$GITHUB_ENV"
           test -x "$compiler"
-      - name: Compile all Lua and Luau source files
-        run: python "$SOURCE_ROOT/tools/compile_luau_sources.py" --root "$SOURCE_ROOT" --compiler "$LUAU_COMPILER" --min-files 50
+      - name: Compile every Lua and Luau source file
+        run: python "$SOURCE_ROOT/tools/compile_luau_sources.py" --root "$SOURCE_ROOT" --compiler "$LUAU_COMPILER" --min-files 65
       - name: Install pinned Rojo CLI
         env:
           ROJO_VERSION: '7.7.1'
@@ -106,10 +118,63 @@ jobs:
           "$ROJO_BIN" build "$SOURCE_ROOT/studio-plugin/default.project.json" \
             --output "$RUNNER_TEMP/roblox-builds/ContentFactoryPlugin.rbxmx"
           test -s "$RUNNER_TEMP/roblox-builds/ContentFactoryPlugin.rbxmx"
-      - name: Upload build artifacts
+      - name: Build V14 Studio Test Runner plugin
+        run: |
+          "$ROJO_BIN" build "$SOURCE_ROOT/studio-test-plugin/default.project.json" \
+            --output "$RUNNER_TEMP/roblox-builds/V14StudioTestRunner.rbxmx"
+          test -s "$RUNNER_TEMP/roblox-builds/V14StudioTestRunner.rbxmx"
+      - name: Build disposable V14 Studio test fixture
+        run: |
+          "$ROJO_BIN" build "$SOURCE_ROOT/examples/v14/studio-test-fixture/default.project.json" \
+            --output "$RUNNER_TEMP/roblox-builds/V14StudioTestFixture.rbxlx"
+          test -s "$RUNNER_TEMP/roblox-builds/V14StudioTestFixture.rbxlx"
+      - name: Upload Roblox build artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: roblox-build-artifacts
+          name: roblox-v14-build-artifacts
           path: ${{ runner.temp }}/roblox-builds/
+          if-no-files-found: error
+          retention-days: 14
+
+  package-v14:
+    name: Package cumulative V14 source archives
+    runs-on: ubuntu-24.04
+    needs: [python-quality, roblox-build]
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Reconstruct cumulative V14 source
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/v14-source"
+          mkdir -p "$work"
+          overlay="$RUNNER_TEMP/v14-overlay.tar.xz"
+          cat dist/v14-overlay-b64parts/part-*.b64 | base64 --decode > "$overlay"
+          echo "8ac5adfe3aaa54e33c674e979cf2814fc8f311933176f1890fadf0fa84b79158  $overlay" | sha256sum --check
+          tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C "$work"
+          mv "$work/roblox-codex-game-studio-kit-v13" "$work/roblox-codex-game-studio-kit-v14"
+          tar -xJf "$overlay" -C "$work/roblox-codex-game-studio-kit-v14"
+          echo "SOURCE_ROOT=$work/roblox-codex-game-studio-kit-v14" >> "$GITHUB_ENV"
+      - name: Create complete V14 ZIP and TAR.XZ
+        run: |
+          set -euo pipefail
+          package_dir="$(dirname "$SOURCE_ROOT")"
+          package_name="$(basename "$SOURCE_ROOT")"
+          tar -cJf "$RUNNER_TEMP/${package_name}.tar.xz" --directory "$package_dir" "$package_name"
+          (cd "$package_dir" && zip -qr "$RUNNER_TEMP/${package_name}.zip" "$package_name")
+          test -s "$RUNNER_TEMP/${package_name}.tar.xz"
+          test -s "$RUNNER_TEMP/${package_name}.zip"
+      - name: Upload complete V14 package
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: roblox-codex-game-studio-kit-v14
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v14.tar.xz
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v14.zip
           if-no-files-found: error
           retention-days: 14
