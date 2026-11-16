@@ -15,6 +15,10 @@ You do not need to download V1–V13 separately. V14 is cumulative and includes 
 - JSON scenario and report schemas, deterministic catalog generation, scenario/report linters, evidence checks, and a package doctor.
 - CI now validates the cumulative package, compiles Luau, builds the sample experience and three Studio/test assets, and packages V14.
 
+## GitHub Release
+
+The published V14 release includes the ready-to-use ZIP and TAR.XZ packages, release notes, and checksums. **[Open the V14.0.0 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v14.0.0).**
+
 ## Get the full V14 package
 
 A complete V14 ZIP and TAR.XZ archive are produced by the **V14 Roblox toolkit CI** workflow after the repository update. Open [Actions](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/ci.yml), select the latest successful run on `main`, and download the artifact named **`roblox-codex-game-studio-kit-v14`**.
@@ -68,7 +72,7 @@ Every push to `main`, pull request, and manual workflow dispatch runs:
 - Pinned Rojo builds for the sample experience, Content Factory plugin, V14 Test Runner plugin, and disposable test fixture.
 - Upload of build outputs and the complete V14 ZIP/TAR.XZ package as downloadable workflow artifacts.
 
-The workflow uses read-only repository permissions and does not publish anything to Roblox.
+The build and test jobs use read-only repository permissions. A one-time, commit-gated release job receives the minimum write permission needed to publish the V14 GitHub Release and attach the tested archives; it does not publish anything to Roblox.
 
 ## Repository documentation
 

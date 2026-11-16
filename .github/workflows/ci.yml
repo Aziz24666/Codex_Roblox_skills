@@ -178,3 +178,46 @@ jobs:
             ${{ runner.temp }}/roblox-codex-game-studio-kit-v14.zip
           if-no-files-found: error
           retention-days: 14
+
+  release-v14:
+    name: Publish V14 GitHub Release
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[release-v14]')
+    runs-on: ubuntu-24.04
+    needs: [python-quality, roblox-build, package-v14]
+    permissions:
+      contents: write
+      actions: read
+    timeout-minutes: 10
+    steps:
+      - name: Checkout release notes
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Download the validated V14 package artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/release-assets"
+          gh run download "$GITHUB_RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name roblox-codex-game-studio-kit-v14 \
+            --dir "$RUNNER_TEMP/release-assets"
+          test -s "$RUNNER_TEMP/release-assets/roblox-codex-game-studio-kit-v14.zip"
+          test -s "$RUNNER_TEMP/release-assets/roblox-codex-game-studio-kit-v14.tar.xz"
+      - name: Create the V14 release and upload both archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v14.0.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v14.0.0 already exists; refusing to overwrite it."
+            exit 1
+          fi
+          gh release create v14.0.0 \
+            "$RUNNER_TEMP/release-assets/roblox-codex-game-studio-kit-v14.zip" \
+            "$RUNNER_TEMP/release-assets/roblox-codex-game-studio-kit-v14.tar.xz" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "V14 — Roblox Codex Game Studio Kit" \
+            --notes-file RELEASE_NOTES_V14.md
