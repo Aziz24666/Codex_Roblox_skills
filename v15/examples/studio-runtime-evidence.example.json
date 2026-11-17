@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "run_id": "example-not-an-executed-run",
+  "environment": "studio",
+  "scenario_id": "two-client-remote-contract",
+  "status": "NOT_RUN",
+  "started_at": "2026-11-17T00:00:00Z",
+  "client_count": 2,
+  "artifacts": [],
+  "logs": [],
+  "limitations": ["Illustrative template only; no Studio session was executed."]
+}
