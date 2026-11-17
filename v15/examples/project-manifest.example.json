@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "project_name": "ExampleExperience",
+  "project_kind": "experience",
+  "entrypoints": ["src/server/init.server.luau", "src/client/init.client.luau"],
+  "toolchain": {"luau": "pinned-in-ci", "rojo": "pinned-in-ci"},
+  "architecture_docs": ["docs/ARCHITECTURE.md"],
+  "skill_tags": ["server-authority", "multiplayer", "persistence"],
+  "data_schema_version": 1
+}
