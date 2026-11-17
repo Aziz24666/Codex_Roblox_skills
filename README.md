@@ -15,6 +15,10 @@ You do not need to download V1–V13 separately. V14 is cumulative and includes 
 - JSON scenario and report schemas, deterministic catalog generation, scenario/report linters, evidence checks, and a package doctor.
 - CI now validates the cumulative package, compiles Luau, builds the sample experience and three Studio/test assets, and packages V14.
 
+## V15 development preview
+
+V15 adds a project-aware development and verification layer: project intelligence, skill selection, acceptance-driven implementation, security and persistence review, performance regression guidance, runtime evidence contracts, and reproducible release engineering. See [`v15/README.md`](v15/README.md). This preview does not replace the stable V14 release and does not claim to execute Roblox Studio runtime tests.
+
 ## GitHub Release
 
 The published V14 release includes the ready-to-use ZIP and TAR.XZ packages, release notes, and checksums. **[Open the V14.0.0 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v14.0.0).**

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v15/project-manifest.schema.json",
+  "title": "V15 Roblox Project Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project_name", "project_kind", "entrypoints", "toolchain"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "project_name": {"type": "string", "minLength": 1},
+    "project_kind": {"enum": ["experience", "plugin", "package", "shared-library"]},
+    "entrypoints": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["luau", "rojo"],
+      "properties": {
+        "luau": {"type": "string", "minLength": 1},
+        "rojo": {"type": "string", "minLength": 1},
+        "wally": {"type": "string"},
+        "studio_channel": {"type": "string"}
+      }
+    },
+    "architecture_docs": {"type": "array", "items": {"type": "string"}},
+    "skill_tags": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "performance_budgets": {"type": "object"},
+    "data_schema_version": {"type": "integer", "minimum": 1}
+  }
+}

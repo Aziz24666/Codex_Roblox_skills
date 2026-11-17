@@ -1,0 +1,128 @@
+name: V15 development-system quality
+
+on:
+  push:
+    branches: [main, v15-development-system]
+    paths:
+      - 'v15/**'
+      - '.github/workflows/v15-quality.yml'
+  pull_request:
+    paths:
+      - 'v15/**'
+      - '.github/workflows/v15-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v15-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Validate V15 manifests and benchmark contracts
+        run: python v15/tools/v15_validate.py --root v15
+      - name: Run V15 regression tests
+        run: python -m unittest discover -s v15/tests -v
+      - name: Compile Python validator and tests
+        run: python -m py_compile v15/tools/v15_validate.py v15/tests/test_validator.py
+      - name: Check JSON files
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in Path("v15").rglob("*.json"):
+              json.loads(path.read_text(encoding="utf-8"))
+              print(f"valid JSON: {path}")
+          PY
+
+  package-v15:
+    name: Package cumulative V15 overlay
+    runs-on: ubuntu-24.04
+    needs: [validate]
+    permissions:
+      contents: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Reconstruct cumulative V14 and apply V15
+        run: |
+          set -euo pipefail
+          work="$RUNNER_TEMP/v15-source"
+          mkdir -p "$work"
+          overlay="$RUNNER_TEMP/v14-overlay.tar.xz"
+          cat dist/v14-overlay-b64parts/part-*.b64 | base64 --decode > "$overlay"
+          echo "8ac5adfe3aaa54e33c674e979cf2814fc8f311933176f1890fadf0fa84b79158  $overlay" | sha256sum --check
+          tar -xJf dist/roblox-codex-game-studio-kit-v13.tar.xz -C "$work"
+          mv "$work/roblox-codex-game-studio-kit-v13" "$work/roblox-codex-game-studio-kit-v15"
+          tar -xJf "$overlay" -C "$work/roblox-codex-game-studio-kit-v15"
+          cp -a v15 "$work/roblox-codex-game-studio-kit-v15/"
+          cp RELEASE_NOTES_V15.md "$work/roblox-codex-game-studio-kit-v15/"
+          echo "PACKAGE_ROOT=$work/roblox-codex-game-studio-kit-v15" >> "$GITHUB_ENV"
+      - name: Create cumulative V15 archives
+        run: |
+          set -euo pipefail
+          parent="$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          tar -cJf "$RUNNER_TEMP/${name}.tar.xz" --directory "$parent" "$name"
+          (cd "$parent" && zip -qr "$RUNNER_TEMP/${name}.zip" "$name")
+          test -s "$RUNNER_TEMP/${name}.tar.xz"
+          test -s "$RUNNER_TEMP/${name}.zip"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v15
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v15.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v15.tar.xz
+          if-no-files-found: error
+          retention-days: 14
+
+  release-v15:
+    name: Publish V15 GitHub Release
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[release-v15]')
+    runs-on: ubuntu-24.04
+    needs: [validate, package-v15]
+    permissions:
+      contents: write
+      actions: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Download validated V15 package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/release-assets"
+          gh run download "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --name roblox-codex-game-studio-kit-v15 --dir "$RUNNER_TEMP/release-assets"
+          test -s "$RUNNER_TEMP/release-assets/roblox-codex-game-studio-kit-v15.zip"
+          test -s "$RUNNER_TEMP/release-assets/roblox-codex-game-studio-kit-v15.tar.xz"
+      - name: Publish V15 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v15.0.0 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release v15.0.0 already exists; refusing to overwrite."
+            exit 1
+          fi
+          gh release create v15.0.0 \
+            "$RUNNER_TEMP/release-assets/roblox-codex-game-studio-kit-v15.zip" \
+            "$RUNNER_TEMP/release-assets/roblox-codex-game-studio-kit-v15.tar.xz" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "V15 — Roblox Codex Game Studio Kit" \
+            --notes-file RELEASE_NOTES_V15.md

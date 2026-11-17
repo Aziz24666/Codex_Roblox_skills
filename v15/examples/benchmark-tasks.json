@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "task_id": "remote-input-validation",
+      "description": "Add a server-validated remote contract for a player interaction.",
+      "required_skill_tags": ["remote-security", "client-server-contracts"],
+      "acceptance_criteria": ["server validates payload type and bounds", "server checks ownership and state", "invalid requests are rejected", "negative tests exist"]
+    },
+    {
+      "task_id": "persistent-profile-migration",
+      "description": "Add a versioned player profile migration using isolated test data.",
+      "required_skill_tags": ["persistence", "data-migrations", "test-isolation"],
+      "acceptance_criteria": ["schema version is explicit", "migration is deterministic", "failure and retry behavior is covered", "production data is not used"]
+    }
+  ]
+}
