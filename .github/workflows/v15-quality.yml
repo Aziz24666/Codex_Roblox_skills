@@ -32,8 +32,10 @@ jobs:
           python-version: '3.13'
       - name: Validate V15 manifests and benchmark contracts
         run: python v15/tools/v15_validate.py --root v15
-      - name: Compile Python validator
-        run: python -m py_compile v15/tools/v15_validate.py
+      - name: Run V15 regression tests
+        run: python -m unittest discover -s v15/tests -v
+      - name: Compile Python validator and tests
+        run: python -m py_compile v15/tools/v15_validate.py v15/tests/test_validator.py
       - name: Check JSON files
         run: |
           python - <<'PY'
