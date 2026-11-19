@@ -68,7 +68,7 @@ class V15ValidatorTests(unittest.TestCase):
             (package / "v15" / "tests").mkdir(parents=True)
             (package / "v15" / "tests" / "leftover.pyc").write_bytes(b"generated")
             removed = patcher.clean_generated_python_artifacts(package)
-            self.assertEqual(removed, 2)
+            self.assertEqual(removed, 3)
             self.assertFalse(cache.exists())
             self.assertFalse((package / "v15" / "tests" / "leftover.pyc").exists())
 

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "task_id": "remote-input-validation",
+  "selected_skills": [
+    "roblox-remote-security-review",
+    "roblox-acceptance-driven-implementation"
+  ],
+  "criteria": [
+    {
+      "id": "server-validates-input",
+      "description": "The server validates payload shape and bounds before acting.",
+      "status": "PASS",
+      "evidence": ["tests/remote_contract_spec.lua"]
+    },
+    {
+      "id": "negative-tests-exist",
+      "description": "Malformed and unauthorized requests are rejected by tests.",
+      "status": "NOT_RUN",
+      "evidence": [],
+      "reason": "Illustrative example; no project test session was executed."
+    }
+  ],
+  "result": "NOT_RUN",
+  "notes": "Example only. A NOT_RUN criterion prevents the task from being reported as PASS."
+}
