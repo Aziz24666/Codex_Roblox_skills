@@ -1,6 +1,6 @@
 # V15 Project-Aware Development System
 
-V15.0.1 is a corrective cumulative release. It retains the V1–V14 package and adds a project-aware implementation workflow, measurable acceptance criteria, explicit security/persistence/performance review, runtime-evidence rules, and eight native Codex skills.
+V15.0.2 is a corrective cumulative release. It retains the V1–V14 package and adds a project-aware implementation workflow, measurable acceptance criteria, explicit security/persistence/performance review, runtime-evidence rules, and eight native Codex skills.
 
 ## What changed
 - Eight native Codex skills are provided under codex-skills/ in this source overlay and copied into the cumulative package's .agents/skills/ directory. Codex can discover these skills from the package root.
@@ -12,7 +12,7 @@ V15.0.1 is a corrective cumulative release. It retains the V1–V14 package and 
 - JSON schemas, example records, regression tests, package inventory, and SHA-256 file manifest.
 
 ## Install and use
-1. Download the V15.0.1 ZIP or TAR.XZ release asset and extract it.
+1. Download the V15.0.2 ZIP or TAR.XZ release asset and extract it.
 2. Open the extracted package root in Codex.
 3. Read AGENTS.md and INDEX_V15.md.
 4. Start whole-project work with $roblox-game-builder; add only the V15 specialist skills relevant to the task.

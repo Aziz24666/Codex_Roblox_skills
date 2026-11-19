@@ -1,6 +1,6 @@
 ---
 name: roblox-project-intelligence
-description: Inspect an existing Roblox project before changing it; map its source of truth, architecture, entry points, toolchain, dependencies, and risks, then create or update a V15 project manifest.
+description: Inspect a Roblox project, map its source of truth, architecture, entry points, toolchain, and risks, and create or update its V15 project manifest.
 ---
 
 # Roblox Project Intelligence

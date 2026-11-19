@@ -2,18 +2,18 @@ name: V15 development-system quality
 
 on:
   push:
-    branches: [main, v15-0-1-codex-skill-fix]
+    branches: [main, v15-0-2-package-doctor-fix]
     paths:
       - 'v15/**'
       - '.github/workflows/v15-quality.yml'
       - 'README.md'
-      - 'RELEASE_NOTES_V15_0_1.md'
+      - 'RELEASE_NOTES_V15_0_2.md'
   pull_request:
     paths:
       - 'v15/**'
       - '.github/workflows/v15-quality.yml'
       - 'README.md'
-      - 'RELEASE_NOTES_V15_0_1.md'
+      - 'RELEASE_NOTES_V15_0_2.md'
   workflow_dispatch:
 
 permissions:
@@ -76,9 +76,12 @@ jobs:
           mv "$work/roblox-codex-game-studio-kit-v13" "$work/roblox-codex-game-studio-kit-v15"
           tar -xJf "$overlay" -C "$work/roblox-codex-game-studio-kit-v15"
           cp -a v15 "$work/roblox-codex-game-studio-kit-v15/"
-          cp RELEASE_NOTES_V15_0_1.md "$work/roblox-codex-game-studio-kit-v15/"
+          cp RELEASE_NOTES_V15_0_2.md "$work/roblox-codex-game-studio-kit-v15/"
           PACKAGE_ROOT="$work/roblox-codex-game-studio-kit-v15"
           python v15/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/tools/v14_pack_doctor.py" "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v15/tools/v15_validate.py" --root "$PACKAGE_ROOT/v15"
+          python -m unittest discover -s "$PACKAGE_ROOT/v15/tests" -v
           (cd "$PACKAGE_ROOT" && sha256sum --check V15_SHA256SUMS.txt)
           echo "PACKAGE_ROOT=$PACKAGE_ROOT" >> "$GITHUB_ENV"
       - name: Create cumulative V15 archives and compare contents
@@ -147,5 +150,5 @@ jobs:
             "$RUNNER_TEMP/roblox-codex-game-studio-kit-${TAG}.zip" \
             "$RUNNER_TEMP/roblox-codex-game-studio-kit-${TAG}.tar.xz" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "V15.0.1 — Roblox Codex Game Studio Kit" \
-            --notes-file RELEASE_NOTES_V15_0_1.md
+            --title "V15.0.2 — Roblox Codex Game Studio Kit" \
+            --notes-file RELEASE_NOTES_V15_0_2.md

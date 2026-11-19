@@ -1,6 +1,6 @@
 ---
 name: roblox-remote-security-review
-description: Review Roblox RemoteEvents, RemoteFunctions, prompts, and other client-originated actions for server authority, payload validation, permissions, rate limits, and negative tests.
+description: Review Roblox client-originated actions for server authority, payload validation, permissions, rate limits, and negative tests.
 ---
 
 # Roblox Remote Security Review
