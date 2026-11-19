@@ -83,12 +83,11 @@ jobs:
           python v15/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
           python -m pip install --disable-pip-version-check --requirement "$PACKAGE_ROOT/requirements-ci.txt"
           python -m unittest discover -s "$PACKAGE_ROOT/v15/tests" -v
-          python -m unittest discover -s "$PACKAGE_ROOT/tools/tests" -v
-          # The inherited V12 package doctor intentionally byte-compiles every Python source.
-          # Re-run the package patcher after the full suite to remove temporary caches and
-          # regenerate inventory/checksums from the final clean package tree.
-          python v15/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          (cd "$PACKAGE_ROOT" && PYTHONPATH="$PACKAGE_ROOT" python -m unittest discover -s tools/tests -v)
           python "$PACKAGE_ROOT/tools/v14_pack_doctor.py" "$PACKAGE_ROOT"
+          # The inherited package doctor byte-compiles Python sources; remove those
+          # generated caches and rebuild package metadata/checksums as the final step.
+          python v15/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
           python "$PACKAGE_ROOT/v15/tools/v15_validate.py" --root "$PACKAGE_ROOT/v15"
           if find "$PACKAGE_ROOT" \( -type d -name '__pycache__' -o -type f \( -name '*.pyc' -o -name '*.pyo' \) \) -print -quit | grep -q .; then
             echo "Generated Python cache files must not be included in the release package."
