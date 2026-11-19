@@ -1,4 +1,5 @@
 import importlib.util
+import tempfile
 import subprocess
 import sys
 import unittest
@@ -52,6 +53,24 @@ class V15ValidatorTests(unittest.TestCase):
     def test_native_skills_are_codex_entrypoints(self):
         MODULE.validate_skills(ROOT)
         self.assertEqual(len(list((ROOT / "codex-skills").glob("*/SKILL.md"))), 8)
+
+    def test_package_patcher_removes_generated_python_caches(self):
+        patcher_path = ROOT / "tools" / "patch_cumulative_package.py"
+        patcher_spec = importlib.util.spec_from_file_location("v15_package_patcher", patcher_path)
+        patcher = importlib.util.module_from_spec(patcher_spec)
+        sys.modules[patcher_spec.name] = patcher
+        patcher_spec.loader.exec_module(patcher)
+        with tempfile.TemporaryDirectory() as temp:
+            package = Path(temp)
+            cache = package / "v15" / "tools" / "__pycache__"
+            cache.mkdir(parents=True)
+            (cache / "stale.cpython-313.pyc").write_bytes(b"generated")
+            (package / "v15" / "tests").mkdir(parents=True)
+            (package / "v15" / "tests" / "leftover.pyc").write_bytes(b"generated")
+            removed = patcher.clean_generated_python_artifacts(package)
+            self.assertEqual(removed, 2)
+            self.assertFalse(cache.exists())
+            self.assertFalse((package / "v15" / "tests" / "leftover.pyc").exists())
 
 
 if __name__ == "__main__":
