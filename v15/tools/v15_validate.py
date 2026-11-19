@@ -11,14 +11,10 @@ from pathlib import Path
 STATUSES = {"PASS", "FAIL", "BLOCKED", "NOT_RUN", "NOT_APPLICABLE"}
 ENVIRONMENTS = {"static", "luau-cli", "rojo-build", "studio", "device-simulator", "physical-device", "staging-service", "production"}
 EXPECTED_SKILLS = {
-    "roblox-project-intelligence",
-    "roblox-skill-selection-orchestration",
-    "roblox-acceptance-driven-implementation",
-    "roblox-remote-security-review",
-    "roblox-persistence-migration-testing",
-    "roblox-performance-regression-testing",
-    "roblox-runtime-evidence-triage",
-    "roblox-reproducible-release-engineering",
+    "roblox-project-intelligence", "roblox-skill-selection-orchestration",
+    "roblox-acceptance-driven-implementation", "roblox-remote-security-review",
+    "roblox-persistence-migration-testing", "roblox-performance-regression-testing",
+    "roblox-runtime-evidence-triage", "roblox-reproducible-release-engineering",
 }
 SCHEMAS = {
     "project-manifest.schema.json": {"schema_version", "project_name", "project_kind", "entrypoints", "toolchain"},
@@ -149,11 +145,14 @@ def parse_skill(path):
     if end < 0:
         raise ValueError(f"{path}: unterminated YAML frontmatter")
     front = content[4:end]
-    name = re.search(r"^name:\s*([a-z0-9-]+)\s*$", front, re.MULTILINE)
-    description = re.search(r'^description:\s*"?([^\n"]{20,})"?\s*$', front, re.MULTILINE)
+    name = re.search(r"^name:\\s*([a-z0-9-]+)\\s*$", front, re.MULTILINE)
+    description = re.search(r'^description:\\s*"?([^\\n"]{20,})"?\\s*$', front, re.MULTILINE)
     if not name or not description:
         raise ValueError(f"{path}: frontmatter requires valid name and description")
-    if len(name.group(1)) > 64 or len(description.group(1).strip()) > 160 or len(content[end + 5:].strip()) < 200:
+    body = content[end + 5:].strip()
+    if "Mandatory current-source research gate" not in body and "V10 mandatory current-source research gate" not in body:
+        raise ValueError(f"{path}: missing mandatory current-source research gate")
+    if len(name.group(1)) > 64 or len(description.group(1).strip()) > 160 or len(body) < 200:
         raise ValueError(f"{path}: invalid name length or insufficient instructions")
     return name.group(1)
 

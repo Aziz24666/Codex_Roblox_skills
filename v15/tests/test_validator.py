@@ -52,7 +52,10 @@ class V15ValidatorTests(unittest.TestCase):
 
     def test_native_skills_are_codex_entrypoints(self):
         MODULE.validate_skills(ROOT)
-        self.assertEqual(len(list((ROOT / "codex-skills").glob("*/SKILL.md"))), 8)
+        skill_files = list((ROOT / "codex-skills").glob("*/SKILL.md"))
+        self.assertEqual(len(skill_files), 8)
+        for path in skill_files:
+            self.assertIn("Mandatory current-source research gate", path.read_text(encoding="utf-8"))
 
     def test_package_patcher_removes_generated_python_caches(self):
         patcher_path = ROOT / "tools" / "patch_cumulative_package.py"

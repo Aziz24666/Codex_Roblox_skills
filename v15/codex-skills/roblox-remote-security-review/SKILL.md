@@ -3,6 +3,10 @@ name: roblox-remote-security-review
 description: Review Roblox client-originated actions for server authority, payload validation, permissions, rate limits, and negative tests.
 ---
 
+## Mandatory current-source research gate
+
+Before substantive implementation, perform fresh online research using the current official Roblox Creator Hub/API documentation and relevant Roblox platform updates, deprecations, security guidance, or release notes. Check upstream documentation for any external tool or framework involved. Compare viable approaches when an API, architecture, or platform behavior is version-sensitive. Record exact source URLs, access dates, verified claims, alternatives, decisions, and the verification plan in `research/decisions/`. Re-open sources for each new task; previous research is background, not a substitute for current verification. Never invent a citation or claim a source was checked when it was not. If a critical platform or tool claim cannot be verified, mark the affected implementation `BLOCKED — RESEARCH NOT VERIFIED` rather than guessing.
+
 # Roblox Remote Security Review
 
 ## When to use
