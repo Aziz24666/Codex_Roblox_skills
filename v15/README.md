@@ -1,31 +1,32 @@
-# V15 Development System Overlay
+# V15 Project-Aware Development System
 
-V15 extends the cumulative V14 kit with a project-aware development and verification layer. This directory is a source-controlled V15 overlay; it does not replace the V14 release or claim that Roblox Studio runtime tests have been executed.
+V15.0.1 is a corrective cumulative release. It retains the V1–V14 package and adds a project-aware implementation workflow, measurable acceptance criteria, explicit security/persistence/performance review, runtime-evidence rules, and eight native Codex skills.
 
-## V15 objectives
-- Inspect a project before changing it and build a dependency-aware implementation plan.
-- Select only relevant specialist skills instead of loading the entire library.
-- Define measurable acceptance criteria for each implementation task.
-- Evaluate skill selection and task outcomes with repeatable benchmark cases.
-- Validate security, persistence, performance, and runtime evidence explicitly.
-- Keep verification claims honest: static checks, builds, Studio runtime tests, device checks, and production checks are separate evidence classes.
+## What changed
+- Eight native Codex skills are provided under codex-skills/ in this source overlay and copied into the cumulative package's .agents/skills/ directory. Codex can discover these skills from the package root.
+- Project intelligence, architecture discovery, source-of-truth mapping, and project-manifest guidance.
+- Task-to-skill routing that keeps context focused.
+- Acceptance-driven implementation and vertical-slice verification.
+- Remote-security, persistence-migration, and performance-regression review workflows.
+- Runtime evidence classification and reproducible release guidance.
+- JSON schemas, example records, regression tests, package inventory, and SHA-256 file manifest.
 
-## Contents
-- `skills/`: eight specialist workflow specifications.
-- `schemas/`: project manifest, task evaluation, and runtime evidence contracts.
-- `examples/`: benchmark tasks and example evidence.
-- `tools/v15_validate.py`: standard-library validator for manifests, benchmark cases, and evidence.
-- `docs/IMPLEMENTATION_PIPELINE.md`: mandatory project workflow.
-- `docs/QUALITY_GATES.md`: evidence and release gates.
+## Install and use
+1. Download the V15.0.1 ZIP or TAR.XZ release asset and extract it.
+2. Open the extracted package root in Codex.
+3. Read AGENTS.md and INDEX_V15.md.
+4. Start whole-project work with $roblox-game-builder; add only the V15 specialist skills relevant to the task.
+5. Run python v15/tools/v15_validate.py --root v15 and python -m unittest discover -s v15/tests -v after changing V15 contracts or skill metadata.
 
-## Use with V14
-Keep the V14 package intact. Copy or merge this `v15/` directory into the extracted cumulative package, then read the skill specifications and schemas relevant to the task. V15 is an additive development-system layer, not a replacement for V14's existing skills, plugins, or fixtures.
+## Source overlay layout
+- codex-skills/<skill-name>/SKILL.md — native Codex skills; copied to package .agents/skills/.
+- skills/ — concise workflow-specification source notes retained for traceability.
+- schemas/ and examples/ — machine-readable contracts and illustrative records.
+- tools/v15_validate.py — standard-library validator.
+- tools/patch_cumulative_package.py — applies the V15 layer to cumulative V14 source and regenerates package documentation and checksums.
+- docs/IMPLEMENTATION_PIPELINE.md and docs/QUALITY_GATES.md — project and verification policies.
 
-## Validation
-Run:
-```bash
-python v15/tools/v15_validate.py --root v15
-python -m unittest discover -s v15/tests -v
-```
+## Evidence boundaries
+The V15 CI workflow validates metadata and JSON contracts, runs Python regression tests, compiles Python, reconstructs the cumulative package, integrates the V15 layer, verifies per-file checksums, and creates ZIP/TAR.XZ archives. The separate V14 CI workflow compiles Luau and builds the sample experience, Content Factory plugin, V14 Test Runner plugin, and disposable fixture.
 
-These checks validate V15 metadata and evidence contracts. They do not launch Roblox Studio, simulate physical devices, verify live DataStores, or prove production behavior.
+Neither workflow launches Roblox Studio. No CI result alone proves a Studio playtest, multiplayer runtime correctness, physical-device behavior, live DataStore behavior, asset permissions, or production safety. Such checks must be executed in their real authorized environments and recorded as separate evidence.
