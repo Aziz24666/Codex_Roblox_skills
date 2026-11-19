@@ -146,7 +146,7 @@ def parse_skill(path):
         raise ValueError(f"{path}: unterminated YAML frontmatter")
     front = content[4:end]
     name = re.search(r"^name:\s*([a-z0-9-]+)\s*$", front, re.MULTILINE)
-    description = re.search(r'^description:\s*"?([^\n"]{20,})"?\s*, front, re.MULTILINE)
+    description = re.search(r'^description:\s*"?([^\n"]{20,})"?\s*$', front, re.MULTILINE)
     if not name or not description:
         raise ValueError(f"{path}: frontmatter requires valid name and description")
     body = content[end + 5:].strip()
