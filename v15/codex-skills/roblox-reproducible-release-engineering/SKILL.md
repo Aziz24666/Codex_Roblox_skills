@@ -1,6 +1,6 @@
 ---
 name: roblox-reproducible-release-engineering
-description: Audit Roblox toolkit or game-project release pipelines for pinned tools, deterministic builds, artifact integrity, least privilege, traceability, and truthful release notes.
+description: Audit Roblox release pipelines for pinned tools, deterministic builds, artifact integrity, traceability, and truthful release notes.
 ---
 
 # Roblox Reproducible Release Engineering

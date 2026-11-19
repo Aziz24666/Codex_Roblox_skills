@@ -10,21 +10,21 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def package_readme(version: str) -> str:
-    return """# Roblox Codex Game Studio Kit
+def package_readme(version: str, skill_count: int) -> str:
+    return f"""# Roblox Codex Game Studio Kit
 
-**Current cumulative release: V""" + version + """.** This package contains the complete V1–V14 toolkit plus the V15 project-aware development and verification layer. Earlier versions do not need separate downloads.
+**Current cumulative release: V{version}.** This package contains the complete V1–V14 toolkit plus the V15 project-aware development and verification layer. Earlier versions do not need separate downloads.
 
 ## Included
 
-- **144 native Codex skills** in .agents/skills/, including eight V15 skills for project intelligence, skill orchestration, acceptance-driven implementation, remote security, persistence migrations, performance regression, runtime evidence, and reproducible releases.
+- **{skill_count} native Codex skills** in .agents/skills/, including eight V15 skills for project intelligence, skill orchestration, acceptance-driven implementation, remote security, persistence migrations, performance regression, runtime evidence, and reproducible releases.
 - Reusable Luau systems, data-driven gameplay patterns, server/client architecture guidance, UI and content workflows, Studio tooling, templates, examples, schemas, and quality automation.
 - The V14 Studio Test Runner plugin, disposable multi-client fixture, scenario catalog, and evidence/report utilities.
 - V15 project manifest, task evaluation, runtime evidence schemas, examples, validator, package-integrity tooling, and implementation/quality-gate references.
 
 ## Quick start
 
-1. Download the ZIP or TAR.XZ asset from the V""" + version + """ GitHub Release.
+1. Download the ZIP or TAR.XZ asset from the V{version} GitHub Release.
 2. Extract the archive and open the extracted package root in Codex.
 3. Read AGENTS.md and INDEX_V15.md.
 4. Start whole-game or cross-system work with $roblox-game-builder.
@@ -37,6 +37,7 @@ From the extracted package root, run:
 
     python v15/tools/v15_validate.py --root v15
     python -m unittest discover -s v15/tests -v
+    python tools/v14_pack_doctor.py .
     sha256sum --check V15_SHA256SUMS.txt
 
 ## Studio and runtime evidence
@@ -45,13 +46,12 @@ The V14 Test Runner plugin and disposable fixture require execution inside Roblo
 
 ## Release and provenance
 
-GitHub Actions validates V15 metadata/contracts, runs regression tests, compiles Python, reconstructs the cumulative V14 package, applies V15, generates package inventory/checksums, and builds ZIP/TAR.XZ archives. The V14 workflow separately compiles Luau and builds the sample experience, Content Factory plugin, Test Runner plugin, and disposable test fixture. See the linked Actions run for exact outcomes.
+GitHub Actions validates V15 metadata/contracts, runs regression tests, compiles Python, reconstructs the cumulative V14 package, applies V15, generates package inventory and both checksum manifests, and builds ZIP/TAR.XZ archives. The V14 workflow separately compiles Luau and builds the sample experience, Content Factory plugin, Test Runner plugin, and disposable test fixture.
 
 ## License and affiliation
 
 Released under the MIT License. Roblox, Roblox Studio, and Luau are trademarks or projects of their respective owners. This independent community toolkit is not affiliated with or endorsed by Roblox Corporation or OpenAI.
 """
-
 
 def update_agents(package_root: Path) -> None:
     path = package_root / "AGENTS.md"
@@ -88,14 +88,17 @@ def update_agents(package_root: Path) -> None:
 
 def generate_inventory_and_checksums(package_root: Path, version: str) -> None:
     inventory_path = package_root / "PACKAGE_INVENTORY.md"
-    sums_path = package_root / "V15_SHA256SUMS.txt"
-    if not sums_path.exists():
-        sums_path.write_text("", encoding="utf-8")
+    v14_sums = package_root / "V14_SHA256SUMS.txt"
+    v15_sums = package_root / "V15_SHA256SUMS.txt"
+    for manifest in (v14_sums, v15_sums):
+        if not manifest.exists():
+            manifest.write_text("", encoding="utf-8")
     excluded = {".git", "__pycache__", "node_modules", ".venv"}
     files = sorted(p for p in package_root.rglob("*") if p.is_file()
                    and not any(part in excluded for part in p.parts))
+    skill_count = len(list((package_root / ".agents" / "skills").rglob("SKILL.md")))
     counts = {
-        "Specialist skills (SKILL.md)": len(list((package_root / ".agents" / "skills").rglob("SKILL.md"))),
+        "Specialist skills (SKILL.md)": skill_count,
         "Documentation Markdown files in docs/": len(list((package_root / "docs").rglob("*.md"))),
         "All Markdown files": len(list(package_root.rglob("*.md"))),
         "Prompt files": len([p for p in (package_root / "prompts").rglob("*") if p.is_file()]),
@@ -106,8 +109,9 @@ def generate_inventory_and_checksums(package_root: Path, version: str) -> None:
         "Python files total": len(list(package_root.rglob("*.py"))),
         "Luau source files": len([p for p in package_root.rglob("*") if p.suffix.lower() in {".lua", ".luau"}]),
         "Active GitHub Actions workflows": len(list((package_root / ".github" / "workflows").glob("*.yml"))) + len(list((package_root / ".github" / "workflows").glob("*.yaml"))),
-        "Total regular files (including V15 checksum manifest)": len(files),
-        "V15 SHA-256 manifest entries": len(files) - 1,
+        "Total regular files (including both checksum manifests)": len(files),
+        "V14 SHA-256 manifest entries": len(files) - 1,
+        "V15 SHA-256 manifest entries": len(files) - 2,
     }
     rows = "\n".join(f"| {label} | {value} |" for label, value in counts.items())
     inventory = f"""# Roblox Codex Game Studio Kit — V{version} Package Inventory
@@ -123,28 +127,33 @@ This inventory is generated from the final cumulative package tree. Counts exclu
 ## V15 additions
 - Eight native Codex skills copied into .agents/skills/.
 - Project manifest, task evaluation, and runtime evidence contracts and examples.
-- V15 validator, regression suite, package integration tool, and checksum manifest.
+- V15 validator, regression suite, package integration tool, and dual checksum manifests.
 - V15 index, implementation pipeline, and quality-gate documentation.
 
 ## Evidence boundary
 File integrity and Python/schema validation do not prove Roblox Studio runtime behavior. Studio playtests, multiplayer execution, device checks, live DataStore behavior, asset permissions, and production operations require separate execution and evidence.
 """
     inventory_path.write_text(inventory, encoding="utf-8")
-    lines = []
-    for path in sorted(p for p in package_root.rglob("*") if p.is_file()
-                       and p != sums_path and not any(part in excluded for part in p.parts)):
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        lines.append(f"{digest}  {path.relative_to(package_root).as_posix()}")
-    sums_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    for line in sums_path.read_text(encoding="utf-8").splitlines():
-        digest, rel = line.split("  ", 1)
-        target = package_root / rel
-        if not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest() != digest:
-            raise ValueError(f"Checksum verification failed: {rel}")
-    if len(lines) != counts["V15 SHA-256 manifest entries"]:
+    # Avoid circular checksums: V15 omits both manifests; V14 includes V15's manifest.
+    def write_manifest(path: Path, excluded_manifests: set[Path]) -> int:
+        entries = []
+        for target in sorted(p for p in package_root.rglob("*") if p.is_file()
+                              and p not in excluded_manifests
+                              and not any(part in excluded for part in p.parts)):
+            digest = hashlib.sha256(target.read_bytes()).hexdigest()
+            entries.append(f"{digest}  {target.relative_to(package_root).as_posix()}")
+        path.write_text("\n".join(entries) + "\n", encoding="utf-8")
+        for entry in entries:
+            digest, rel = entry.split("  ", 1)
+            target = package_root / rel
+            if hashlib.sha256(target.read_bytes()).hexdigest() != digest:
+                raise ValueError(f"Checksum verification failed: {rel}")
+        return len(entries)
+    v15_count = write_manifest(v15_sums, {v14_sums, v15_sums})
+    v14_count = write_manifest(v14_sums, {v14_sums})
+    if v15_count != counts["V15 SHA-256 manifest entries"] or v14_count != counts["V14 SHA-256 manifest entries"]:
         raise ValueError("Checksum entry count does not match package inventory")
-    print(f"Generated inventory for {len(files)} files and verified {len(lines)} SHA-256 entries.")
-
+    print(f"Generated inventory for {len(files)} files; verified {v14_count} V14 and {v15_count} V15 SHA-256 entries.")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -162,7 +171,7 @@ def main():
             shutil.copytree(source, target_skills / source.name, dirs_exist_ok=True)
     shutil.copy2(ROOT / "INDEX_V15.md", package_root / "INDEX_V15.md")
     update_agents(package_root)
-    (package_root / "README.md").write_text(package_readme(version), encoding="utf-8")
+    (package_root / "README.md").write_text(package_readme(version, len(list((package_root / ".agents" / "skills").rglob("SKILL.md")))), encoding="utf-8")
     generate_inventory_and_checksums(package_root, version)
     print(f"V{version} cumulative package integration passed.")
 

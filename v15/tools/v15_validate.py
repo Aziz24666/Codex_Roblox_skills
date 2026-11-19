@@ -153,7 +153,7 @@ def parse_skill(path):
     description = re.search(r'^description:\s*"?([^\n"]{20,})"?\s*$', front, re.MULTILINE)
     if not name or not description:
         raise ValueError(f"{path}: frontmatter requires valid name and description")
-    if len(name.group(1)) > 64 or len(content[end + 5:].strip()) < 200:
+    if len(name.group(1)) > 64 or len(description.group(1).strip()) > 160 or len(content[end + 5:].strip()) < 200:
         raise ValueError(f"{path}: invalid name length or insufficient instructions")
     return name.group(1)
 

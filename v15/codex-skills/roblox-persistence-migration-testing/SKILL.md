@@ -1,6 +1,6 @@
 ---
 name: roblox-persistence-migration-testing
-description: Design and test versioned Roblox player-data or game-state migrations with deterministic transformations, isolated fixtures, retry handling, and rollback planning.
+description: Design and test versioned Roblox data migrations with deterministic transforms, isolated fixtures, retries, and rollback plans.
 ---
 
 # Roblox Persistence and Migration Testing
