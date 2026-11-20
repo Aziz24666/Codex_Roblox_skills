@@ -54,6 +54,8 @@ One orchestrator owns cross-skill integration. Specialists do not independently 
 
 - Use server authority for consequential game state.
 - Make persistence and economy mutations idempotent and auditable.
+- Enforce `NO_GAMBLING_AND_FAIR_MONETIZATION.md` for every shop/economy task: monetized outcomes are fixed and disclosed; paid random outcomes and wagering are prohibited.
+- Route monetization work to all four V18 economy specialists. Tier progression requires ownership of every required item in all earlier tiers, and required items must have a non-Robux acquisition route.
 - Treat imported/generated content and client input as untrusted.
 - Generate outputs from canonical schemas/catalogs where practical.
 - Prefer shared modules and explicit interfaces over copy-paste systems.
