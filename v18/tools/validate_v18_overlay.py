@@ -2,7 +2,6 @@
 """Validate the V18 overlay independently of the reconstructed V17 baseline."""
 from __future__ import annotations
 import json
-import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,24 +26,30 @@ def main() -> int:
     names: set[str] = set()
     for path in files:
         source = path.read_text(encoding="utf-8")
-        if not source.startswith("---\\n"):
+        lines = source.splitlines()
+        if not lines or lines[0] != "---":
             fail(f"{path}: missing frontmatter")
-        end = source.find("\\n---\\n", 4)
-        if end < 0:
+        try:
+            closing = lines.index("---", 1)
+        except ValueError:
             fail(f"{path}: unterminated frontmatter")
-        frontmatter = source[4:end]
-        name_match = re.search(r"(?m)^name:\\s*([a-z0-9-]+)\\s*$", frontmatter)
-        desc_match = re.search(r"(?m)^description:\\s*(.+?)\\s*$", frontmatter)
-        if not name_match or not desc_match:
-            fail(f"{path}: invalid name or description")
-        name, description = name_match.group(1), desc_match.group(1)
+        metadata = {}
+        for line in lines[1:closing]:
+            key, separator, value = line.partition(":")
+            if not separator:
+                fail(f"{path}: malformed frontmatter line: {line}")
+            metadata[key.strip()] = value.strip()
+        name = metadata.get("name", "")
+        description = metadata.get("description", "")
+        if not name or not description:
+            fail(f"{path}: missing name or description")
         if name != path.parent.name:
             fail(f"{path}: folder/name mismatch")
         if len(description) > 160:
             fail(f"{path}: description exceeds 160 characters")
         if name in names:
             fail(f"duplicate skill name: {name}")
-        if not source[end + 5:].strip():
+        if not "\n".join(lines[closing + 1:]).strip():
             fail(f"{path}: empty skill body")
         names.add(name)
 
