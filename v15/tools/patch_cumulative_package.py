@@ -203,9 +203,9 @@ File integrity and static validation do not prove Roblox Studio runtime behavior
     # Avoid cycles while preserving the inherited V14 doctor contract:
     # root excludes all three current manifests; V15 excludes itself and V14;
     # V14 excludes only itself and therefore covers the root and V15 manifests.
+    root_count = write_manifest(root_sums, {root_sums, v14_sums, v15_sums})
     v15_count = write_manifest(v15_sums, {v14_sums, v15_sums})
     v14_count = write_manifest(v14_sums, {v14_sums})
-    root_count = write_manifest(root_sums, {root_sums, v14_sums, v15_sums})
     expected = {
         "Root SHA256SUMS.txt entries": total - 3,
         "V14_SHA256SUMS.txt entries": total - 1,
