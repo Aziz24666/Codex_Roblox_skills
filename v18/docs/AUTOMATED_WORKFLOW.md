@@ -33,6 +33,7 @@ python v18/tools/v18.py validate --root .
 
 - Read-only project marker and toolchain discovery.
 - Skill inventory and deterministic task-to-skill routing suggestions.
+- Economy/monetization routing to four V18 specialists, backed by a mandatory no-gambling policy and regression tests.
 - Work-item and dependency-graph validation.
 - Structured JSON project profile and task artifacts.
 - Package/schema/skill audits and repeatable Python test suites.
