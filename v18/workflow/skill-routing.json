@@ -18,7 +18,7 @@
       "skills": ["roblox-persistence-migration-testing", "roblox-data-migration-operations", "roblox-deterministic-test-fixtures", "roblox-test-data-isolation", "roblox-economy-transactions"]
     },
     "economy": {
-      "signals": ["currency", "economy", "shop", "catalog", "purchase", "product", "gamepass", "monetization", "reward", "tier", "unlock", "price", "transaction"],
+      "signals": ["currency", "economy", "shop", "catalog", "purchase", "product", "developer product", "gamepass", "game pass", "passes", "robux", "monetization", "subscription", "paid access", "private server", "reward", "tier", "unlock", "price", "transaction"],
       "skills": ["roblox-deterministic-progression-shop", "roblox-tiered-catalog-progression", "roblox-earned-currency-economy", "roblox-player-friendly-monetization", "roblox-economy-transactions", "roblox-data-progression", "roblox-inventory-loadouts"]
     },
     "security": {
