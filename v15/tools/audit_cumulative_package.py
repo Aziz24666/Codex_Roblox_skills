@@ -77,9 +77,9 @@ def verify_manifest(root: Path, manifest_name: str, excluded_names: set[str], fi
 
 def validate_skill_frontmatter(path: Path) -> str:
     content = path.read_text(encoding="utf-8")
-    if not content.startswith("---\\n"):
+    if not content.startswith("---\n"):
         raise ValueError(f"{path}: missing YAML frontmatter opener")
-    end = content.find("\\n---\\n", 4)
+    end = content.find("\n---\n", 4)
     if end < 0:
         raise ValueError(f"{path}: missing YAML frontmatter closer")
     metadata = yaml.safe_load(content[4:end])
@@ -103,7 +103,7 @@ def validate_skill_frontmatter(path: Path) -> str:
 
 
 def validate_markdown_links(root: Path, markdown_files: list[Path]) -> int:
-    pattern = re.compile(r"!?(?:\\[[^\\]]*\\])\\(([^)]+)\\)")
+    pattern = re.compile(r"!?(?:\[[^\]]*\])\(([^)]+)\)")
     checked = 0
     for source in markdown_files:
         content = source.read_text(encoding="utf-8")
@@ -244,7 +244,7 @@ def run_audit(root: Path) -> dict[str, int]:
             errors.append(str(exc))
 
     if errors:
-        raise RuntimeError("Cumulative package audit failed:\\n- " + "\\n- ".join(errors[:100]))
+        raise RuntimeError("Cumulative package audit failed:\n- " + "\n- ".join(errors[:100]))
     return {
         "files": len(files),
         "json": len(json_files),

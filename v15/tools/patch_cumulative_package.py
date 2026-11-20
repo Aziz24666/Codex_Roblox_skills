@@ -114,22 +114,22 @@ def normalize_invalid_skill_descriptions(package_root: Path) -> int:
     skill_root = package_root / ".agents" / "skills"
     for path in sorted(skill_root.glob("*/SKILL.md")):
         content = path.read_text(encoding="utf-8")
-        if not content.startswith("---\\n"):
+        if not content.startswith("---\n"):
             raise ValueError(f"{path}: missing YAML frontmatter opener")
-        end = content.find("\\n---\\n", 4)
+        end = content.find("\n---\n", 4)
         if end < 0:
             raise ValueError(f"{path}: missing YAML frontmatter closer")
         front = content[4:end]
         lines = front.splitlines()
         updated = []
         for line in lines:
-            match = re.match(r"^(description:\\s*)(.*)$", line)
+            match = re.match(r"^(description:\s*)(.*)$", line)
             if match and ": " in match.group(2) and not match.group(2).startswith(('"', "'", "|", ">")):
                 line = match.group(1) + json.dumps(match.group(2), ensure_ascii=False)
                 changed += 1
             updated.append(line)
         if updated != lines:
-            path.write_text(content[:4] + "\\n".join(updated) + content[end:], encoding="utf-8")
+            path.write_text(content[:4] + "\n".join(updated) + content[end:], encoding="utf-8")
     return changed
 
 
@@ -163,7 +163,7 @@ def generate_inventory_and_checksums(package_root: Path, version: str) -> None:
         "V14_SHA256SUMS.txt entries": total - 2,
         "V15_SHA256SUMS.txt entries": total - 3,
     }
-    rows = "\\n".join(f"| {label} | {value} |" for label, value in counts.items())
+    rows = "\n".join(f"| {label} | {value} |" for label, value in counts.items())
     inventory = f"""# Roblox Codex Game Studio Kit — V{version} Package Inventory
 
 This inventory is generated from the final cumulative package tree. Counts exclude .git, __pycache__, node_modules, and .venv.
@@ -192,7 +192,7 @@ File integrity and static validation do not prove Roblox Studio runtime behavior
                               and not any(part in excluded_dirs for part in p.parts)):
             digest = hashlib.sha256(target.read_bytes()).hexdigest()
             entries.append(f"{digest}  {target.relative_to(package_root).as_posix()}")
-        path.write_text("\\n".join(entries) + "\\n", encoding="utf-8")
+        path.write_text("\n".join(entries) + "\n", encoding="utf-8")
         for entry in entries:
             digest, rel = entry.split("  ", 1)
             target = package_root / rel
