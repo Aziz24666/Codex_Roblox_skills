@@ -39,7 +39,7 @@ jobs:
       - name: Run V15 regression tests
         run: python -m unittest discover -s v15/tests -v
       - name: Compile Python tools and tests
-        run: python -m py_compile v15/tools/v15_validate.py v15/tools/patch_cumulative_package.py v15/tests/test_validator.py
+        run: python -m py_compile v15/tools/v15_validate.py v15/tools/patch_cumulative_package.py v15/tools/audit_cumulative_package.py v15/tests/test_validator.py
       - name: Check every V15 JSON file
         run: |
           python - <<'PY'

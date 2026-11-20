@@ -4,9 +4,9 @@
 
 The current cumulative package ships three active integrity manifests:
 
-- `SHA256SUMS.txt` covers every regular package file except itself.
-- `V14_SHA256SUMS.txt` covers the cumulative package except itself and the generic root manifest. It includes the current V15 manifest.
-- `V15_SHA256SUMS.txt` covers the cumulative package except itself, the V14 manifest, and the generic root manifest.
+- `SHA256SUMS.txt` covers current package files except the three current manifest files.
+- `V15_SHA256SUMS.txt` covers the package except itself and the V14 manifest; it includes the generic root manifest.
+- `V14_SHA256SUMS.txt` covers every package file except itself, including the root and V15 manifests. This preserves the inherited V14 package-doctor contract.
 
 This dependency order avoids circular checksums. Verify the current package from its root with:
 
@@ -16,7 +16,7 @@ sha256sum --check V14_SHA256SUMS.txt
 sha256sum --check V15_SHA256SUMS.txt
 ```
 
-The package integration tool regenerates all three manifests only after documentation, inventory, skills, schemas, and examples are finalized.
+The package integration tool regenerates all three manifests in dependency order only after documentation, inventory, skills, schemas, and examples are finalized.
 
 ## Historical manifests
 

@@ -51,7 +51,7 @@ The V14 Test Runner plugin and disposable fixture require execution inside Roblo
 
 ## Package integrity manifests
 
-`SHA256SUMS.txt` covers the complete current package except itself. `V14_SHA256SUMS.txt` and `V15_SHA256SUMS.txt` are the current version-layer manifests and omit the generic root manifest to avoid checksum cycles. V6–V13 manifests are historical snapshots; use the three current manifests above for this release.
+`SHA256SUMS.txt` covers the current package except the three current manifests. `V15_SHA256SUMS.txt` covers the package except itself and the V14 manifest; it includes the root manifest. `V14_SHA256SUMS.txt` covers every package file except itself, including both other current manifests. This dependency order avoids checksum cycles and preserves the inherited V14 package-doctor contract. V6–V13 manifests are historical snapshots; use the three current manifests above for this release.
 
 ## Release and provenance
 
@@ -200,15 +200,16 @@ File integrity and static validation do not prove Roblox Studio runtime behavior
                 raise ValueError(f"Checksum verification failed: {rel}")
         return len(entries)
 
-    # Avoid cycles:
-    # V15 excludes V14/V15/root; V14 excludes V14/root; root covers V14 and V15.
-    v15_count = write_manifest(v15_sums, {v14_sums, v15_sums, root_sums})
-    v14_count = write_manifest(v14_sums, {v14_sums, root_sums})
-    root_count = write_manifest(root_sums, {root_sums})
+    # Avoid cycles while preserving the inherited V14 doctor contract:
+    # root excludes all three current manifests; V15 excludes itself and V14;
+    # V14 excludes only itself and therefore covers the root and V15 manifests.
+    v15_count = write_manifest(v15_sums, {v14_sums, v15_sums})
+    v14_count = write_manifest(v14_sums, {v14_sums})
+    root_count = write_manifest(root_sums, {root_sums, v14_sums, v15_sums})
     expected = {
-        "Root SHA256SUMS.txt entries": total - 1,
-        "V14_SHA256SUMS.txt entries": total - 2,
-        "V15_SHA256SUMS.txt entries": total - 3,
+        "Root SHA256SUMS.txt entries": total - 3,
+        "V14_SHA256SUMS.txt entries": total - 1,
+        "V15_SHA256SUMS.txt entries": total - 2,
     }
     actual = {
         "Root SHA256SUMS.txt entries": root_count,

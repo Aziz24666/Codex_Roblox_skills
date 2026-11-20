@@ -17,9 +17,9 @@ import yaml
 from referencing import Registry, Resource
 
 CURRENT_MANIFESTS = {
-    "SHA256SUMS.txt": {"SHA256SUMS.txt"},
-    "V14_SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt"},
-    "V15_SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V15_SHA256SUMS.txt"},
+    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V15_SHA256SUMS.txt"},
+    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
+    "V15_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V15_SHA256SUMS.txt"},
 }
 EXPECTED_SKILL_COUNT = 143
 EXPECTED_V15_SKILLS = {
