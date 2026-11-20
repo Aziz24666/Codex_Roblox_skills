@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse
 import hashlib
+import json
 import re
 import shutil
 from pathlib import Path
@@ -38,15 +39,23 @@ From the extracted package root, run:
     python v15/tools/v15_validate.py --root v15
     python -m unittest discover -s v15/tests -v
     python tools/v14_pack_doctor.py .
+    python -m pip install --requirement requirements-ci.txt
+    python v15/tools/audit_cumulative_package.py --root .
+    sha256sum --check SHA256SUMS.txt
+    sha256sum --check V14_SHA256SUMS.txt
     sha256sum --check V15_SHA256SUMS.txt
 
 ## Studio and runtime evidence
 
 The V14 Test Runner plugin and disposable fixture require execution inside Roblox Studio. CI compilation and Rojo builds do not launch Studio playtests. Device simulation is not physical-device testing, and a local mock is not a live DataStore or production-service test. Use NOT_RUN or BLOCKED for checks that were not executed.
 
+## Package integrity manifests
+
+`SHA256SUMS.txt` covers the complete current package except itself. `V14_SHA256SUMS.txt` and `V15_SHA256SUMS.txt` are the current version-layer manifests and omit the generic root manifest to avoid checksum cycles. V6–V13 manifests are historical snapshots; use the three current manifests above for this release.
+
 ## Release and provenance
 
-GitHub Actions validates V15 metadata/contracts, runs regression tests, compiles Python, reconstructs the cumulative V14 package, applies V15, generates package inventory and both checksum manifests, and builds ZIP/TAR.XZ archives. The V14 workflow separately compiles Luau and builds the sample experience, Content Factory plugin, Test Runner plugin, and disposable test fixture.
+GitHub Actions validates all installed skill YAML frontmatter, V15 metadata/contracts, schemas and examples, runs regression tests, compiles Python, reconstructs the cumulative V14 package, applies V15, runs the cumulative package audit, generates package inventory and all three current checksum manifests, and builds ZIP/TAR.XZ archives. The V14 workflow separately compiles Luau and builds the sample experience, Content Factory plugin, Test Runner plugin, and disposable test fixture.
 
 ## License and affiliation
 
@@ -99,34 +108,62 @@ def clean_generated_python_artifacts(package_root: Path) -> int:
     return removed
 
 
+def normalize_invalid_skill_descriptions(package_root: Path) -> int:
+    """Quote plain YAML descriptions containing a colon-space sequence."""
+    changed = 0
+    skill_root = package_root / ".agents" / "skills"
+    for path in sorted(skill_root.glob("*/SKILL.md")):
+        content = path.read_text(encoding="utf-8")
+        if not content.startswith("---\\n"):
+            raise ValueError(f"{path}: missing YAML frontmatter opener")
+        end = content.find("\\n---\\n", 4)
+        if end < 0:
+            raise ValueError(f"{path}: missing YAML frontmatter closer")
+        front = content[4:end]
+        lines = front.splitlines()
+        updated = []
+        for line in lines:
+            match = re.match(r"^(description:\\s*)(.*)$", line)
+            if match and ": " in match.group(2) and not match.group(2).startswith(('"', "'", "|", ">")):
+                line = match.group(1) + json.dumps(match.group(2), ensure_ascii=False)
+                changed += 1
+            updated.append(line)
+        if updated != lines:
+            path.write_text(content[:4] + "\\n".join(updated) + content[end:], encoding="utf-8")
+    return changed
+
+
 def generate_inventory_and_checksums(package_root: Path, version: str) -> None:
     inventory_path = package_root / "PACKAGE_INVENTORY.md"
+    root_sums = package_root / "SHA256SUMS.txt"
     v14_sums = package_root / "V14_SHA256SUMS.txt"
     v15_sums = package_root / "V15_SHA256SUMS.txt"
-    for manifest in (v14_sums, v15_sums):
+    for manifest in (root_sums, v14_sums, v15_sums):
         if not manifest.exists():
             manifest.write_text("", encoding="utf-8")
-    excluded = {".git", "__pycache__", "node_modules", ".venv"}
+    excluded_dirs = {".git", "__pycache__", "node_modules", ".venv"}
     files = sorted(p for p in package_root.rglob("*") if p.is_file()
-                   and not any(part in excluded for part in p.parts))
-    skill_count = len(list((package_root / ".agents" / "skills").rglob("SKILL.md")))
+                   and not any(part in excluded_dirs for part in p.parts))
+    skill_count = len(list((package_root / ".agents" / "skills").glob("*/SKILL.md")))
+    total = len(files)
     counts = {
-        "Specialist skills (SKILL.md)": skill_count,
+        "Installed native Codex skills": skill_count,
         "Documentation Markdown files in docs/": len(list((package_root / "docs").rglob("*.md"))),
         "All Markdown files": len(list(package_root.rglob("*.md"))),
         "Prompt files": len([p for p in (package_root / "prompts").rglob("*") if p.is_file()]),
         "Template files": len([p for p in (package_root / "templates").rglob("*") if p.is_file()]),
-        "Top-level JSON schemas": len(list((package_root / "schemas").glob("*.json"))),
+        "Top-level JSON schemas": len(list((package_root / "schemas").glob("*.schema.json"))),
         "JSON files total": len(list(package_root.rglob("*.json"))),
         "Top-level Python tools": len(list((package_root / "tools").glob("*.py"))),
         "Python files total": len(list(package_root.rglob("*.py"))),
         "Luau source files": len([p for p in package_root.rglob("*") if p.suffix.lower() in {".lua", ".luau"}]),
         "Active GitHub Actions workflows": len(list((package_root / ".github" / "workflows").glob("*.yml"))) + len(list((package_root / ".github" / "workflows").glob("*.yaml"))),
-        "Total regular files (including both checksum manifests)": len(files),
-        "V14 SHA-256 manifest entries": len(files) - 1,
-        "V15 SHA-256 manifest entries": len(files) - 2,
+        "Total regular files (including three current checksum manifests)": total,
+        "Root SHA256SUMS.txt entries": total - 1,
+        "V14_SHA256SUMS.txt entries": total - 2,
+        "V15_SHA256SUMS.txt entries": total - 3,
     }
-    rows = "\n".join(f"| {label} | {value} |" for label, value in counts.items())
+    rows = "\\n".join(f"| {label} | {value} |" for label, value in counts.items())
     inventory = f"""# Roblox Codex Game Studio Kit — V{version} Package Inventory
 
 This inventory is generated from the final cumulative package tree. Counts exclude .git, __pycache__, node_modules, and .venv.
@@ -139,34 +176,48 @@ This inventory is generated from the final cumulative package tree. Counts exclu
 
 ## V15 additions
 - Eight native Codex skills copied into .agents/skills/.
-- Project manifest, task evaluation, and runtime evidence contracts and examples.
-- V15 validator, regression suite, package integration tool, and dual checksum manifests.
-- V15 index, implementation pipeline, and quality-gate documentation.
+- Project manifest, task evaluation, runtime evidence, and legacy V9 collection-schema contracts and examples.
+- V15 validator, cumulative-package audit, regression suite, package integration tool, and three current checksum manifests.
+- V15 index, implementation pipeline, package-integrity guide, and quality-gate documentation.
 
 ## Evidence boundary
-File integrity and Python/schema validation do not prove Roblox Studio runtime behavior. Studio playtests, multiplayer execution, device checks, live DataStore behavior, asset permissions, and production operations require separate execution and evidence.
+File integrity and static validation do not prove Roblox Studio runtime behavior. Studio playtests, multiplayer execution, device checks, live DataStore behavior, asset permissions, and production operations require separate execution and evidence.
 """
     inventory_path.write_text(inventory, encoding="utf-8")
-    # Avoid circular checksums: V15 omits both manifests; V14 includes V15's manifest.
+
     def write_manifest(path: Path, excluded_manifests: set[Path]) -> int:
         entries = []
         for target in sorted(p for p in package_root.rglob("*") if p.is_file()
                               and p not in excluded_manifests
-                              and not any(part in excluded for part in p.parts)):
+                              and not any(part in excluded_dirs for part in p.parts)):
             digest = hashlib.sha256(target.read_bytes()).hexdigest()
             entries.append(f"{digest}  {target.relative_to(package_root).as_posix()}")
-        path.write_text("\n".join(entries) + "\n", encoding="utf-8")
+        path.write_text("\\n".join(entries) + "\\n", encoding="utf-8")
         for entry in entries:
             digest, rel = entry.split("  ", 1)
             target = package_root / rel
             if hashlib.sha256(target.read_bytes()).hexdigest() != digest:
                 raise ValueError(f"Checksum verification failed: {rel}")
         return len(entries)
-    v15_count = write_manifest(v15_sums, {v14_sums, v15_sums})
-    v14_count = write_manifest(v14_sums, {v14_sums})
-    if v15_count != counts["V15 SHA-256 manifest entries"] or v14_count != counts["V14 SHA-256 manifest entries"]:
-        raise ValueError("Checksum entry count does not match package inventory")
-    print(f"Generated inventory for {len(files)} files; verified {v14_count} V14 and {v15_count} V15 SHA-256 entries.")
+
+    # Avoid cycles:
+    # V15 excludes V14/V15/root; V14 excludes V14/root; root covers V14 and V15.
+    v15_count = write_manifest(v15_sums, {v14_sums, v15_sums, root_sums})
+    v14_count = write_manifest(v14_sums, {v14_sums, root_sums})
+    root_count = write_manifest(root_sums, {root_sums})
+    expected = {
+        "Root SHA256SUMS.txt entries": total - 1,
+        "V14_SHA256SUMS.txt entries": total - 2,
+        "V15_SHA256SUMS.txt entries": total - 3,
+    }
+    actual = {
+        "Root SHA256SUMS.txt entries": root_count,
+        "V14_SHA256SUMS.txt entries": v14_count,
+        "V15_SHA256SUMS.txt entries": v15_count,
+    }
+    if actual != expected:
+        raise ValueError(f"Checksum entry counts do not match package inventory: {actual} != {expected}")
+    print(f"Generated inventory for {total} files; verified root={root_count}, V14={v14_count}, V15={v15_count} SHA-256 entries.")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -183,6 +234,11 @@ def main():
         if source.is_dir():
             shutil.copytree(source, target_skills / source.name, dirs_exist_ok=True)
     shutil.copy2(ROOT / "INDEX_V15.md", package_root / "INDEX_V15.md")
+    shutil.copy2(ROOT / "schemas" / "v9-editor-field-descriptors.schema.json", package_root / "schemas" / "v9-editor-field-descriptors.schema.json")
+    shutil.copy2(ROOT / "examples" / "v9-editor-field-descriptors.example.json", package_root / "schemas" / "examples" / "v9-editor-field-descriptors.example.json")
+    shutil.copy2(ROOT / "docs" / "PACKAGE_INTEGRITY.md", package_root / "docs" / "PACKAGE_INTEGRITY.md")
+    skill_descriptions_fixed = normalize_invalid_skill_descriptions(package_root)
+    print(f"Quoted {skill_descriptions_fixed} YAML skill descriptions requiring explicit quoting.")
     removed = clean_generated_python_artifacts(package_root)
     print(f"Removed {removed} generated Python cache entries before checksumming.")
     update_agents(package_root)

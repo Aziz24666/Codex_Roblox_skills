@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox/v9-editor-field-descriptors.schema.json",
+  "title": "V9 Editor Field Descriptor Collection",
+  "description": "An ordered collection of V9 editor field descriptors.",
+  "type": "array",
+  "minItems": 1,
+  "items": {
+    "$ref": "https://example.invalid/roblox/v9-field-descriptor.schema.json"
+  }
+}

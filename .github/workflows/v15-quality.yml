@@ -2,18 +2,18 @@ name: V15 development-system quality
 
 on:
   push:
-    branches: [main, v15-0-2-package-doctor-fix, v15-0-3-cache-cleanup]
+    branches: [main, v15-0-2-package-doctor-fix, v15-0-3-cache-cleanup, v15-0-4-full-audit-fixes]
     paths:
       - 'v15/**'
       - '.github/workflows/v15-quality.yml'
       - 'README.md'
-      - 'RELEASE_NOTES_V15_0_3.md'
+      - 'RELEASE_NOTES_V15_0_4.md'
   pull_request:
     paths:
       - 'v15/**'
       - '.github/workflows/v15-quality.yml'
       - 'README.md'
-      - 'RELEASE_NOTES_V15_0_3.md'
+      - 'RELEASE_NOTES_V15_0_4.md'
   workflow_dispatch:
 
 permissions:
@@ -78,7 +78,7 @@ jobs:
           mv "$work/roblox-codex-game-studio-kit-v13" "$work/roblox-codex-game-studio-kit-v15"
           tar -xJf "$overlay" -C "$work/roblox-codex-game-studio-kit-v15"
           cp -a v15 "$work/roblox-codex-game-studio-kit-v15/"
-          cp RELEASE_NOTES_V15_0_3.md "$work/roblox-codex-game-studio-kit-v15/"
+          cp RELEASE_NOTES_V15_0_4.md "$work/roblox-codex-game-studio-kit-v15/"
           PACKAGE_ROOT="$work/roblox-codex-game-studio-kit-v15"
           python v15/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
           python -m pip install --disable-pip-version-check --requirement "$PACKAGE_ROOT/requirements-ci.txt"
@@ -93,7 +93,8 @@ jobs:
             echo "Generated Python cache files must not be included in the release package."
             exit 1
           fi
-          (cd "$PACKAGE_ROOT" && sha256sum --check V14_SHA256SUMS.txt && sha256sum --check V15_SHA256SUMS.txt)
+          python "$PACKAGE_ROOT/v15/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          (cd "$PACKAGE_ROOT" && sha256sum --check SHA256SUMS.txt && sha256sum --check V14_SHA256SUMS.txt && sha256sum --check V15_SHA256SUMS.txt)
           echo "PACKAGE_ROOT=$PACKAGE_ROOT" >> "$GITHUB_ENV"
       - name: Create cumulative V15 archives and compare contents
         run: |
@@ -113,6 +114,8 @@ jobs:
           test -f "$RUNNER_TEMP/package-check-zip/$name/.agents/skills/roblox-project-intelligence/SKILL.md"
           test -f "$RUNNER_TEMP/package-check-zip/$name/INDEX_V15.md"
           test -f "$RUNNER_TEMP/package-check-zip/$name/V15_SHA256SUMS.txt"
+          test -f "$RUNNER_TEMP/package-check-zip/$name/SHA256SUMS.txt"
+          test -f "$RUNNER_TEMP/package-check-zip/$name/schemas/v9-editor-field-descriptors.schema.json"
           if find "$RUNNER_TEMP/package-check-zip/$name" \( -type d -name '__pycache__' -o -type f \( -name '*.pyc' -o -name '*.pyo' \) \) -print -quit | grep -q .; then
             echo "Release archive contains Python cache files."
             exit 1
@@ -165,5 +168,5 @@ jobs:
             "$RUNNER_TEMP/roblox-codex-game-studio-kit-${TAG}.zip" \
             "$RUNNER_TEMP/roblox-codex-game-studio-kit-${TAG}.tar.xz" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "V15.0.3 — Roblox Codex Game Studio Kit" \
-            --notes-file RELEASE_NOTES_V15_0_3.md
+            --title "V15.0.4 — Roblox Codex Game Studio Kit" \
+            --notes-file RELEASE_NOTES_V15_0_4.md
