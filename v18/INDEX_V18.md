@@ -1,6 +1,6 @@
 # Roblox Codex Game Studio Kit — V18 Index
 
-V18 adds a connected development control plane to the complete V1–V17 package. The package includes 175 native Codex skills after integration. V18 focuses on workflow automation, task graphs, shared contracts, agent coordination, validation, safe autonomy, and evidence-backed completion.
+V18 adds a connected development control plane to the complete V1–V17 package. After integration, the cumulative package includes 179 native Codex skills. V18 adds 16 skills: 12 workflow/orchestration specialists and four economy/monetization specialists, alongside task graphs, shared contracts, agent coordination, validation, safe autonomy, and evidence-backed completion.
 
 ## Start here
 - Root `AGENTS.md` — operating contract.
@@ -24,6 +24,14 @@ V18 adds a connected development control plane to the complete V1–V17 package.
 - `$roblox-risk-and-approval-gating` — preserves user control of external side effects.
 - `$roblox-workflow-state-and-context-handoff` — validated task/project state across sessions.
 - `$roblox-evidence-first-completion` — truthful completion and release reporting.
+
+## V18 economy and monetization specialists
+- `$roblox-player-friendly-monetization` — mandatory no-gambling policy and transparent monetization strategy.
+- `$roblox-deterministic-progression-shop` — fixed catalogs, explicit prices, exact grants, and idempotent fulfillment.
+- `$roblox-tiered-catalog-progression` — all required items in every earlier tier must be owned before the next tier unlocks; required items need a non-Robux route.
+- `$roblox-earned-currency-economy` — predictable gameplay earnings, server-authoritative balances, and auditable transactions.
+
+Read `docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md` before any store, economy, currency, or monetization work. Paid random outcomes and gambling-like mechanics are prohibited by V18.
 
 ## Existing specialists by domain
 Use the generated `v18/data/skill-registry.json` and `v18/workflow/skill-routing.json` as routing aids. Major domains include core game development; architecture; UI/input/accessibility; character/avatar/animation; multiplayer/networking/security; data/persistence/economy; NPC/gameplay; assets/content/procedural world; Studio/plugins/MCP; QA/performance; analytics/liveops; research/reference originality; and CI/release.
