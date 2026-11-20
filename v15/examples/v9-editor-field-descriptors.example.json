@@ -1,0 +1,35 @@
+[
+  {
+    "path": "id",
+    "label": "Definition ID",
+    "kind": "identifier",
+    "default": "SampleOne",
+    "required": true
+  },
+  {
+    "path": "movement.walkSpeed",
+    "label": "Walk speed",
+    "kind": "number",
+    "default": 10,
+    "min": 0,
+    "max": 24
+  },
+  {
+    "path": "behavior",
+    "label": "Behavior",
+    "kind": "enum",
+    "default": "Patrol",
+    "options": [
+      "Wander",
+      "Patrol",
+      "Guide"
+    ]
+  },
+  {
+    "path": "presentation.idleAnimationAssetId",
+    "label": "Idle animation",
+    "kind": "assetId",
+    "default": "",
+    "assetKind": "Animation"
+  }
+]

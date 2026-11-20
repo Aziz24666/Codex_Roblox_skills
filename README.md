@@ -4,17 +4,17 @@
 [![V15 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v15-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v15-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A research-first, cumulative Roblox game-development toolkit for Codex. **The current release is V15.0.3**, which includes the complete V1–V14 package plus eight native Codex skills and a project-aware implementation/verification layer.
+A research-first, cumulative Roblox game-development toolkit for Codex. **The current release is V15.0.4**, which includes the complete V1–V14 package plus eight native Codex skills and a project-aware implementation/verification layer.
 
 ## Get the package
 
-**[Download V15.0.3 ZIP and TAR.XZ from GitHub Releases](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v15.0.2)**
+**[Download V15.0.4 ZIP and TAR.XZ from GitHub Releases](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v15.0.4)**
 
 V15 is cumulative. You do not need to download earlier versions separately.
 
 ## What's included
 
-- **144 native Codex skills**: 136 existing specialist skills plus eight V15 skills installed under .agents/skills/.
+- **143 native Codex skills**, including eight V15 specialist skills installed under .agents/skills/.
 - **Project intelligence**: inspect the existing project's source of truth, entry points, architecture, dependencies, and toolchain before editing.
 - **Skill orchestration**: select the smallest relevant set of specialists instead of loading the entire library.
 - **Acceptance-driven implementation**: deliver complete vertical slices with observable acceptance criteria and explicit failure paths.
@@ -25,7 +25,7 @@ V15 is cumulative. You do not need to download earlier versions separately.
 
 ## Quick start with Codex
 
-1. Download and extract the V15.0.3 package.
+1. Download and extract the V15.0.4 package.
 2. Open the extracted package root in Codex.
 3. Read AGENTS.md and INDEX_V15.md.
 4. Use $roblox-game-builder as the main orchestrator.
@@ -38,6 +38,10 @@ From the extracted package root:
 
     python v15/tools/v15_validate.py --root v15
     python -m unittest discover -s v15/tests -v
+    python -m pip install --requirement requirements-ci.txt
+    python v15/tools/audit_cumulative_package.py --root .
+    sha256sum --check SHA256SUMS.txt
+    sha256sum --check V14_SHA256SUMS.txt
     sha256sum --check V15_SHA256SUMS.txt
 
 ## What CI proves — and what it does not
@@ -52,7 +56,8 @@ The separate V14 workflow compiles inherited Lua/Luau sources and builds the sam
 - [V15 layer overview](v15/README.md)
 - [V15 implementation pipeline](v15/docs/IMPLEMENTATION_PIPELINE.md)
 - [V15 quality gates](v15/docs/QUALITY_GATES.md)
-- [V15 corrective release notes](RELEASE_NOTES_V15_0_3.md)
+- [V15.0.4 corrective release notes](RELEASE_NOTES_V15_0_4.md)
+- [V15 package integrity policy](v15/docs/PACKAGE_INTEGRITY.md)
 - [V14 index](INDEX_V14.md)
 - [MIT License](LICENSE)
 

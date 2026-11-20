@@ -7,7 +7,8 @@ V15 is cumulative. It includes all V1–V14 material plus eight native Codex ski
 - README.md — installation, package validation, and capability boundaries.
 - INDEX_V15.md — current skill and reference routing.
 - PACKAGE_INVENTORY.md — generated package counts.
-- V15_SHA256SUMS.txt — per-file integrity manifest.
+- SHA256SUMS.txt, V14_SHA256SUMS.txt, and V15_SHA256SUMS.txt — current per-file integrity manifests.
+- v15/docs/PACKAGE_INTEGRITY.md — manifest coverage and historical checksum policy.
 - v15/README.md — V15 layer overview and validation commands.
 
 ## V15 Codex skills
@@ -25,9 +26,10 @@ The following native skills are installed in .agents/skills/ in the extracted pa
 ## V15 references and contracts
 - v15/docs/IMPLEMENTATION_PIPELINE.md — end-to-end project workflow.
 - v15/docs/QUALITY_GATES.md — quality gates and evidence vocabulary.
-- v15/schemas/ — project manifest, task evaluation, and runtime evidence schemas.
+- v15/schemas/ — project manifest, task evaluation, runtime evidence, and V9 collection schemas.
 - v15/examples/ — illustrative manifests, benchmark tasks, evaluation, and NOT_RUN evidence.
 - v15/tools/v15_validate.py — V15 contract and native-skill validator.
+- v15/tools/audit_cumulative_package.py — full installed-skill, schema, source-syntax, link, and checksum audit.
 - v15/tools/patch_cumulative_package.py — package integration, inventory, and checksum generation.
 
 ## V14 Studio testing
