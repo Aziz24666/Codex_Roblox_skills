@@ -11,7 +11,7 @@ V15.0.4 fixes defects identified by a full file-level audit of the published V15
 - Quotes the three installed V14 skill descriptions that had invalid YAML frontmatter.
 - Adds a CI audit that parses all 143 installed Codex skill frontmatters, checks unique names and folder agreement, validates description length, and compares all eight V15 source skills with their installed copies.
 - Regenerates the unversioned root `SHA256SUMS.txt` as a complete current-package manifest.
-- Defines a non-circular checksum policy: the root manifest covers all other files; V14 excludes itself and the root manifest; V15 excludes itself, V14, and the root manifest.
+- Defines a non-circular checksum policy: the root manifest covers package content except the three current manifests; V15 excludes itself and V14 but includes the root manifest; V14 excludes only itself and therefore includes the root and V15 manifests.
 - Documents V6–V13 manifests as historical snapshots, not current integrity manifests.
 - Adds a V9 editor-field collection schema referencing the existing single-field schema and validates the existing collection example against it.
 - Adds cumulative-package checks for JSON, JSON Schema, YAML, Python, TOML, CSV, Markdown local paths, zero-byte files, generated caches, and all current checksums.
