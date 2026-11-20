@@ -19,6 +19,7 @@
 - YAML frontmatter includes a unique valid name and useful description.
 - Skill names match folder names and stay within naming constraints.
 - Instructions define triggers, inputs, a concrete procedure, pitfalls, and a verification/output contract.
+- Every V15 skill contains the mandatory current-source research gate and does not invent citations.
 - The cumulative package copies skills into .agents/skills/.
 
 ## Gate D — Security

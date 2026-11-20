@@ -2,18 +2,18 @@ name: V15 development-system quality
 
 on:
   push:
-    branches: [main, v15-0-2-package-doctor-fix]
+    branches: [main, v15-0-2-package-doctor-fix, v15-0-3-cache-cleanup]
     paths:
       - 'v15/**'
       - '.github/workflows/v15-quality.yml'
       - 'README.md'
-      - 'RELEASE_NOTES_V15_0_2.md'
+      - 'RELEASE_NOTES_V15_0_3.md'
   pull_request:
     paths:
       - 'v15/**'
       - '.github/workflows/v15-quality.yml'
       - 'README.md'
-      - 'RELEASE_NOTES_V15_0_2.md'
+      - 'RELEASE_NOTES_V15_0_3.md'
   workflow_dispatch:
 
 permissions:
@@ -65,6 +65,8 @@ jobs:
         with:
           persist-credentials: false
       - name: Reconstruct cumulative V14 and apply V15
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
         run: |
           set -euo pipefail
           work="$RUNNER_TEMP/v15-source"
@@ -76,13 +78,22 @@ jobs:
           mv "$work/roblox-codex-game-studio-kit-v13" "$work/roblox-codex-game-studio-kit-v15"
           tar -xJf "$overlay" -C "$work/roblox-codex-game-studio-kit-v15"
           cp -a v15 "$work/roblox-codex-game-studio-kit-v15/"
-          cp RELEASE_NOTES_V15_0_2.md "$work/roblox-codex-game-studio-kit-v15/"
+          cp RELEASE_NOTES_V15_0_3.md "$work/roblox-codex-game-studio-kit-v15/"
           PACKAGE_ROOT="$work/roblox-codex-game-studio-kit-v15"
           python v15/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
-          python "$PACKAGE_ROOT/tools/v14_pack_doctor.py" "$PACKAGE_ROOT"
-          python "$PACKAGE_ROOT/v15/tools/v15_validate.py" --root "$PACKAGE_ROOT/v15"
+          python -m pip install --disable-pip-version-check --requirement "$PACKAGE_ROOT/requirements-ci.txt"
           python -m unittest discover -s "$PACKAGE_ROOT/v15/tests" -v
-          (cd "$PACKAGE_ROOT" && sha256sum --check V15_SHA256SUMS.txt)
+          (cd "$PACKAGE_ROOT" && PYTHONPATH="$PACKAGE_ROOT" python -m unittest discover -s tools/tests -v)
+          python "$PACKAGE_ROOT/tools/v14_pack_doctor.py" "$PACKAGE_ROOT"
+          # The inherited package doctor byte-compiles Python sources; remove those
+          # generated caches and rebuild package metadata/checksums as the final step.
+          python v15/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v15/tools/v15_validate.py" --root "$PACKAGE_ROOT/v15"
+          if find "$PACKAGE_ROOT" \( -type d -name '__pycache__' -o -type f \( -name '*.pyc' -o -name '*.pyo' \) \) -print -quit | grep -q .; then
+            echo "Generated Python cache files must not be included in the release package."
+            exit 1
+          fi
+          (cd "$PACKAGE_ROOT" && sha256sum --check V14_SHA256SUMS.txt && sha256sum --check V15_SHA256SUMS.txt)
           echo "PACKAGE_ROOT=$PACKAGE_ROOT" >> "$GITHUB_ENV"
       - name: Create cumulative V15 archives and compare contents
         run: |
@@ -102,6 +113,10 @@ jobs:
           test -f "$RUNNER_TEMP/package-check-zip/$name/.agents/skills/roblox-project-intelligence/SKILL.md"
           test -f "$RUNNER_TEMP/package-check-zip/$name/INDEX_V15.md"
           test -f "$RUNNER_TEMP/package-check-zip/$name/V15_SHA256SUMS.txt"
+          if find "$RUNNER_TEMP/package-check-zip/$name" \( -type d -name '__pycache__' -o -type f \( -name '*.pyc' -o -name '*.pyo' \) \) -print -quit | grep -q .; then
+            echo "Release archive contains Python cache files."
+            exit 1
+          fi
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: roblox-codex-game-studio-kit-v15
@@ -150,5 +165,5 @@ jobs:
             "$RUNNER_TEMP/roblox-codex-game-studio-kit-${TAG}.zip" \
             "$RUNNER_TEMP/roblox-codex-game-studio-kit-${TAG}.tar.xz" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "V15.0.2 — Roblox Codex Game Studio Kit" \
-            --notes-file RELEASE_NOTES_V15_0_2.md
+            --title "V15.0.3 — Roblox Codex Game Studio Kit" \
+            --notes-file RELEASE_NOTES_V15_0_3.md
