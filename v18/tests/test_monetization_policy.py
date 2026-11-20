@@ -30,7 +30,7 @@ class MonetizationPolicyTests(unittest.TestCase):
     def test_shop_and_currency_are_fixed_and_auditable(self):
         shop = (SKILLS / "roblox-deterministic-progression-shop" / "SKILL.md").read_text(encoding="utf-8").lower()
         economy = (SKILLS / "roblox-earned-currency-economy" / "SKILL.md").read_text(encoding="utf-8").lower()
-        self.assertIn("fixed price", shop)
+        self.assertIn("exact final price", shop)
         self.assertIn("exactly the listed contents", shop)
         self.assertIn("fixed, documented amounts", economy)
         self.assertIn("idempotent", economy)
