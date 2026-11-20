@@ -4,11 +4,13 @@
 **Type:** cumulative workflow automation and interoperability upgrade  
 **License:** MIT
 
-V18 upgrades the cumulative Roblox Codex Game Studio Kit from a large collection of specialist skills into a coordinated development workflow. It retains V1–V17 and adds 12 V18 skills, shared cross-skill contracts, structured task state, dependency-aware planning, local automation tools, and stronger validation/approval boundaries.
+V18 upgrades the cumulative Roblox Codex Game Studio Kit from a large collection of specialist skills into a coordinated development workflow. It retains V1–V17 and adds 16 V18 skills (12 workflow/orchestration skills plus four economy and monetization specialists), shared cross-skill contracts, structured task state, dependency-aware planning, local automation tools, and stronger validation/approval boundaries.
 
 ## Highlights
 
-- Adds 12 specialist skills for end-to-end orchestration, task intake, project reconnaissance, impact-aware skill routing, cross-system contract governance, dependency-aware planning, bounded autonomous implementation, agent delegation, continuous validation/repair, risk and approval gating, context handoff, and evidence-first completion.
+- Adds 12 workflow/orchestration skills for end-to-end coordination, task intake, project reconnaissance, impact-aware routing, cross-system contracts, dependency planning, bounded implementation, delegation, continuous validation/repair, risk/approval gating, context handoff, and evidence-first completion.
+- Adds four economy specialists for transparent player-friendly monetization, deterministic shops, tiered catalog progression, and gameplay-earned currency. V18 explicitly prohibits gambling-like mechanics and all paid random outcomes. Every required item in all earlier catalog tiers must be owned before the next tier unlocks, with a non-Robux acquisition route for required items.
+- Adds `v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md`, including official Roblox platform references and purchase-integrity requirements.
 - Applies the V18 shared handoff contract to the cumulative installed skill library so older specialists report scope, interfaces, changed files, checks, evidence, risks, blockers, and next ownership consistently.
 - Adds a task lifecycle and schemas for work items, project profiles, skill registry, and workflow evidence.
 - Adds deterministic routing configuration connecting existing skills across 14 domains.
