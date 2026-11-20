@@ -74,7 +74,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "175"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "179"
           test -s "$PACKAGE_ROOT/v18/data/skill-registry.json"
           test -s "$PACKAGE_ROOT/INDEX_V18.md"
           test -s "$PACKAGE_ROOT/RELEASE_NOTES_V18.md"
