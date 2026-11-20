@@ -31,9 +31,16 @@ class V18Tests(unittest.TestCase):
         self.assertEqual(order[0],'discovery')
         self.assertEqual(task['status'],'DRAFT')
 
+    def test_monetization_task_routes_to_all_economy_safety_specialists(self):
+        result=MODULE.route_task(PACKAGE_ROOT,'Design a Robux shop with game passes, developer products, subscriptions, fixed prices, and no gambling')
+        self.assertIn('economy',[domain['name'] for domain in result['domains']])
+        for name in ('roblox-player-friendly-monetization','roblox-deterministic-progression-shop',
+                     'roblox-tiered-catalog-progression','roblox-earned-currency-economy'):
+            self.assertIn(name,result['selected_skills'])
+
     def test_skill_frontmatter_is_well_formed(self):
         paths=sorted((V18_ROOT/'codex-skills').glob('*/SKILL.md'))
-        self.assertEqual(len(paths),12)
+        self.assertEqual(len(paths),16)
         for path in paths:
             name,desc,body=MODULE.parse_skill(path)
             self.assertEqual(name,path.parent.name)
