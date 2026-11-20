@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "task_id": "inventory-ui-slice",
+  "title": "Add inventory UI slice",
+  "task": "Add a responsive inventory UI for the existing server-owned inventory service.",
+  "status": "DRAFT",
+  "phase": "intake",
+  "goals": [
+    "Show owned items across supported inputs"
+  ],
+  "non_goals": [
+    "Change inventory persistence format"
+  ],
+  "assumptions": [
+    "Existing server inventory service remains authoritative"
+  ],
+  "impacted_domains": [
+    "ui",
+    "inventory",
+    "cross-platform"
+  ],
+  "selected_skills": [
+    "roblox-end-to-end-development-orchestrator",
+    "roblox-ui-ux",
+    "roblox-inventory-loadouts"
+  ],
+  "workstreams": [
+    {
+      "id": "discover",
+      "title": "Inspect current inventory contracts",
+      "owner": "project-reconnaissance",
+      "depends_on": [],
+      "owned_paths": [],
+      "status": "PENDING",
+      "outputs": [
+        "project map",
+        "inventory API contract"
+      ]
+    },
+    {
+      "id": "ui-slice",
+      "title": "Implement the inventory UI",
+      "owner": "ui-specialist",
+      "depends_on": [
+        "discover"
+      ],
+      "owned_paths": [
+        "src/client/InventoryUI"
+      ],
+      "status": "PENDING",
+      "outputs": [
+        "responsive inventory view"
+      ]
+    },
+    {
+      "id": "verify",
+      "title": "Verify UI and inventory integration",
+      "owner": "integration-owner",
+      "depends_on": [
+        "ui-slice"
+      ],
+      "owned_paths": [],
+      "status": "PENDING",
+      "outputs": [
+        "test evidence"
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "description": "Owned inventory items are displayed from the server-authoritative inventory state.",
+      "verification": "Studio playtest using a synthetic inventory fixture and a client/server contract test.",
+      "owner": "ui-slice",
+      "status": "PENDING",
+      "evidence": []
+    }
+  ],
+  "approvals": [],
+  "evidence": []
+}

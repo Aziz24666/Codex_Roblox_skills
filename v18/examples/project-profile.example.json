@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "root": ".",
+  "detected_at": "2026-11-20T15:00:00Z",
+  "source_of_truth": "rojo-managed",
+  "markers": [
+    "default.project.json",
+    "wally.toml"
+  ],
+  "tools": {
+    "python": {
+      "available": true,
+      "version": "3.13"
+    },
+    "rojo": {
+      "available": false
+    },
+    "luau-analyze": {
+      "available": false
+    }
+  },
+  "skills_count": 175,
+  "confidence": "medium",
+  "notes": [
+    "Illustrative data only; re-run doctor for a real project"
+  ]
+}

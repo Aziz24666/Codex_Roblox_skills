@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v18/skill-registry.schema.json",
+  "title": "V18 Installed Skill Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "skill_count", "skills"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "skill_count": {"type": "integer", "minimum": 1},
+    "skills": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["name", "description", "path", "domains", "role", "related_skills"], "properties": {
+      "name": {"type": "string", "pattern": "^[a-z0-9-]{1,64}$"},
+      "description": {"type": "string", "minLength": 1, "maxLength": 160},
+      "path": {"type": "string"},
+      "domains": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+      "role": {"enum": ["orchestrator", "specialist"]},
+      "related_skills": {"type": "array", "uniqueItems": true, "items": {"type": "string"}}
+    }}}
+  }
+}

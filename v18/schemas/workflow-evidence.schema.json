@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v18/workflow-evidence.schema.json",
+  "title": "V18 Workflow Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "work_item_id", "checks"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "work_item_id": {"type": "string"},
+    "checks": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["check_id", "status", "environment", "expected", "actual", "limitations"], "properties": {
+      "check_id": {"type": "string"},
+      "status": {"enum": ["PASS", "FAIL", "BLOCKED", "NOT_RUN", "NOT_APPLICABLE"]},
+      "environment": {"type": "string"},
+      "tool_version": {"type": "string"},
+      "build_identity": {"type": "string"},
+      "scenario": {"type": "string"},
+      "expected": {"type": "string"},
+      "actual": {"type": "string"},
+      "artifact_path": {"type": "string"},
+      "limitations": {"type": "array", "items": {"type": "string"}}
+    }}}
+  }
+}
