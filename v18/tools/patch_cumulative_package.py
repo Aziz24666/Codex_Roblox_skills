@@ -79,7 +79,8 @@ V17 manifests are historical snapshots in V18. The active manifests are `SHA256S
 - Maintain a task packet under `.codex/workflows/tasks/<task-id>/work-item.json`; define interfaces, data authority, dependencies, and exclusive file ownership before coupled edits.
 - Execute bounded implementation and repair loops; delegate only independent work when subagents are genuinely available.
 - Record checks honestly. Static/CI success is not a Roblox Studio playtest or live-service verification.
-- Stop for approval before publishing, deploying, changing production data/settings/permissions, uploading public assets, destructive changes, or spending.\n- Enforce the V18 no-gambling rule for every economy/store task: no paid random rewards, wagers, paid rerolls, or Robux-funded chance outcomes. Read `v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md` and route to all four V18 economy specialists.
+- Stop for approval before publishing, deploying, changing production data/settings/permissions, uploading public assets, destructive changes, or spending.
+- Enforce the V18 no-gambling rule for every economy/store task: no paid random rewards, wagers, paid rerolls, or Robux-funded chance outcomes. Read `v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md` and route to all four V18 economy specialists.
 - Read `v18/docs/AUTOMATED_WORKFLOW.md`, `v18/docs/SKILL_INTEROPERABILITY.md`, and `v18/docs/APPROVAL_BOUNDARIES.md`.
 '''
     if '## V18 connected automation and cross-skill workflow' not in text: text=text.rstrip()+section
