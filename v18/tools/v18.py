@@ -12,7 +12,9 @@ V18_SKILLS = {
  'roblox-cross-system-contract-governance','roblox-dependency-aware-workstream-planning',
  'roblox-autonomous-implementation-loop','roblox-agent-delegation-and-coordination',
  'roblox-continuous-validation-and-repair','roblox-risk-and-approval-gating',
- 'roblox-workflow-state-and-context-handoff','roblox-evidence-first-completion'}
+ 'roblox-workflow-state-and-context-handoff','roblox-evidence-first-completion',
+ 'roblox-player-friendly-monetization','roblox-deterministic-progression-shop',
+ 'roblox-tiered-catalog-progression','roblox-earned-currency-economy'}
 CONTRACT = '## V18 shared workflow and handoff contract'
 EXCLUDED = {'.git','.venv','node_modules','__pycache__','.pytest_cache','.mypy_cache','.ruff_cache','target','build'}
 
