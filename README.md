@@ -11,8 +11,9 @@ The complete package will be attached to the [V18.0.0 GitHub Release](https://gi
 
 ## What's included
 
-- **175 native Codex skills** spanning Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
-- **12 V18 orchestration skills** for task intake, end-to-end coordination, project reconnaissance, impact-aware routing, shared contracts, dependency planning, bounded autonomous implementation, delegation, continuous validation/repair, approval gates, context handoff, and evidence-first completion.
+- **179 native Codex skills** spanning Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
+- **16 V18 skills**: 12 workflow/orchestration skills plus four economy specialists for no-gambling monetization, deterministic shops, all-prior-tier ownership progression, and gameplay-earned currency.
+- A strict no-gambling policy: no paid random rewards, wagers, paid rerolls, or Robux-funded chance outcomes. Supported deterministic monetization includes cosmetics, game passes, guaranteed developer products, subscriptions, paid access, and private servers.
 - A shared handoff contract connecting the specialist skill library through one task lifecycle.
 - A generated machine-readable registry connecting skills by domain and related capability.
 - A local Python CLI for project inspection, task routing, work-item scaffolding, dependency validation, and package verification.
@@ -52,6 +53,7 @@ CI does **not** launch Roblox Studio. Studio playtests, multiplayer runtime chec
 - [Skill interoperability](v18/docs/SKILL_INTEROPERABILITY.md)
 - [Task contract and state machine](v18/docs/TASK_CONTRACT_AND_STATE_MACHINE.md)
 - [Approval boundaries](v18/docs/APPROVAL_BOUNDARIES.md)
+- [No-gambling and fair monetization policy](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
 - [V18 release notes](RELEASE_NOTES_V18.md)
 - [MIT License](LICENSE)
 
