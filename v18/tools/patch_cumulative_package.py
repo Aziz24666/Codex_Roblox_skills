@@ -51,7 +51,7 @@ def integrate(root):
             for p in sorted(source_dir.glob('*/SKILL.md')): add_contract(p)
     # Upgrade inherited audit to the current cumulative skill count and checksum set.
     audit=root/'v17/tools/audit_cumulative_package.py'
-    a=audit.read_text(encoding='utf-8').replace('EXPECTED_INSTALLED_SKILLS = 163','EXPECTED_INSTALLED_SKILLS = 175')
+    a=audit.read_text(encoding='utf-8').replace('EXPECTED_INSTALLED_SKILLS = 163','EXPECTED_INSTALLED_SKILLS = 179')
     old='''CURRENT_MANIFESTS = {
     "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
     "V17_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
@@ -79,7 +79,7 @@ V17 manifests are historical snapshots in V18. The active manifests are `SHA256S
 - Maintain a task packet under `.codex/workflows/tasks/<task-id>/work-item.json`; define interfaces, data authority, dependencies, and exclusive file ownership before coupled edits.
 - Execute bounded implementation and repair loops; delegate only independent work when subagents are genuinely available.
 - Record checks honestly. Static/CI success is not a Roblox Studio playtest or live-service verification.
-- Stop for approval before publishing, deploying, changing production data/settings/permissions, uploading public assets, destructive changes, or spending.
+- Stop for approval before publishing, deploying, changing production data/settings/permissions, uploading public assets, destructive changes, or spending.\n- Enforce the V18 no-gambling rule for every economy/store task: no paid random rewards, wagers, paid rerolls, or Robux-funded chance outcomes. Read `v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md` and route to all four V18 economy specialists.
 - Read `v18/docs/AUTOMATED_WORKFLOW.md`, `v18/docs/SKILL_INTEROPERABILITY.md`, and `v18/docs/APPROVAL_BOUNDARIES.md`.
 '''
     if '## V18 connected automation and cross-skill workflow' not in text: text=text.rstrip()+section
@@ -111,7 +111,7 @@ def finalize(root):
     fs=files(root); skill_count=len(list((root/'.agents/skills').glob('*/SKILL.md')))
     counts={'Installed native Codex skills':skill_count,'V18 specialist skills':len(list((root/'v18/codex-skills').glob('*/SKILL.md'))),'Markdown files':sum(p.suffix.lower()=='.md' for p in fs),'JSON files':sum(p.suffix.lower()=='.json' for p in fs),'Python files':sum(p.suffix.lower()=='.py' for p in fs),'Luau files':sum(p.suffix.lower() in {'.lua','.luau'} for p in fs),'GitHub Actions workflows':sum('.github/workflows' in p.as_posix() and p.suffix in {'.yml','.yaml'} for p in fs),'Total regular files including three active manifests':len(fs)}
     table='\n'.join(f'| {k} | {v} |' for k,v in counts.items())
-    (root/'PACKAGE_INVENTORY.md').write_text(f'# Roblox Codex Game Studio Kit — V{version} Package Inventory\n\nGenerated from the final cumulative package tree.\n\n| Category | Count |\n|---|---:|\n{table}\n\n## V18 additions\n- 12 native workflow/orchestration skills.\n- Shared handoff contract across all installed skills.\n- Local CLI, cross-skill registry, task and project schemas, examples, documentation, tests, and CI workflow.\n\n## Evidence boundary\nStatic/package validation does not prove Roblox Studio, multiplayer, device, live DataStore, purchase fulfillment, asset permission, or production behavior.\n',encoding='utf-8')
+    (root/'PACKAGE_INVENTORY.md').write_text(f'# Roblox Codex Game Studio Kit — V{version} Package Inventory\n\nGenerated from the final cumulative package tree.\n\n| Category | Count |\n|---|---:|\n{table}\n\n## V18 additions\n- 12 native workflow/orchestration skills and four economy/monetization specialists.\n- Mandatory no-gambling policy and deterministic shop, tier, and earned-currency requirements.\n- Shared handoff contract across all installed skills.\n- Local CLI, cross-skill registry, task and project schemas, examples, documentation, tests, and CI workflow.\n\n## Evidence boundary\nStatic/package validation does not prove Roblox Studio, multiplayer, device, live DataStore, purchase fulfillment, asset permission, or production behavior.\n',encoding='utf-8')
     (root/'README.md').write_text(f'''# Roblox Codex Game Studio Kit
 
 **Current cumulative release: V{version}.** This is the complete V1–V18 package; earlier versions do not need separate downloads.
@@ -125,7 +125,7 @@ def finalize(root):
 6. Create a task packet with `python v18/tools/v18.py plan --root . --task "..." --write`.
 
 ## V18 automation
-175 native skills, 12 new V18 orchestration skills, a shared handoff contract, cross-skill registry, task/dependency schemas, read-only project doctor, routing, planning, and validation tools. The CLI does not grant Codex MCP, subagents, Studio access, or permissions; those depend on the current environment.
+179 native skills, 12 new V18 orchestration skills plus four V18 economy/monetization specialists, a strict no-gambling policy, a shared handoff contract, cross-skill registry, task/dependency schemas, read-only project doctor, routing, planning, and validation tools. The CLI does not grant Codex MCP, subagents, Studio access, or permissions; those depend on the current environment.
 
 ## Validation
 Run `python v18/tools/v18.py validate --root .` and `python v18/tools/v18.py verify --root .`. CI does not launch Roblox Studio. Studio, multiplayer, device, live-service, purchase-fulfillment, and production checks require their real environments and evidence.
@@ -135,7 +135,7 @@ MIT. This independent community toolkit is not affiliated with or endorsed by Ro
 ''',encoding='utf-8')
     checks=manifests(root)
     print(f'Removed {removed} cache entries; inventory files={len(files(root))}; skills={skill_count}; manifests={checks}')
-    if skill_count!=175: raise ValueError(f'Expected 175 installed skills; found {skill_count}')
+    if skill_count!=179: raise ValueError(f'Expected 179 installed skills; found {skill_count}')
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--package-root',type=Path,required=True); p.add_argument('--finalize-only',action='store_true'); a=p.parse_args(); root=a.package_root.resolve()
