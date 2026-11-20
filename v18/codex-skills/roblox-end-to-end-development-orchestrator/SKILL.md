@@ -15,6 +15,16 @@ description: Coordinate the complete Roblox task lifecycle from intake and proje
 ## Mandatory current-source research gate
 Before changing Roblox APIs, Studio behavior, toolchains, security, persistence, monetization, or external integrations, re-check current official Roblox Creator Hub/API documentation and upstream tool documentation. Record exact URLs, accessed date, claims, decision, alternatives, and verification plan in `research/decisions/`. Prior notes are context, not current proof. Never invent sources. Mark unresolved critical facts `BLOCKED — RESEARCH NOT VERIFIED`.
 
+
+## Mandatory economy and monetization policy
+
+For any task involving a shop, catalog, currency, purchase, paid access, pass, developer product, subscription, tier unlock, or monetization UX:
+1. Read `v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md` before planning or editing.
+2. Treat the no-gambling rule as mandatory: do not design or implement paid random rewards, wagers, paid rerolls, chance-based paid upgrades, or any Robux-funded random outcome.
+3. Route to all four V18 economy specialists: `roblox-player-friendly-monetization`, `roblox-deterministic-progression-shop`, `roblox-tiered-catalog-progression`, and `roblox-earned-currency-economy`. Add UX, transaction, persistence, and security specialists when affected.
+4. Preserve deterministic prices and grants. If tiered catalog progression is requested, every required item in every earlier tier must be owned before the next tier unlocks, and each required item must have a non-Robux route.
+5. Re-check current official Roblox documentation and record the URLs/date and the exact claims used. Never claim platform compliance from a static prompt or unrun test alone.
+
 # End-to-end development orchestrator
 
 ## Operating procedure
