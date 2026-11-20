@@ -58,7 +58,7 @@ def main() -> int:
         fail(f"missing economy specialists: {sorted(missing)}")
 
     policy = POLICY.read_text(encoding="utf-8")
-    for phrase in ("Absolute no-gambling rule", "Robux-funded random outcome",
+    for phrase in ("Absolute no-gambling rule", "Robux-funded path",
                    "non-Robux", "developer products", "subscriptions",
                    "private servers"):
         if phrase.lower() not in policy.lower():
