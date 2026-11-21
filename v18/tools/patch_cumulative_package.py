@@ -33,6 +33,62 @@ def add_contract(p):
     p.write_text(s[:pos]+'\n\n'+CONTRACT+'\n'+s[pos:].lstrip('\n').rstrip()+'\n',encoding='utf-8')
     return True
 
+def upgrade_v17_audit(audit: Path):
+    """Migrate the inherited V17 cumulative audit to the V18 package contract."""
+    source=audit.read_text(encoding='utf-8')
+
+    old_count='EXPECTED_INSTALLED_SKILLS = 163'
+    new_count='EXPECTED_INSTALLED_SKILLS = 175'
+    if source.count(old_count)==1 and source.count(new_count)==0:
+        source=source.replace(old_count,new_count)
+    elif source.count(old_count)==0 and source.count(new_count)==1:
+        pass
+    else:
+        raise ValueError('Unexpected V17 audit skill-count declaration; refusing a partial migration')
+
+    manifest_old='''CURRENT_MANIFESTS = {
+    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
+    "V17_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
+    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
+}'''
+    manifest_new='''CURRENT_MANIFESTS = {
+    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
+    "V18_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
+    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
+}'''
+    if source.count(manifest_old)==1 and source.count(manifest_new)==0:
+        source=source.replace(manifest_old,manifest_new)
+    elif source.count(manifest_old)==0 and source.count(manifest_new)==1:
+        pass
+    else:
+        raise ValueError('Unexpected V17 manifest contract; refusing a partial migration')
+
+    old_parity='''    for skill_name in V17_SKILLS:
+        source = root / "v17" / "codex-skills" / skill_name / "SKILL.md"
+        installed = installed_root / skill_name / "SKILL.md"
+        if not source.is_file() or source.read_bytes() != installed.read_bytes():
+            raise ValueError(f"V17 source/install mismatch: {skill_name}")'''
+    new_parity='''    V18_UPGRADED_SKILLS = {
+        "roblox-deterministic-progression-shop",
+        "roblox-tiered-catalog-progression",
+        "roblox-earned-currency-economy",
+        "roblox-player-friendly-monetization",
+    }
+    for skill_name in V17_SKILLS:
+        source_version = "v18" if skill_name in V18_UPGRADED_SKILLS else "v17"
+        source = root / source_version / "codex-skills" / skill_name / "SKILL.md"
+        installed = installed_root / skill_name / "SKILL.md"
+        if not source.is_file() or source.read_bytes() != installed.read_bytes():
+            raise ValueError(f"{source_version.upper()} source/install mismatch: {skill_name}")'''
+    if source.count(old_parity)==1 and source.count(new_parity)==0:
+        source=source.replace(old_parity,new_parity)
+    elif source.count(old_parity)==0 and source.count(new_parity)==1:
+        pass
+    else:
+        raise ValueError('Unexpected V17 source/install parity contract; refusing a partial migration')
+
+    audit.write_text(source,encoding='utf-8')
+
 def integrate(root):
     if not (root/'AGENTS.md').is_file() or not (root/'.agents/skills').is_dir(): raise ValueError('Target is not a reconstructed cumulative package')
     if not (root/'v17/VERSION').is_file(): raise ValueError('Pinned V17 baseline is required')
@@ -53,21 +109,9 @@ def integrate(root):
         source_dir=root/version/'codex-skills'
         if source_dir.is_dir():
             for p in sorted(source_dir.glob('*/SKILL.md')): add_contract(p)
-    # Upgrade inherited audit to the current cumulative skill count and checksum set.
+    # Upgrade the inherited V17 audit without weakening its V17 source checks.
     audit=root/'v17/tools/audit_cumulative_package.py'
-    a=audit.read_text(encoding='utf-8').replace('EXPECTED_INSTALLED_SKILLS = 175','EXPECTED_INSTALLED_SKILLS = 179')
-    old='''CURRENT_MANIFESTS = {
-    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
-    "V17_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
-    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
-}'''
-    new='''CURRENT_MANIFESTS = {
-    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
-    "V18_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
-    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
-}'''
-    if old not in a: raise ValueError('Could not upgrade V17 current-manifest contract')
-    audit.write_text(a.replace(old,new),encoding='utf-8')
+    upgrade_v17_audit(audit)
     (root/'v17/docs/PACKAGE_INTEGRITY.md').write_text('''# Cumulative Package Integrity After V18
 
 V17 manifests are historical snapshots in V18. The active manifests are `SHA256SUMS.txt`, `V18_SHA256SUMS.txt`, and `V14_SHA256SUMS.txt`. Generate in that order: root excludes all three; V18 includes root and excludes itself plus V14; V14 covers every file except itself. See `v18/docs/PACKAGE_INTEGRITY.md`.
@@ -91,6 +135,12 @@ V17 manifests are historical snapshots in V18. The active manifests are `SHA256S
     agents.write_text(text.rstrip()+'\n',encoding='utf-8')
     shutil.copy2(SOURCE/'INDEX_V18.md',root/'INDEX_V18.md')
     shutil.copy2(REPO/'RELEASE_NOTES_V18.md',root/'RELEASE_NOTES_V18.md')
+    shutil.copy2(REPO/'RELEASE_NOTES_V18_0_1.md',root/'RELEASE_NOTES_V18_0_1.md')
+    sample_source=SOURCE/'examples'/'luau-patterns'
+    sample_target=root/'examples'/'luau-patterns'
+    sample_target.mkdir(parents=True,exist_ok=True)
+    shutil.copy2(sample_source/'RemoteRequestValidation.server.luau',sample_target/'RemoteRequestValidation.server.luau')
+    shutil.copy2(sample_source/'README.md',sample_target/'README.md')
     (root/'INDEX.md').write_text('# Current Index\n\nSee [INDEX_V18.md](INDEX_V18.md) for the current cumulative release and skill routing.\n',encoding='utf-8')
 
 def files(root): return sorted(p for p in root.rglob('*') if p.is_file() and not any(x in EXCLUDED for x in p.relative_to(root).parts))
@@ -128,6 +178,24 @@ def finalize(root):
 4. Inspect projects with `python v18/tools/v18.py doctor --root .`.
 5. Route specialists with `python v18/tools/v18.py route --root . --task "..."`.
 6. Create a task packet with `python v18/tools/v18.py plan --root . --task "..." --write`.
+
+## Python CLI setup
+
+The full validation and registry commands use Python 3.13 and the pinned packages listed in the included `requirements-ci.txt`. From the extracted package root, install them with:
+
+```powershell
+python -m pip install -r requirements-ci.txt
+```
+
+For a project-local virtual environment, create and activate it before installing:
+
+```powershell
+python -m venv .venv
+.\\.venv\\Scripts\\Activate.ps1
+python -m pip install -r requirements-ci.txt
+```
+
+On macOS/Linux, activate with `source .venv/bin/activate` instead. The read-only `doctor` and `route` commands do not require the optional validation packages; `validate`, `build-registry`, `validate-task`, and `verify` do.
 
 ## V18 automation
 175 native skills, 12 new V18 orchestration skills plus four upgraded V17 economy/monetization specialists, a strict no-gambling policy, a shared handoff contract, cross-skill registry, task/dependency schemas, read-only project doctor, routing, planning, and validation tools. The CLI does not grant Codex MCP, subagents, Studio access, or permissions; those depend on the current environment.
