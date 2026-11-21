@@ -50,14 +50,17 @@ class V18Tests(unittest.TestCase):
             self.assertTrue(desc)
             self.assertIn(MODULE.CONTRACT,body)
 
-    def test_v17_audit_migration_updates_count_and_v18_source_parity(self):
+    def test_v17_audit_migration_is_idempotent_and_keeps_v18_source_parity(self):
         original=PACKAGE_ROOT/'v17'/'tools'/'audit_cumulative_package.py'
         self.assertTrue(original.is_file(), 'The pinned V17 audit must be present in the cumulative package')
         with tempfile.TemporaryDirectory() as tmp:
             migrated=Path(tmp)/'audit_cumulative_package.py'
             migrated.write_text(original.read_text(encoding='utf-8'),encoding='utf-8')
             PATCHER.upgrade_v17_audit(migrated)
+            first_pass=migrated.read_text(encoding='utf-8')
+            PATCHER.upgrade_v17_audit(migrated)
             result=migrated.read_text(encoding='utf-8')
+        self.assertEqual(first_pass,result)
         self.assertIn('EXPECTED_INSTALLED_SKILLS = 175',result)
         self.assertIn('V18_UPGRADED_SKILLS',result)
         self.assertIn('source_version = "v18" if skill_name in V18_UPGRADED_SKILLS else "v17"',result)
