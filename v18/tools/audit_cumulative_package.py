@@ -10,7 +10,7 @@ EXCLUDED={'.git','.venv','node_modules','__pycache__','.pytest_cache','.mypy_cac
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--root',type=Path,default=Path('.')); root=p.parse_args().root.resolve()
     report=validate(root); skills=list((root/'.agents/skills').glob('*/SKILL.md'))
-    if len(skills)!=179: raise SystemExit(f'Expected 179 skills, found {len(skills)}')
+    if len(skills)!=175: raise SystemExit(f'Expected 175 installed skills, found {len(skills)}')
     if any(f.is_file() and f.suffix in {'.pyc','.pyo'} and not any(x in EXCLUDED for x in f.relative_to(root).parts) for f in root.rglob('*')):
         raise SystemExit('Generated Python bytecode remains in the release tree')
     paths=sorted(f for f in root.rglob('*') if f.is_file() and not any(x in EXCLUDED for x in f.relative_to(root).parts))
