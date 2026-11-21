@@ -134,7 +134,7 @@ jobs:
           diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
           sha256sum "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.zip" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.tar.xz" > "$RUNNER_TEMP/SHA256SUMS-RELEASE.txt"
 
-      - uses: cf430e030ddbb5b0abf93d22962f4752f3646cd9 # actions/upload-artifact
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: roblox-codex-game-studio-kit-v19
           path: |
