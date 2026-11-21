@@ -36,6 +36,8 @@ jobs:
   package:
     name: Reconstruct and verify cumulative V1-V21 package
     runs-on: ubuntu-24.04
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
     timeout-minutes: 50
     needs: overlay
     steps:
