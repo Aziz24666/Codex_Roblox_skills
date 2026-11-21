@@ -11,7 +11,7 @@ The complete package will be attached to the [V18.0.0 GitHub Release](https://gi
 
 ## What's included
 
-- **179 native Codex skills** spanning Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
+- **175 native Codex skills** spanning Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
 - **16 V18 skills**: 12 workflow/orchestration skills plus four economy specialists for no-gambling monetization, deterministic shops, all-prior-tier ownership progression, and gameplay-earned currency.
 - A strict no-gambling policy: no paid random rewards, wagers, paid rerolls, or Robux-funded chance outcomes. Supported deterministic monetization includes cosmetics, game passes, guaranteed developer products, subscriptions, paid access, and private servers.
 - A shared handoff contract connecting the specialist skill library through one task lifecycle.
@@ -19,6 +19,17 @@ The complete package will be attached to the [V18.0.0 GitHub Release](https://gi
 - A local Python CLI for project inspection, task routing, work-item scaffolding, dependency validation, and package verification.
 - Versioned work-item, project-profile, skill-registry, and workflow-evidence schemas with examples.
 - Reusable Luau patterns, Studio tooling, templates, sample projects, quality gates, and historical migration guides from V1–V17.
+
+## Requirements
+
+- **Python 3.13** is the supported and CI-validated runtime. The inherited package uses `tomllib`, included in Python 3.11 and later.
+- From the extracted package root, install the packaged validation dependencies before running validation or verification:
+
+  ```bash
+  python -m pip install -r requirements-ci.txt -r v18/requirements-ci.txt
+  ```
+
+The basic `doctor` and `route` commands use only the Python standard library. Full validation, schema checks, and `verify` require the installed dependencies.
 
 ## Quick start with Codex
 

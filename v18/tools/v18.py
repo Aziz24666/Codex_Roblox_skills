@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse, json, re, shutil, subprocess, sys
 from datetime import datetime, timezone
 from pathlib import Path
-import jsonschema, yaml
 
 V18_SKILLS = {
  'roblox-end-to-end-development-orchestrator','roblox-task-intake-and-requirements',
@@ -18,6 +17,20 @@ V18_SKILLS = {
 CONTRACT = '## V18 shared workflow and handoff contract'
 EXCLUDED = {'.git','.venv','node_modules','__pycache__','.pytest_cache','.mypy_cache','.ruff_cache','target','build'}
 
+def _require_yaml():
+    try:
+        import yaml
+    except ImportError as exc:
+        raise RuntimeError('PyYAML is required for skill/schema validation. From the package root run: python -m pip install -r requirements-ci.txt -r v18/requirements-ci.txt') from exc
+    return yaml
+
+def _require_jsonschema():
+    try:
+        import jsonschema
+    except ImportError as exc:
+        raise RuntimeError('jsonschema is required for schema validation. From the package root run: python -m pip install -r requirements-ci.txt -r v18/requirements-ci.txt') from exc
+    return jsonschema
+
 def now(): return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace('+00:00','Z')
 def read_json(p): return json.loads(Path(p).read_text(encoding='utf-8'))
 def write_json(p, obj): Path(p).write_text(json.dumps(obj,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
@@ -30,6 +43,7 @@ def parse_skill(path):
     if not text.startswith('---\n'): raise ValueError(f'{path}: missing YAML frontmatter')
     end=text.find('\n---\n',4)
     if end<0: raise ValueError(f'{path}: unterminated YAML frontmatter')
+    yaml=_require_yaml()
     meta=yaml.safe_load(text[4:end])
     if not isinstance(meta,dict): raise ValueError(f'{path}: frontmatter is not a mapping')
     name,desc=meta.get('name'),meta.get('description')
@@ -154,6 +168,7 @@ def make_work_item(root,task,task_id=None):
       {'id':'review','title':'Review risks, scope, and evidence','owner':'roblox-evidence-first-completion','depends_on':['verification'],'owned_paths':[],'status':'PENDING','outputs':['completion report']}]
     return {'schema_version':1,'task_id':slug,'title':task[:160],'task':task,'status':'DRAFT','phase':'intake','goals':['Deliver the requested player-visible or developer-visible outcome.'],'non_goals':['Unrequested architecture migrations and external side effects.'],'assumptions':['Project-specific architecture will be confirmed during discovery.'],'impacted_domains':[x['name'] for x in route['domains']],'selected_skills':route['selected_skills'],'workstreams':streams,'acceptance_criteria':[{'id':'AC-01','description':'The delivered behavior satisfies the requested outcome and constraints.','verification':'Run the agreed acceptance scenario and record expected and actual behavior.','owner':'integration','status':'PENDING','evidence':[]},{'id':'AC-02','description':'Changed interfaces have documented ownership and compatible producer/consumer behavior.','verification':'Review contracts and run relevant schema, unit, and integration tests.','owner':'contracts','status':'PENDING','evidence':[]},{'id':'AC-03','description':'Verification results are recorded honestly and unexecuted checks remain visible.','verification':'Validate evidence and inspect final diff and risks.','owner':'verification','status':'PENDING','evidence':[]}],'approvals':[],'evidence':[],'created_at':now(),'updated_at':now()}
 def validate_task(root,data):
+    jsonschema=_require_jsonschema()
     schema=read_json(Path(root)/'v18/schemas/work-item.schema.json')
     jsonschema.Draft202012Validator(schema,format_checker=jsonschema.FormatChecker()).validate(data)
     order=topo(data['workstreams']); known={x['id'] for x in data['workstreams']}
@@ -163,6 +178,7 @@ def validate_task(root,data):
     if data['status']=='DONE' and any(x['status'] not in {'PASS','NOT_APPLICABLE'} for x in data['acceptance_criteria']): raise ValueError('DONE requires all criteria to pass or be not applicable')
     return order
 def validate(root):
+    jsonschema=_require_jsonschema()
     root=Path(root); files=skill_files(root); names={}; missing=[]
     for p in files:
         name,_,body=parse_skill(p)
@@ -217,7 +233,11 @@ def verify(root):
         print(f'[{label}] {" ".join([sys.executable]+cmd)}')
         result=subprocess.run([sys.executable]+cmd,cwd=root,check=False)
         if result.returncode: return result.returncode
-    return subprocess.run([sys.executable,'v18/tools/audit_cumulative_package.py','--root',str(root)],cwd=root,check=False).returncode
+    v18_audit=subprocess.run([sys.executable,'v18/tools/audit_cumulative_package.py','--root',str(root)],cwd=root,check=False)
+    if v18_audit.returncode: return v18_audit.returncode
+    legacy_audit_cmd=[sys.executable,'v17/tools/audit_cumulative_package.py','--root',str(root)]
+    print(f'[V17 migrated cumulative audit] {" ".join(legacy_audit_cmd)}')
+    return subprocess.run(legacy_audit_cmd,cwd=root,check=False).returncode
 def main():
     p=argparse.ArgumentParser(description=__doc__); sub=p.add_subparsers(dest='cmd',required=True)
     d=sub.add_parser('doctor'); d.add_argument('--root',type=Path,default=Path('.')); d.add_argument('--json',action='store_true'); d.add_argument('--write-profile',action='store_true'); d.add_argument('--force',action='store_true')
