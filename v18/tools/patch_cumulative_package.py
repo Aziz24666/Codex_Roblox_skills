@@ -36,10 +36,15 @@ def add_contract(p):
 def upgrade_v17_audit(audit: Path):
     """Migrate the inherited V17 cumulative audit to the V18 package contract."""
     source=audit.read_text(encoding='utf-8')
+
     old_count='EXPECTED_INSTALLED_SKILLS = 163'
-    if source.count(old_count)!=1:
+    new_count='EXPECTED_INSTALLED_SKILLS = 175'
+    if source.count(old_count)==1 and source.count(new_count)==0:
+        source=source.replace(old_count,new_count)
+    elif source.count(old_count)==0 and source.count(new_count)==1:
+        pass
+    else:
         raise ValueError('Unexpected V17 audit skill-count declaration; refusing a partial migration')
-    source=source.replace(old_count,'EXPECTED_INSTALLED_SKILLS = 175')
 
     manifest_old='''CURRENT_MANIFESTS = {
     "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
@@ -51,9 +56,12 @@ def upgrade_v17_audit(audit: Path):
     "V18_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
     "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
 }'''
-    if source.count(manifest_old)!=1:
-        raise ValueError('Could not identify the original V17 manifest contract')
-    source=source.replace(manifest_old,manifest_new)
+    if source.count(manifest_old)==1 and source.count(manifest_new)==0:
+        source=source.replace(manifest_old,manifest_new)
+    elif source.count(manifest_old)==0 and source.count(manifest_new)==1:
+        pass
+    else:
+        raise ValueError('Unexpected V17 manifest contract; refusing a partial migration')
 
     old_parity='''    for skill_name in V17_SKILLS:
         source = root / "v17" / "codex-skills" / skill_name / "SKILL.md"
@@ -72,11 +80,14 @@ def upgrade_v17_audit(audit: Path):
         installed = installed_root / skill_name / "SKILL.md"
         if not source.is_file() or source.read_bytes() != installed.read_bytes():
             raise ValueError(f"{source_version.upper()} source/install mismatch: {skill_name}")'''
-    if source.count(old_parity)!=1:
-        raise ValueError('Could not identify the original V17 source/install parity check')
-    source=source.replace(old_parity,new_parity)
-    audit.write_text(source,encoding='utf-8')
+    if source.count(old_parity)==1 and source.count(new_parity)==0:
+        source=source.replace(old_parity,new_parity)
+    elif source.count(old_parity)==0 and source.count(new_parity)==1:
+        pass
+    else:
+        raise ValueError('Unexpected V17 source/install parity contract; refusing a partial migration')
 
+    audit.write_text(source,encoding='utf-8')
 
 def integrate(root):
     if not (root/'AGENTS.md').is_file() or not (root/'.agents/skills').is_dir(): raise ValueError('Target is not a reconstructed cumulative package')
@@ -180,7 +191,7 @@ For a project-local virtual environment, create and activate it before installin
 
 ```powershell
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.\\.venv\\Scripts\\Activate.ps1
 python -m pip install -r requirements-ci.txt
 ```
 
