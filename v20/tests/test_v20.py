@@ -54,7 +54,17 @@ def fixture_root(temp: str) -> Path:
         "roblox-dependency-aware-workstream-planning",
         "roblox-risk-and-approval-gating",
     })
-    V20.merge_routing(root)
+    for domain_name, extra in additions["additions"].items():
+        current = routing["domains"][domain_name]
+        for signal in extra.get("signals", []):
+            if signal not in current["signals"]:
+                current["signals"].append(signal)
+        for skill in extra.get("skills", []):
+            if skill not in current["skills"]:
+                current["skills"].insert(0, skill)
+    (root / "v18/workflow/skill-routing.json").write_text(
+        json.dumps(routing, indent=2) + "\n", encoding="utf-8"
+    )
     for name in skill_names:
         skill_dir = root / ".agents/skills" / name
         skill_dir.mkdir(parents=True, exist_ok=True)
