@@ -1,7 +1,7 @@
 # V18 No-Gambling and Fair Monetization Policy
 
 **Status:** Mandatory design constraint for V18 and projects using its economy specialists.  
-**Last reviewed against official Roblox documentation:** 2026-11-20.
+**Last reviewed against official Roblox documentation:** 2026-11-21.
 
 ## 1. Absolute no-gambling rule
 
@@ -24,6 +24,19 @@ The following are possible models, subject to current Roblox rules and a player-
 | Avatar items / Creator Store | Fixed-price avatar items, models, or plugins where applicable | Exact asset/product and price |
 
 A developer product or currency top-up must never be a disguised route into a randomized result. Do not add any pay-to-randomize mechanic.
+
+### Mutually exclusive experience access settings
+
+Roblox does not allow an experience to enable paid access (whether paid in Robux or local currency) and private servers at the same time. Treat these as alternative experience-level configurations, not features that can be enabled together:
+
+- If the experience uses paid access, do not plan or advertise private servers for that same experience.
+- If the experience offers private servers, do not configure paid access for that same experience.
+- Re-check the current Creator Hub access settings and eligibility before making a release decision. Do not promise that a combination is available.
+
+Official references:
+- [Paid access in Robux — policies](https://create.roblox.com/docs/production/monetization/paid-access-robux)
+- [Paid access in local currency — policies](https://create.roblox.com/docs/production/monetization/paid-access-local-currency)
+- [Private servers — configuration and restrictions](https://create.roblox.com/docs/production/monetization/private-servers)
 
 ## 3. Earned currency and progression
 
