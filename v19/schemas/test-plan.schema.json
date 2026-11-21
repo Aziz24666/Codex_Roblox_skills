@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v19/test-plan.schema.json",
+  "title": "V19 Verification Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task", "selected_skills", "checks", "execution_note"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "task": {"type": "string", "minLength": 1},
+    "changed_paths": {"type": "array", "items": {"type": "string"}},
+    "selected_skills": {"type": "array", "items": {"type": "string"}},
+    "domains": {"type": "array", "items": {"type": "string"}},
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check_id", "category", "status", "reason", "tool_hints", "evidence_required"],
+        "properties": {
+          "check_id": {"type": "string", "minLength": 1},
+          "category": {"type": "string", "minLength": 1},
+          "status": {"const": "NOT_RUN"},
+          "reason": {"type": "string", "minLength": 1},
+          "tool_hints": {"type": "array", "items": {"type": "string"}},
+          "evidence_required": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "execution_note": {"type": "string", "minLength": 1}
+  }
+}

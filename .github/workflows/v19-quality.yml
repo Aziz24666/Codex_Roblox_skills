@@ -1,0 +1,189 @@
+name: V19 testing intelligence and cumulative release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'v19/**'
+      - 'v18/**'
+      - 'dist/v17-baseline-b64parts/**'
+      - '.github/workflows/v19-quality.yml'
+      - 'README.md'
+      - 'INDEX_V19.md'
+      - 'RELEASE_NOTES_V19.md'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'v19/**'
+      - 'v18/**'
+      - 'dist/v17-baseline-b64parts/**'
+      - '.github/workflows/v19-quality.yml'
+      - 'README.md'
+      - 'INDEX_V19.md'
+      - 'RELEASE_NOTES_V19.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v19-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  overlay:
+    name: Validate V19 overlay and regression suite
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
+      - name: Validate V19 skills, schemas, and routing corpus
+        run: python v19/tools/validate_v19_overlay.py
+      - name: Run V19 routing, planning, evidence, and migration regressions
+        run: python -m unittest discover -s v19/tests -v
+
+  package:
+    name: Reconstruct, integrate, audit, and package V19
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    permissions:
+      contents: read
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+
+      - name: Reconstruct pinned V17 baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline="$RUNNER_TEMP/roblox-codex-game-studio-kit-v17.tar.xz"
+          cat dist/v17-baseline-b64parts/part-*.b64 | base64 --decode > "$baseline"
+          echo "6679380cdfd962611645bd6b9427690ef7d036784ba033825480847026cf8c61  $baseline" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/v17-extract"
+          tar -xJf "$baseline" -C "$RUNNER_TEMP/v17-extract"
+          mv "$RUNNER_TEMP/v17-extract/roblox-codex-game-studio-kit-v17" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v19" >> "$GITHUB_ENV"
+
+      - name: Install pinned inherited validation dependencies
+        run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt --requirement "$PACKAGE_ROOT/requirements-ci.txt"
+
+      - name: Integrate and fully verify V18 baseline first
+        run: |
+          set -euo pipefail
+          python v18/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          mkdir -p "$PACKAGE_ROOT/.github/workflows"
+          cp .github/workflows/v18-quality.yml "$PACKAGE_ROOT/.github/workflows/v18-quality.yml"
+          python "$PACKAGE_ROOT/v18/tools/v18.py" verify --root "$PACKAGE_ROOT"
+
+      - name: Integrate V19 into the verified V18 package
+        run: |
+          set -euo pipefail
+          python v19/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          test "$(tr -d '\r\n' < "$PACKAGE_ROOT/v19/VERSION")" = "19.0.0"
+
+      - name: Run cumulative V19 regression tests
+        run: python -m unittest discover -s "$PACKAGE_ROOT/v19/tests" -v
+
+      - name: Run V19 cumulative verification and all inherited audits
+        run: python "$PACKAGE_ROOT/v19/tools/v19.py" verify --root "$PACKAGE_ROOT"
+
+      - name: Confirm inventory and release metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "180"
+          test -s "$PACKAGE_ROOT/v19/data/routing-benchmark-report.json"
+          test -s "$PACKAGE_ROOT/v19/INDEX_V19.md"
+          test -s "$PACKAGE_ROOT/INDEX_V19.md"
+          test -s "$PACKAGE_ROOT/RELEASE_NOTES_V19.md"
+          test "$(tr -d '\r\n' < "$PACKAGE_ROOT/v19/VERSION")" = "19.0.0"
+          python "$PACKAGE_ROOT/v19/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+
+      - name: Build and compare release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          parent="$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          cd "$parent"
+          tar -cJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.tar.xz" "$name"
+          zip -qr "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.zip" "$name"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.zip"
+          xz -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.tar.xz"
+          mkdir -p "$RUNNER_TEMP/check-zip" "$RUNNER_TEMP/check-tar"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.zip" -d "$RUNNER_TEMP/check-zip"
+          tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.tar.xz" -C "$RUNNER_TEMP/check-tar"
+          diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
+          sha256sum "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.zip" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v19.tar.xz" > "$RUNNER_TEMP/SHA256SUMS-RELEASE.txt"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v19
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v19.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v19.tar.xz
+            ${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish versioned V19 GitHub Release
+    if: github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v19:')
+    runs-on: ubuntu-24.04
+    needs: [overlay, package]
+    permissions:
+      contents: write
+      actions: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: roblox-codex-game-studio-kit-v19
+          path: ${{ runner.temp }}/v19-release-assets
+
+      - name: Publish immutable versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v19:(v19\.[0-9]+\.[0-9]+)\].*/\1/p' | head -n1)"
+          if [[ ! "$tag" =~ ^v19\.[0-9]+\.[0-9]+$ ]]; then
+            echo "No valid [release-v19:v19.x.y] marker found in the main-branch commit message."
+            exit 1
+          fi
+          version="$(printf '%s' "$tag" | sed 's/^v//')"
+          test "$(tr -d '\r\n' < v19/VERSION)" = "$version"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $tag already exists; refusing to overwrite it."
+            exit 1
+          fi
+          gh release create "$tag" \
+            "$RUNNER_TEMP/v19-release-assets/roblox-codex-game-studio-kit-v19.zip" \
+            "$RUNNER_TEMP/v19-release-assets/roblox-codex-game-studio-kit-v19.tar.xz" \
+            "$RUNNER_TEMP/v19-release-assets/SHA256SUMS-RELEASE.txt" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$tag — Roblox Codex Game Studio Kit" \
+            --notes-file RELEASE_NOTES_V19.md

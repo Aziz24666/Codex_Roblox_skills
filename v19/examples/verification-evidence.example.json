@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "work_item_id": "inventory-trading-v19",
+  "build_identity": "local-commit-or-build-id",
+  "checks": [
+    {
+      "check_id": "luau-static-analysis",
+      "category": "static",
+      "status": "PASS",
+      "environment": "Windows 11 local development machine",
+      "tool_version": "Luau Analyzer version recorded here",
+      "command": "luau-analyze --formatter=gnu src/Server/Trading.luau",
+      "expected": "No new analyzer errors in the changed module",
+      "actual": "Analyzer completed successfully; zero errors were reported",
+      "evidence_paths": ["artifacts/luau-analyzer-trading.txt"],
+      "limitations": [],
+      "scenario": "Changed server trading module"
+    },
+    {
+      "check_id": "studio-multiplayer-trading",
+      "category": "multiplayer",
+      "status": "NOT_RUN",
+      "environment": "Roblox Studio multi-client session",
+      "tool_version": "Not recorded",
+      "command": "Run the authorized StudioTestService trading scenario",
+      "expected": "Two test clients observe one server-authoritative transaction",
+      "actual": "",
+      "evidence_paths": [],
+      "limitations": ["This example has not launched Roblox Studio or run a multiplayer session."],
+      "scenario": "Two clients attempt the same trade"
+    }
+  ]
+}
