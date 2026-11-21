@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "roblox-codex-sustainable-monetization-routing-v21",
+  "cases": [
+    {
+      "id": "project-monetization-discovery",
+      "task": "Inspect the game design, gameplay loops, customization systems, current shop and progression to discover game-aware monetization opportunities with evidence",
+      "required_domains": [
+        "economy"
+      ],
+      "required_skills": [
+        "roblox-game-aware-monetization-discovery",
+        "roblox-monetization-product-strategy"
+      ],
+      "forbidden_skills": [
+        "roblox-avatar-customization"
+      ]
+    },
+    {
+      "id": "fair-storefront-design",
+      "task": "Design an accessible storefront with clear product details, truthful prices, duration and subscription disclosures, cancellation, and player-first UX",
+      "required_domains": [
+        "ui",
+        "economy"
+      ],
+      "required_skills": [
+        "roblox-monetization-storefront-ux-and-policy"
+      ],
+      "forbidden_skills": [
+        "roblox-performance-benchmarking"
+      ]
+    },
+    {
+      "id": "monetization-pricing-test",
+      "task": "Plan a controlled pricing experiment for the game shop using price testing, store conversion, sample confidence and retention guardrails",
+      "required_domains": [
+        "economy"
+      ],
+      "required_skills": [
+        "roblox-monetization-experiment-and-pricing"
+      ],
+      "forbidden_skills": [
+        "roblox-npc-ai"
+      ]
+    },
+    {
+      "id": "exact-receipt-fulfillment",
+      "task": "Implement secure developer product receipt fulfillment with a DataStore-backed purchase ledger, catalog validation, exact fixed grants and idempotent transaction handling",
+      "required_domains": [
+        "economy",
+        "persistence"
+      ],
+      "required_skills": [
+        "roblox-monetization-purchase-integrity",
+        "roblox-idempotent-economy-transactions"
+      ],
+      "forbidden_skills": [
+        "roblox-avatar-customization"
+      ]
+    },
+    {
+      "id": "aggregate-revenue-dashboard",
+      "task": "Calculate monetization analytics such as ARPPU, ARPDAU, payer conversion, purchase conversion and retention from validated aggregate data",
+      "required_domains": [
+        "economy",
+        "performance"
+      ],
+      "required_skills": [
+        "roblox-monetization-analytics-and-revenue-modeling"
+      ],
+      "forbidden_skills": [
+        "roblox-character-animation-graphs"
+      ]
+    },
+    {
+      "id": "monetization-policy-review",
+      "task": "Review the Roblox monetization product portfolio for transparent purchase descriptions, optional spending, policy compliance and the mandatory no-gambling rule",
+      "required_domains": [
+        "economy"
+      ],
+      "required_skills": [
+        "roblox-player-friendly-monetization",
+        "roblox-monetization-storefront-ux-and-policy"
+      ],
+      "forbidden_skills": [
+        "roblox-npc-ai"
+      ]
+    }
+  ]
+}

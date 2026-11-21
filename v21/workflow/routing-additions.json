@@ -1,0 +1,24 @@
+{
+  "schema_version":1,
+  "additions":{
+    "economy":{
+      "signals":["monetization discovery","game-aware monetization","offer portfolio","pricing experiment","store conversion","revenue analytics","purchase integrity","subscription benefits","product catalog audit","monetization plan"],
+      "skills":[
+        "roblox-game-aware-monetization-discovery",
+        "roblox-monetization-product-strategy",
+        "roblox-monetization-experiment-and-pricing",
+        "roblox-monetization-purchase-integrity",
+        "roblox-monetization-analytics-and-revenue-modeling",
+        "roblox-monetization-storefront-ux-and-policy"
+      ]
+    },
+    "ui":{
+      "signals":["storefront","storefront conversion","monetization storefront","offer disclosure","purchase ux","shop accessibility"],
+      "skills":["roblox-monetization-storefront-ux-and-policy","roblox-monetization-product-strategy"]
+    },
+    "performance":{
+      "signals":["monetization analytics","arpdau","arppu","purchase conversion","payer conversion","revenue dashboard"],
+      "skills":["roblox-monetization-analytics-and-revenue-modeling","roblox-monetization-experiment-and-pricing"]
+    }
+  }
+}
