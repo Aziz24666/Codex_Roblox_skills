@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "tool_version": "21.0.0",
+  "project": {
+    "name": "Example Vehicle Exploration Game",
+    "genres": ["racing", "simulator"],
+    "classification_confidence": "medium"
+  },
+  "scan": {
+    "files_scanned": 8,
+    "source_files": 5,
+    "design_documents": 3,
+    "skipped_files": 0,
+    "signals_detected": 3
+  },
+  "genres": [
+    {"id": "racing", "matches": 7, "evidence": [{"path": "src/RaceController.luau", "line": 11, "term": "race"}]},
+    {"id": "simulator", "matches": 2, "evidence": [{"path": "docs/GAME_DESIGN.md", "line": 3, "term": "simulator"}]}
+  ],
+  "signals": [
+    {"id": "vehicles", "matches": 12, "evidence": [{"path": "src/VehicleController.luau", "line": 19, "term": "vehicle"}]},
+    {"id": "avatar_customization", "matches": 5, "evidence": [{"path": "src/GarageUI.luau", "line": 22, "term": "customize"}]},
+    {"id": "seasonal_content", "matches": 2, "evidence": [{"path": "docs/ROADMAP.md", "line": 8, "term": "season"}]}
+  ],
+  "offers": [
+    {
+      "id": "vehicle-visual-collection",
+      "title": "Fixed-price vehicle visual collection",
+      "purchase_type": "cosmetic_catalog",
+      "player_value": "Lets players personalize vehicle appearance without changing vehicle performance.",
+      "fit_score": 92,
+      "confidence": "high",
+      "evidence": ["src/VehicleController.luau: vehicle system", "src/GarageUI.luau: customization interface"],
+      "implementation_effort": "medium",
+      "fairness_guardrails": ["Every item and price is shown before purchase.", "Visual-only items do not change speed, handling, or competitive outcomes.", "Equivalent gameplay options remain available where appropriate."],
+      "revenue_estimate": "NOT_ESTIMATED_WITHOUT_REAL_METRICS"
+    }
+  ],
+  "metrics": null,
+  "policy": {
+    "purchase_model": "deterministic_only",
+    "paid_random_rewards": "REJECTED",
+    "paid_chance_modifiers": "REJECTED",
+    "player_fairness_review": "REQUIRED_BEFORE_RELEASE"
+  },
+  "limitations": ["This example is illustrative and is not evidence of demand or revenue.", "The scanner inspects readable files only; it does not inspect a live Roblox experience or binary place file."]
+}

@@ -1,0 +1,24 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://example.invalid/roblox-codex/v21/monetization-discovery.schema.json",
+  "title":"Roblox Game-Aware Monetization Discovery Report",
+  "type":"object",
+  "additionalProperties":false,
+  "required":["schema_version","tool_version","project","scan","genres","signals","offers","metrics","policy","limitations"],
+  "properties":{
+    "schema_version":{"const":1},
+    "tool_version":{"const":"21.0.0"},
+    "project":{"type":"object","required":["name","classification_confidence"],"properties":{"name":{"type":"string","minLength":1},"genres":{"type":"array","items":{"type":"string"}},"classification_confidence":{"enum":["high","medium","low","unknown"]}}},
+    "scan":{"type":"object","required":["files_scanned","source_files","design_documents","skipped_files","signals_detected"],"properties":{"files_scanned":{"type":"integer","minimum":0},"source_files":{"type":"integer","minimum":0},"design_documents":{"type":"integer","minimum":0},"skipped_files":{"type":"integer","minimum":0},"signals_detected":{"type":"integer","minimum":0}}},
+    "genres":{"type":"array","items":{"$ref":"#/$defs/evidenceSignal"}},
+    "signals":{"type":"array","items":{"$ref":"#/$defs/evidenceSignal"}},
+    "offers":{"type":"array","items":{"$ref":"#/$defs/offer"}},
+    "metrics":{"type":["object","null"]},
+    "policy":{"type":"object","required":["purchase_model","paid_random_rewards","paid_chance_modifiers","player_fairness_review"],"properties":{"purchase_model":{"const":"deterministic_only"},"paid_random_rewards":{"const":"REJECTED"},"paid_chance_modifiers":{"const":"REJECTED"},"player_fairness_review":{"const":"REQUIRED_BEFORE_RELEASE"}}},
+    "limitations":{"type":"array","items":{"type":"string"}}
+  },
+  "$defs":{
+    "evidenceSignal":{"type":"object","required":["id","matches","evidence"],"properties":{"id":{"type":"string","minLength":1},"matches":{"type":"integer","minimum":0},"evidence":{"type":"array","items":{"type":"object","required":["path","line","term"],"properties":{"path":{"type":"string"},"line":{"type":"integer","minimum":1},"term":{"type":"string"}}}}}},
+    "offer":{"type":"object","required":["id","title","purchase_type","player_value","fit_score","confidence","evidence","implementation_effort","fairness_guardrails","revenue_estimate"],"properties":{"id":{"type":"string"},"title":{"type":"string"},"purchase_type":{"enum":["game_pass","developer_product","subscription","cosmetic_catalog","private_server"]},"player_value":{"type":"string"},"fit_score":{"type":"integer","minimum":0,"maximum":100},"confidence":{"enum":["high","medium","low"]},"evidence":{"type":"array","items":{"type":"string"},"minItems":1},"implementation_effort":{"enum":["low","medium","high"]},"fairness_guardrails":{"type":"array","items":{"type":"string"},"minItems":1},"revenue_estimate":{"const":"NOT_ESTIMATED_WITHOUT_REAL_METRICS"}}}
+  }
+}

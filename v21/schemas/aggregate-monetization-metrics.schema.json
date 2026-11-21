@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v21/aggregate-monetization-metrics.schema.json",
+  "title": "Aggregate Monetization Metrics Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "period_days",
+    "unique_active_users",
+    "average_daily_active_users",
+    "shop_impressions",
+    "shop_views",
+    "unique_shop_viewers",
+    "unique_purchasers",
+    "purchase_transactions",
+    "unique_payers",
+    "gross_robux"
+  ],
+  "properties": {
+    "period_days": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "unique_active_users": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "average_daily_active_users": {
+      "type": "number",
+      "minimum": 0
+    },
+    "shop_impressions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "shop_views": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unique_shop_viewers": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unique_purchasers": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "purchase_transactions": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unique_payers": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "gross_robux": {
+      "type": "number",
+      "minimum": 0
+    },
+    "offer_performance": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "offer_id",
+          "eligible_impressions",
+          "shop_views",
+          "unique_shop_viewers",
+          "unique_purchasers",
+          "purchase_transactions",
+          "gross_robux"
+        ],
+        "properties": {
+          "offer_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "eligible_impressions": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "shop_views": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unique_shop_viewers": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unique_purchasers": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "purchase_transactions": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "gross_robux": {
+            "type": "number",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}
