@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse, json, re, shutil, subprocess, sys
 from datetime import datetime, timezone
 from pathlib import Path
-import jsonschema, yaml
 
 V18_SKILLS = {
  'roblox-end-to-end-development-orchestrator','roblox-task-intake-and-requirements',
@@ -26,6 +25,10 @@ def skill_files(root):
     if not p.is_dir(): raise ValueError(f'Missing installed skills directory: {p}')
     return sorted(p.glob('*/SKILL.md'))
 def parse_skill(path):
+    try:
+        import yaml
+    except ModuleNotFoundError as exc:
+        raise RuntimeError('Skill metadata validation requires PyYAML. Install dependencies with: python -m pip install -r requirements-ci.txt') from exc
     text=path.read_text(encoding='utf-8')
     if not text.startswith('---\n'): raise ValueError(f'{path}: missing YAML frontmatter')
     end=text.find('\n---\n',4)
@@ -154,6 +157,10 @@ def make_work_item(root,task,task_id=None):
       {'id':'review','title':'Review risks, scope, and evidence','owner':'roblox-evidence-first-completion','depends_on':['verification'],'owned_paths':[],'status':'PENDING','outputs':['completion report']}]
     return {'schema_version':1,'task_id':slug,'title':task[:160],'task':task,'status':'DRAFT','phase':'intake','goals':['Deliver the requested player-visible or developer-visible outcome.'],'non_goals':['Unrequested architecture migrations and external side effects.'],'assumptions':['Project-specific architecture will be confirmed during discovery.'],'impacted_domains':[x['name'] for x in route['domains']],'selected_skills':route['selected_skills'],'workstreams':streams,'acceptance_criteria':[{'id':'AC-01','description':'The delivered behavior satisfies the requested outcome and constraints.','verification':'Run the agreed acceptance scenario and record expected and actual behavior.','owner':'integration','status':'PENDING','evidence':[]},{'id':'AC-02','description':'Changed interfaces have documented ownership and compatible producer/consumer behavior.','verification':'Review contracts and run relevant schema, unit, and integration tests.','owner':'contracts','status':'PENDING','evidence':[]},{'id':'AC-03','description':'Verification results are recorded honestly and unexecuted checks remain visible.','verification':'Validate evidence and inspect final diff and risks.','owner':'verification','status':'PENDING','evidence':[]}],'approvals':[],'evidence':[],'created_at':now(),'updated_at':now()}
 def validate_task(root,data):
+    try:
+        import jsonschema
+    except ModuleNotFoundError as exc:
+        raise RuntimeError('Task schema validation requires jsonschema. Install dependencies with: python -m pip install -r requirements-ci.txt') from exc
     schema=read_json(Path(root)/'v18/schemas/work-item.schema.json')
     jsonschema.Draft202012Validator(schema,format_checker=jsonschema.FormatChecker()).validate(data)
     order=topo(data['workstreams']); known={x['id'] for x in data['workstreams']}
@@ -163,6 +170,10 @@ def validate_task(root,data):
     if data['status']=='DONE' and any(x['status'] not in {'PASS','NOT_APPLICABLE'} for x in data['acceptance_criteria']): raise ValueError('DONE requires all criteria to pass or be not applicable')
     return order
 def validate(root):
+    try:
+        import jsonschema
+    except ModuleNotFoundError as exc:
+        raise RuntimeError('Package validation requires jsonschema. Install dependencies with: python -m pip install -r requirements-ci.txt') from exc
     root=Path(root); files=skill_files(root); names={}; missing=[]
     for p in files:
         name,_,body=parse_skill(p)
@@ -211,6 +222,10 @@ def verify(root):
     # Refresh once more in case tests generated package-local cache/artifact files.
     final=subprocess.run([sys.executable,'v18/tools/patch_cumulative_package.py','--package-root',str(root),'--finalize-only'],cwd=root,check=False)
     if final.returncode: return final.returncode
+    inherited_v17_audit=[sys.executable,'v17/tools/audit_cumulative_package.py','--root',str(root)]
+    print(f'[inherited V17 cumulative audit] {" ".join(inherited_v17_audit)}')
+    result=subprocess.run(inherited_v17_audit,cwd=root,check=False)
+    if result.returncode: return result.returncode
     for label,cmd in (
       ('V13 package doctor',['tools/v13_pack_doctor.py',str(root)]),
       ('V14 package doctor',['tools/v14_pack_doctor.py',str(root)])):
