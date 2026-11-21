@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "domains": {
+    "character": {
+      "signals": ["character", "avatar", "rig", "r15", "r6", "humanoid", "skin", "skinning", "animation", "layered clothing", "accessory", "body customization"],
+      "skills": ["roblox-character-systems-orchestration", "roblox-avatar-architecture", "roblox-avatar-customization", "roblox-custom-rigging-and-skinning", "roblox-character-pipeline-validation", "roblox-runtime-character-customization", "roblox-character-animation-graphs", "roblox-adaptive-animation-retargeting"]
+    },
+    "ui": {
+      "signals": ["ui", "interface", "menu", "hud", "screen", "button", "shop", "inventory display", "responsive", "mobile ui", "controller ui", "accessibility"],
+      "skills": ["roblox-ui-ux", "roblox-content-authoring-ux", "roblox-cross-platform-input", "roblox-accessibility-device", "roblox-shop-ux-and-accessibility", "roblox-dynamic-form-rendering"]
+    },
+    "multiplayer": {
+      "signals": ["multiplayer", "network", "replication", "remoteevent", "remotefunction", "server client", "matchmaking", "teleport", "party", "session"],
+      "skills": ["roblox-networking-security", "roblox-remote-security-review", "roblox-client-server-contract-testing", "roblox-multiplayer-scenario-engineering", "roblox-matchmaking-teleport", "roblox-network-condition-verification"]
+    },
+    "persistence": {
+      "signals": ["save", "saving", "load data", "datastore", "data store", "persistent", "profile", "migration", "inventory data", "player data"],
+      "skills": ["roblox-persistence-migration-testing", "roblox-data-migration-operations", "roblox-deterministic-test-fixtures", "roblox-test-data-isolation", "roblox-economy-transactions"]
+    },
+    "economy": {
+      "signals": ["currency", "economy", "shop", "catalog", "purchase", "product", "developer product", "gamepass", "game pass", "passes", "robux", "monetization", "subscription", "paid access", "private server", "reward", "tier", "unlock", "price", "transaction"],
+      "skills": ["roblox-deterministic-progression-shop", "roblox-tiered-catalog-progression", "roblox-earned-currency-economy", "roblox-player-friendly-monetization", "roblox-economy-transactions", "roblox-data-progression", "roblox-inventory-loadouts"]
+    },
+    "security": {
+      "signals": ["security", "exploit", "remote", "client input", "validation", "permissions", "trust boundary", "anti cheat", "authorization"],
+      "skills": ["roblox-remote-security-review", "roblox-networking-security", "roblox-platform-security-review", "roblox-github-actions-security", "roblox-community-safety"]
+    },
+    "performance": {
+      "signals": ["performance", "optimize", "lag", "frame rate", "memory", "profiling", "benchmark", "streaming", "scale"],
+      "skills": ["roblox-performance-regression-testing", "roblox-performance-benchmarking", "roblox-performance-budget-governance", "roblox-runtime-performance-profiling", "roblox-instance-streaming-readiness"]
+    },
+    "assets": {
+      "signals": ["asset", "model", "mesh", "texture", "audio", "import", "provenance", "prefab", "content pipeline"],
+      "skills": ["roblox-asset-pipeline", "roblox-asset-provenance", "roblox-rights-and-asset-provenance", "roblox-content-factory", "roblox-prefab-governance", "roblox-content-loading-optimization"]
+    },
+    "reference": {
+      "signals": ["reference game", "reference experience", "inspired by", "feature parity", "study game", "analyze game", "similar mechanics", "original mechanics"],
+      "skills": ["roblox-reference-experience-analysis", "roblox-feature-parity-and-scope-planning", "roblox-original-mechanics-implementation", "roblox-rights-and-asset-provenance", "roblox-reference-and-release-quality-audit"]
+    },
+    "testing": {
+      "signals": ["test", "testing", "bug", "regression", "reproduce", "qa", "validation", "test runner", "playtest"],
+      "skills": ["roblox-automated-test-engineering", "roblox-studio-test-automation", "roblox-studio-scripted-test-orchestration", "roblox-regression-engineering", "roblox-runtime-evidence-triage", "roblox-test-evidence-governance"]
+    },
+    "studio": {
+      "signals": ["studio", "mcp", "plugin", "editor", "tooling", "testservice", "studio automation"],
+      "skills": ["roblox-studio-mcp-integration", "roblox-studio-mcp-workflows", "roblox-plugin-development", "roblox-plugin-tooling", "roblox-studio-test-plugin-engineering"]
+    },
+    "release": {
+      "signals": ["release", "deploy", "publish", "ci", "github actions", "build pipeline", "package", "versioning", "checksum"],
+      "skills": ["roblox-ci-pipeline-engineering", "roblox-release-engineering", "roblox-reproducible-release-engineering", "roblox-release-operations", "roblox-release-candidate-assembly"]
+    },
+    "npc": {
+      "signals": ["npc", "enemy ai", "pathfinding", "navigation", "companion", "pet", "behavior tree"],
+      "skills": ["roblox-npc-ai", "roblox-data-driven-npc-runtime", "roblox-pets-companions", "roblox-gameplay-systems"]
+    },
+    "world": {
+      "signals": ["terrain", "worldbuilding", "map", "procedural world", "environment", "level design", "streaming enabled"],
+      "skills": ["roblox-worldbuilding", "roblox-procedural-content", "roblox-instance-streaming-readiness", "roblox-building-sandbox"]
+    }
+  }
+}

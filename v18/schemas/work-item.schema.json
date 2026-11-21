@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v18/work-item.schema.json",
+  "title": "V18 Work Item",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "task_id", "title", "task", "status", "phase", "goals", "non_goals", "impacted_domains", "selected_skills", "workstreams", "acceptance_criteria", "approvals", "evidence"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "task_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{2,63}$"},
+    "title": {"type": "string", "minLength": 1},
+    "task": {"type": "string", "minLength": 1},
+    "status": {"enum": ["DRAFT", "DISCOVERED", "SPECIFIED", "DESIGNED", "IMPLEMENTING", "INTEGRATING", "VERIFYING", "REVIEWED", "DONE", "BLOCKED"]},
+    "phase": {"enum": ["intake", "discovery", "requirements", "design", "implementation", "integration", "verification", "review", "completion"]},
+    "goals": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "non_goals": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "assumptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "impacted_domains": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "selected_skills": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z0-9-]{1,64}$"}},
+    "workstreams": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "title", "owner", "depends_on", "owned_paths", "status"], "properties": {
+      "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]{1,40}$"},
+      "title": {"type": "string", "minLength": 1},
+      "owner": {"type": "string", "minLength": 1},
+      "depends_on": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+      "owned_paths": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+      "status": {"enum": ["PENDING", "IN_PROGRESS", "PASS", "FAIL", "BLOCKED", "NOT_RUN"]},
+      "outputs": {"type": "array", "items": {"type": "string"}}
+    }}},
+    "acceptance_criteria": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["id", "description", "verification", "owner", "status"], "properties": {
+      "id": {"type": "string", "pattern": "^AC-[0-9]{2,4}$"},
+      "description": {"type": "string", "minLength": 1},
+      "verification": {"type": "string", "minLength": 1},
+      "owner": {"type": "string", "minLength": 1},
+      "status": {"enum": ["PENDING", "PASS", "FAIL", "BLOCKED", "NOT_RUN", "NOT_APPLICABLE"]},
+      "evidence": {"type": "array", "items": {"type": "string"}}
+    }}},
+    "approvals": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["action", "required", "status"], "properties": {
+      "action": {"type": "string", "minLength": 1},
+      "required": {"type": "boolean"},
+      "status": {"enum": ["NOT_REQUIRED", "PENDING", "APPROVED", "DENIED"]},
+      "notes": {"type": "string"}
+    }}},
+    "evidence": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["check_id", "status", "environment", "description"], "properties": {
+      "check_id": {"type": "string", "minLength": 1},
+      "status": {"enum": ["PASS", "FAIL", "BLOCKED", "NOT_RUN", "NOT_APPLICABLE"]},
+      "environment": {"type": "string", "minLength": 1},
+      "description": {"type": "string", "minLength": 1},
+      "command": {"type": "string"},
+      "artifact_path": {"type": "string"},
+      "limitations": {"type": "array", "items": {"type": "string"}}
+    }}},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

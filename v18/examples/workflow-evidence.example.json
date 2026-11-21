@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "work_item_id": "inventory-ui-slice",
+  "checks": [
+    {
+      "check_id": "schema-validation",
+      "status": "PASS",
+      "environment": "local-python",
+      "tool_version": "3.13",
+      "build_identity": "example-only",
+      "scenario": "Validate work item schema",
+      "expected": "Work item conforms",
+      "actual": "Validator passed",
+      "limitations": []
+    },
+    {
+      "check_id": "studio-playtest",
+      "status": "NOT_RUN",
+      "environment": "Roblox Studio",
+      "expected": "Inventory UI renders and responds on target inputs",
+      "actual": "Not executed in this example",
+      "limitations": [
+        "Example record only; no Studio session was run"
+      ]
+    }
+  ]
+}

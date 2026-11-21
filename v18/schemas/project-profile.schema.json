@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v18/project-profile.schema.json",
+  "title": "V18 Project Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "root", "detected_at", "source_of_truth", "markers", "tools", "skills_count", "confidence"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "root": {"type": "string", "minLength": 1},
+    "detected_at": {"type": "string", "format": "date-time"},
+    "source_of_truth": {"enum": ["rojo-managed", "studio-native", "hybrid", "unknown"]},
+    "markers": {"type": "array", "items": {"type": "string"}},
+    "tools": {"type": "object", "additionalProperties": {"type": "object", "required": ["available"], "properties": {"available": {"type": "boolean"}, "version": {"type": "string"}, "path": {"type": "string"}}}},
+    "skills_count": {"type": "integer", "minimum": 0},
+    "git_status": {"type": "array", "items": {"type": "string"}},
+    "confidence": {"enum": ["high", "medium", "low"]},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  }
+}
