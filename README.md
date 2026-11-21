@@ -1,72 +1,75 @@
 # Roblox Codex Game Studio Kit
 
-[![V18 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v18-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v18-quality.yml)
+[![V19 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v19-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v19-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V18.0.1 — Connected Automation and Cross-Skill Orchestration.** This is the complete cumulative V1–V18 Roblox game-development toolkit for Codex. You only need the current V18 release; earlier versions do not need separate downloads.
+**Current release: V19.0.0 — Testing Intelligence and Evidence Governance.** This is the complete cumulative V1–V19 Roblox game-development toolkit for Codex. You only need the current V19 release; earlier versions do not need separate downloads.
 
 ## Download
 
-The complete package will be attached to the [V18.0.1 GitHub Release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v18.0.1) as ZIP and TAR.XZ archives, with SHA-256 checksums.
+The complete package is attached to the [V19.0.0 GitHub Release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v19.0.0) as ZIP and TAR.XZ archives, with SHA-256 checksums.
 
 ## What's included
 
-- **175 native Codex skills** spanning Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
-- **16 V18 skills**: 12 workflow/orchestration skills plus four economy specialists for no-gambling monetization, deterministic shops, all-prior-tier ownership progression, and gameplay-earned currency.
-- A strict no-gambling policy: no paid random rewards, wagers, paid rerolls, or Robux-funded chance outcomes. Supported deterministic monetization includes cosmetics, game passes, guaranteed developer products, subscriptions, paid access, and private servers.
-- A shared handoff contract connecting the specialist skill library through one task lifecycle.
-- A generated machine-readable registry connecting skills by domain and related capability.
-- A local Python CLI for project inspection, task routing, work-item scaffolding, dependency validation, and package verification.
-- Versioned work-item, project-profile, skill-registry, and workflow-evidence schemas with examples.
-- Reusable Luau patterns, Studio tooling, templates, sample projects, quality gates, and historical migration guides from V1–V17.
+- **180 native Codex skills** across Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
+- **Five V19 verification specialists** for risk-based testing, Luau static analysis/type safety, Studio multi-client tests, deterministic routing benchmarks, and evidence auditing.
+- A deterministic 12-case routing regression corpus with positive and negative selection expectations.
+- A local Python CLI for risk-based test-plan generation, routing evaluation, and evidence validation.
+- Structured evidence rules: PASS requires an executed command/scenario, environment, tool version, build identity, expected/actual result, and a non-empty artifact.
+- All V18 workflow orchestration, shared contracts, approval gates, and mandatory no-gambling monetization policy.
+- Versioned schemas, examples, documentation, regression tests, Studio workflows, and CI package audits.
 
 ## Requirements
 
-- **Python 3.13** is the supported and CI-validated runtime. The inherited package uses `tomllib`, included in Python 3.11 and later.
-- From the extracted package root, install the packaged validation dependencies before running validation or verification:
+- **Python 3.13** is the supported and CI-validated runtime. The inherited package uses \`tomllib\`, included in Python 3.11 and later.
+- From the extracted package root, install validation dependencies:
 
-  ```bash
+  \`\`\`bash
   python -m pip install -r requirements-ci.txt -r v18/requirements-ci.txt
-  ```
+  \`\`\`
 
-The basic `doctor` and `route` commands use only the Python standard library. Full validation, schema checks, and `verify` require the installed dependencies.
+The V19 routing and planning commands use the standard library. Schema and full package validation require the installed dependencies.
 
 ## Quick start with Codex
 
-1. Download and extract the complete V18 ZIP.
+1. Download and extract the complete V19 ZIP.
 2. Open the extracted package root in Codex.
-3. Read `AGENTS.md` and `INDEX_V18.md`.
-4. Start substantial work with `$roblox-end-to-end-development-orchestrator`.
-5. Let the orchestrator inspect the project, define acceptance criteria, select relevant specialists, coordinate implementation, and require evidence for completion.
-6. For command-line assistance, run `python v18/tools/v18.py --help` from the extracted package root.
+3. Read \`AGENTS.md\` and \`INDEX_V19.md\`.
+4. Start substantial work with \`$roblox-end-to-end-development-orchestrator\`.
+5. Inspect the project with \`python v18/tools/v18.py doctor --root .\`.
+6. Generate a risk-based verification plan:
 
-## V18 automation commands
+   \`\`\`bash
+   python v19/tools/v19.py plan-tests --root . --task "Build a multiplayer inventory trade system" --changed src/Server/Trading.luau
+   \`\`\`
 
-```bash
-python v18/tools/v18.py doctor --root .
-python v18/tools/v18.py route --root . --task "Build an R15 character customization system"
-python v18/tools/v18.py plan --root . --task "Build an R15 character customization system" --write
-python v18/tools/v18.py verify --root .
-```
+7. Run the applicable checks in their actual environments and record outcomes.
+8. Validate an evidence packet with \`python v19/tools/v19.py validate-evidence --root . --file path/to/verification-evidence.json\`.
 
-The CLI provides deterministic local planning and validation. It does not itself grant Codex subagents, MCP connections, Roblox Studio access, permissions, or production credentials; those depend on the actual environment and connected tools.
+## V19 commands
+
+\`\`\`bash
+python v19/tools/v19.py evaluate-routing --root .
+python v19/tools/v19.py plan-tests --root . --task "..."
+python v19/tools/v19.py validate-evidence --root . --file path/to/verification-evidence.json
+python v19/tools/v19.py verify --root .
+\`\`\`
+
+The routing benchmark evaluates deterministic skill selection only; it does not assess LLM reasoning quality or prove generated game code is correct. Test-plan generation is planning only: it does not execute Luau tools, launch Roblox Studio, or run multiplayer/device/live-service tests.
 
 ## Validation and evidence boundaries
 
-GitHub Actions reconstructs the cumulative package from the pinned V17 baseline, applies V18, runs source and cumulative validators, regression tests, inherited package checks, full-package audits, checksum verification, and ZIP/TAR.XZ extraction comparisons. Only a validated package is attached to the release.
-
-CI does **not** launch Roblox Studio. Studio playtests, multiplayer runtime checks, physical-device testing, live DataStore behavior, asset permissions, live purchase fulfillment, and production operations must be executed in their real authorized environments and recorded separately. Unexecuted checks must remain `NOT_RUN` or `BLOCKED`, not `PASS`.
+GitHub Actions validates overlay metadata, Python regression tests, schemas, the routing corpus, cumulative package audits, SHA-256 manifests, and ZIP/TAR.XZ extraction integrity. It does **not** launch Roblox Studio. Studio playtests, multi-client runtime checks, physical-device testing, performance profiling, live DataStore behavior, asset permissions, live purchase fulfillment, and production operations must be executed in their real authorized environments and recorded separately. Unexecuted checks must remain \`NOT_RUN\` or \`BLOCKED\`, not \`PASS\`.
 
 ## Maintainer documentation
 
-- [V18 index](v18/INDEX_V18.md)
-- [Automated workflow](v18/docs/AUTOMATED_WORKFLOW.md)
-- [Skill interoperability](v18/docs/SKILL_INTEROPERABILITY.md)
-- [Task contract and state machine](v18/docs/TASK_CONTRACT_AND_STATE_MACHINE.md)
-- [Approval boundaries](v18/docs/APPROVAL_BOUNDARIES.md)
-- [No-gambling and fair monetization policy](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
-- [V18.0.1 release notes](RELEASE_NOTES_V18_0_1.md)
-- [V18.0.0 original release notes](RELEASE_NOTES_V18.md)
+- [V19 index](INDEX_V19.md)
+- [Testing and evidence strategy](v19/docs/TESTING_AND_EVIDENCE.md)
+- [Studio and multiplayer automation](v19/docs/STUDIO_TEST_AUTOMATION.md)
+- [Skill-routing benchmarks](v19/docs/SKILL_BENCHMARKS.md)
+- [Research snapshot](v19/docs/RESEARCH_SNAPSHOT.md)
+- [V19.0.0 release notes](RELEASE_NOTES_V19.md)
+- [V18 no-gambling and fair monetization policy](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
 - [MIT License](LICENSE)
 
 ## License and affiliation

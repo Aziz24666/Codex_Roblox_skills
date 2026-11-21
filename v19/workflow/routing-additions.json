@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "additions": {
+    "testing": {
+      "signals": ["luau", "static analysis", "type checking", "strict mode", "lint", "evidence", "routing benchmark"],
+      "skills": [
+        "roblox-test-matrix-and-risk-planning",
+        "roblox-luau-static-analysis-and-type-safety",
+        "roblox-test-evidence-auditing",
+        "roblox-skill-routing-benchmarking",
+        "roblox-studio-multiplayer-test-engineering"
+      ]
+    },
+    "studio": {
+      "signals": ["studio testservice", "multi-client test", "multiplayer studio test"],
+      "skills": ["roblox-studio-multiplayer-test-engineering"]
+    },
+    "performance": {
+      "signals": ["static analyzer", "type analysis"],
+      "skills": ["roblox-luau-static-analysis-and-type-safety"]
+    }
+  }
+}

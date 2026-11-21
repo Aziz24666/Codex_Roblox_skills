@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "roblox-codex-routing-v19",
+  "cases": [
+    {
+      "id": "generic-small-task",
+      "task": "Explain how a simple local ModuleScript should be organized",
+      "required_domains": [],
+      "required_skills": ["roblox-end-to-end-development-orchestrator", "roblox-task-intake-and-requirements"],
+      "forbidden_skills": ["roblox-player-friendly-monetization", "roblox-studio-multiplayer-test-engineering"]
+    },
+    {
+      "id": "r15-character-customization",
+      "task": "Build an R15 character avatar skin and body customization pipeline with rigging and animation",
+      "required_domains": ["character"],
+      "required_skills": ["roblox-avatar-customization", "roblox-custom-rigging-and-skinning"],
+      "forbidden_skills": ["roblox-player-friendly-monetization"]
+    },
+    {
+      "id": "responsive-accessible-interface",
+      "task": "Create a responsive mobile HUD menu with touch and gamepad accessibility",
+      "required_domains": ["ui"],
+      "required_skills": ["roblox-ui-ux", "roblox-cross-platform-input"],
+      "forbidden_skills": ["roblox-data-migration-operations"]
+    },
+    {
+      "id": "authoritative-network-validation",
+      "task": "Review multiplayer networking and RemoteEvent server validation, ownership, and trust boundaries",
+      "required_domains": ["multiplayer", "security"],
+      "required_skills": ["roblox-networking-security", "roblox-remote-security-review"],
+      "forbidden_skills": ["roblox-tiered-catalog-progression"]
+    },
+    {
+      "id": "isolated-persistence-migration",
+      "task": "Migrate DataStore profiles, save/load recovery, and persistent player data compatibility across schema versions",
+      "required_domains": ["persistence"],
+      "required_skills": ["roblox-data-migration-operations", "roblox-persistence-migration-testing"],
+      "forbidden_skills": ["roblox-studio-multiplayer-test-engineering"]
+    },
+    {
+      "id": "deterministic-economy",
+      "task": "Design a deterministic Robux game pass and developer product economy with fixed prices and exact purchase grants",
+      "required_domains": ["economy"],
+      "required_skills": ["roblox-player-friendly-monetization", "roblox-deterministic-progression-shop"],
+      "forbidden_skills": ["roblox-studio-multiplayer-test-engineering"]
+    },
+    {
+      "id": "performance-profiling",
+      "task": "Profile frame rate, memory, streaming, and network performance on low-end devices",
+      "required_domains": ["performance"],
+      "required_skills": ["roblox-performance-regression-testing", "roblox-performance-budget-governance"],
+      "forbidden_skills": ["roblox-player-friendly-monetization"]
+    },
+    {
+      "id": "regression-test-matrix",
+      "task": "Create a testing QA regression validation and evidence matrix for code changes",
+      "required_domains": ["testing"],
+      "required_skills": ["roblox-test-matrix-and-risk-planning", "roblox-test-evidence-auditing", "roblox-skill-routing-benchmarking"],
+      "forbidden_skills": ["roblox-player-friendly-monetization"]
+    },
+    {
+      "id": "luau-static-type-analysis",
+      "task": "Set up Luau strict mode type checking, lint, static analysis, and module boundary validation",
+      "required_domains": ["testing"],
+      "required_skills": ["roblox-luau-static-analysis-and-type-safety"],
+      "forbidden_skills": ["roblox-earned-currency-economy"]
+    },
+    {
+      "id": "studio-multiplayer-automation",
+      "task": "Build a Roblox Studio StudioTestService multi-client multiplayer playtest for lobby join leave and replication",
+      "required_domains": ["studio", "testing"],
+      "required_skills": ["roblox-studio-multiplayer-test-engineering"],
+      "forbidden_skills": ["roblox-player-friendly-monetization"]
+    },
+    {
+      "id": "reproducible-release",
+      "task": "Prepare a reproducible CI package build, checksums, and a versioned release candidate",
+      "required_domains": ["release"],
+      "required_skills": ["roblox-release-engineering", "roblox-reproducible-release-engineering"],
+      "forbidden_skills": ["roblox-studio-multiplayer-test-engineering"]
+    },
+    {
+      "id": "procedural-world-content",
+      "task": "Create a procedural terrain world generation and streaming content pipeline",
+      "required_domains": ["world"],
+      "required_skills": ["roblox-worldbuilding", "roblox-procedural-content"],
+      "forbidden_skills": ["roblox-player-friendly-monetization"]
+    }
+  ]
+}
