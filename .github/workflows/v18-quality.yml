@@ -66,7 +66,7 @@ jobs:
           set -euo pipefail
           baseline="$RUNNER_TEMP/roblox-codex-game-studio-kit-v17.tar.xz"
           cat dist/v17-baseline-b64parts/part-*.b64 | base64 --decode > "$baseline"
-          echo "b1501a65fc4455ba358a6100e2a3a5bddb3b0363ad615d3d9971466634fc57d9  $baseline" | sha256sum --check
+          echo "6679380cdfd962611645bd6b9427690ef7d036784ba033825480847026cf8c61  $baseline" | sha256sum --check
           mkdir -p "$RUNNER_TEMP/v17-extract"
           tar -xJf "$baseline" -C "$RUNNER_TEMP/v17-extract"
           mv "$RUNNER_TEMP/v17-extract/roblox-codex-game-studio-kit-v17" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v18"
