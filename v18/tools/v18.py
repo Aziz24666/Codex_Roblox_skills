@@ -194,17 +194,23 @@ def verify(root):
       ['v15/tools/v15_validate.py','--root','v15'],['-m','unittest','discover','-s','v15/tests','-v'],
       ['v16/tools/v16_validate.py','--root','v16'],['-m','unittest','discover','-s','v16/tests','-v'],
       ['v17/tools/v17_validate.py','--root','v17'],['-m','unittest','discover','-s','v17/tests','-v'],
-      ['v18/tools/v18.py','validate','--root',str(root)],['-m','unittest','discover','-s','v18/tests','-v'],
-      ['-m','unittest','discover','-s','tools/tests','-v']]
+      ['v18/tools/v18.py','validate','--root',str(root)],['-m','unittest','discover','-s','v18/tests','-v']]
     for n,cmd in enumerate(cmds,1):
         full=[sys.executable]+cmd; print(f'[{n}/{len(cmds)+2}] {" ".join(full)}')
         result=subprocess.run(full,cwd=root,check=False)
         if result.returncode: return result.returncode
-    # Rebuild inventories and checksum manifests after validators/tests have finished,
-    # because test tooling may create or update package files.
+    # Generate fresh package manifests after version-specific validators and tests.
     final=subprocess.run([sys.executable,'v18/tools/patch_cumulative_package.py','--package-root',str(root),'--finalize-only'],cwd=root,check=False)
     if final.returncode: return final.returncode
-    # Run inherited package doctors only after manifests have been regenerated.
+    # The inherited tools test suite contains V13/V14 pack-doctor tests, so it must
+    # run only after the package manifests have been regenerated.
+    tool_tests=['-m','unittest','discover','-s','tools/tests','-v']
+    print(f'[legacy tools unit tests] {" ".join([sys.executable]+tool_tests)}')
+    result=subprocess.run([sys.executable]+tool_tests,cwd=root,check=False)
+    if result.returncode: return result.returncode
+    # Refresh once more in case tests generated package-local cache/artifact files.
+    final=subprocess.run([sys.executable,'v18/tools/patch_cumulative_package.py','--package-root',str(root),'--finalize-only'],cwd=root,check=False)
+    if final.returncode: return final.returncode
     for label,cmd in (
       ('V13 package doctor',['tools/v13_pack_doctor.py',str(root)]),
       ('V14 package doctor',['tools/v14_pack_doctor.py',str(root)])):
