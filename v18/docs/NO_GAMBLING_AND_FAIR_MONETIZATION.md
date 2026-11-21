@@ -1,7 +1,7 @@
 # V18 No-Gambling and Fair Monetization Policy
 
 **Status:** Mandatory design constraint for V18 and projects using its economy specialists.  
-**Last reviewed against official Roblox documentation:** 2026-11-20.
+**Last reviewed against official Roblox documentation:** 2026-11-21.
 
 ## 1. Absolute no-gambling rule
 
@@ -24,6 +24,8 @@ The following are possible models, subject to current Roblox rules and a player-
 | Avatar items / Creator Store | Fixed-price avatar items, models, or plugins where applicable | Exact asset/product and price |
 
 A developer product or currency top-up must never be a disguised route into a randomized result. Do not add any pay-to-randomize mechanic.
+
+**Mutual-exclusion constraint:** Roblox does not allow paid experience access (whether priced in Robux or local currency) and private servers to be enabled for the same experience at the same time. Treat these as mutually exclusive experience-level access configurations, not as two simultaneously available options. Re-check the platform settings and current Creator Hub guidance before changing an experience's access model.
 
 ## 3. Earned currency and progression
 
@@ -64,6 +66,7 @@ Re-check these sources before release because platform APIs and requirements can
 - Roblox Creator Hub — Developer Products: https://create.roblox.com/docs/production/monetization/developer-products
 - Roblox Creator Hub — Subscriptions: https://create.roblox.com/docs/production/monetization/subscriptions
 - Roblox Creator Hub — Private Servers: https://create.roblox.com/docs/production/monetization/private-servers
+- Roblox Creator Hub — Paid Access in Robux: https://create.roblox.com/docs/production/monetization/paid-access-robux
 - Roblox Creator Hub — Paid Random Items Policy: https://create.roblox.com/docs/production/monetization/paid-random-items
 
 These references describe Roblox platform capabilities and requirements; V18 intentionally excludes paid random items even if a platform page documents eligibility controls or disclosures for them.

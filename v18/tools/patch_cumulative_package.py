@@ -33,6 +33,85 @@ def add_contract(p):
     p.write_text(s[:pos]+'\n\n'+CONTRACT+'\n'+s[pos:].lstrip('\n').rstrip()+'\n',encoding='utf-8')
     return True
 
+
+def migrate_v17_audit(audit_path: Path):
+    """Migrate the embedded V17 audit without weakening unrelated V17 checks."""
+    content=audit_path.read_text(encoding='utf-8')
+    count_pattern=re.compile(r'(?m)^EXPECTED_INSTALLED_SKILLS\s*=\s*163\s*$')
+    content,count=count_pattern.subn('EXPECTED_INSTALLED_SKILLS = 175',content)
+    if count!=1:
+        raise ValueError(f'Expected exactly one V17 installed-skill count of 163; found {count}')
+    if 'V18_UPGRADED_SKILLS' in content:
+        raise ValueError('V17 audit already contains a V18 migration marker')
+    upgraded='V18_UPGRADED_SKILLS = {\n'+''.join(f'    "{name}",\n' for name in sorted(UPGRADE_EXISTING_SKILLS))+'}'
+    content=content.replace('EXPECTED_INSTALLED_SKILLS = 175\n','EXPECTED_INSTALLED_SKILLS = 175\n'+upgraded+'\n',1)
+
+    # Find V17's skill-name loop by the source/installed byte comparison.
+    loop_pattern=re.compile(r'(?m)^(?P<indent>[ \t]*)for (?P<variable>[A-Za-z_]\w*) in [^\n:]+:\s*$')
+    source_parity_loops=[]
+    lines=content.splitlines(keepends=True)
+    offset=0
+    for index,line in enumerate(lines):
+        raw=line.rstrip('\r\n')
+        match=loop_pattern.fullmatch(raw)
+        if match:
+            base_indent=len(match.group('indent'))
+            body_lines=[]
+            for body_line in lines[index+1:]:
+                if body_line.strip():
+                    body_indent=len(body_line)-len(body_line.lstrip(' \t'))
+                    if body_indent<=base_indent:
+                        break
+                body_lines.append(body_line)
+            body=''.join(body_lines)
+            if re.search(r'\bsource\.read_bytes\(\)',body) and re.search(r'\binstalled\.read_bytes\(\)',body):
+                source_parity_loops.append((offset,offset+len(line),match))
+        offset+=len(line)
+    if len(source_parity_loops)!=1:
+        raise ValueError(f'Expected exactly one V17 source/installed byte-parity loop; found {len(source_parity_loops)}')
+    loop_start,loop_end,loop_match=source_parity_loops[0]
+    indent=loop_match.group('indent')
+    variable=loop_match.group('variable')
+    replacement=(loop_match.group(0)+'\n'
+                 f'{indent}    if {variable} in V18_UPGRADED_SKILLS:\n'
+                 f'{indent}        continue\n')
+    content=content[:loop_start]+replacement+content[loop_end:]
+
+    old='''CURRENT_MANIFESTS = {
+    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
+    "V17_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
+    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
+}'''
+    new='''CURRENT_MANIFESTS = {
+    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
+    "V18_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
+    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
+}'''
+    if content.count(old)!=1:
+        raise ValueError('Could not uniquely migrate the V17 current-manifest contract')
+    content=content.replace(old,new,1)
+    audit_path.write_text(content,encoding='utf-8')
+
+
+def mark_remote_validation_example(root: Path):
+    """Clearly label the inherited incomplete remote-validation teaching sample."""
+    sample=root/'examples/luau-patterns/RemoteRequestValidation.server.luau'
+    if not sample.is_file():
+        raise ValueError(f'Missing expected teaching example: {sample}')
+    content=sample.read_text(encoding='utf-8')
+    marker='-- V18 SAFETY NOTE: TEACHING EXAMPLE ONLY'
+    if marker in content:
+        return False
+    warning='''-- V18 SAFETY NOTE: TEACHING EXAMPLE ONLY — NOT PRODUCTION-READY.
+-- This sample intentionally leaves authoritative world-state, ownership,
+-- distance, cooldown, and duplicate-request checks incomplete.
+-- Do not copy it into a live experience as-is. Implement and test each check
+-- on the server for your specific game before granting any result.
+
+'''
+    sample.write_text(warning+content.lstrip('\n'),encoding='utf-8')
+    return True
+
 def integrate(root):
     if not (root/'AGENTS.md').is_file() or not (root/'.agents/skills').is_dir(): raise ValueError('Target is not a reconstructed cumulative package')
     if not (root/'v17/VERSION').is_file(): raise ValueError('Pinned V17 baseline is required')
@@ -53,21 +132,9 @@ def integrate(root):
         source_dir=root/version/'codex-skills'
         if source_dir.is_dir():
             for p in sorted(source_dir.glob('*/SKILL.md')): add_contract(p)
-    # Upgrade inherited audit to the current cumulative skill count and checksum set.
-    audit=root/'v17/tools/audit_cumulative_package.py'
-    a=audit.read_text(encoding='utf-8').replace('EXPECTED_INSTALLED_SKILLS = 175','EXPECTED_INSTALLED_SKILLS = 179')
-    old='''CURRENT_MANIFESTS = {
-    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
-    "V17_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V17_SHA256SUMS.txt"},
-    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
-}'''
-    new='''CURRENT_MANIFESTS = {
-    "SHA256SUMS.txt": {"SHA256SUMS.txt", "V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
-    "V18_SHA256SUMS.txt": {"V14_SHA256SUMS.txt", "V18_SHA256SUMS.txt"},
-    "V14_SHA256SUMS.txt": {"V14_SHA256SUMS.txt"},
-}'''
-    if old not in a: raise ValueError('Could not upgrade V17 current-manifest contract')
-    audit.write_text(a.replace(old,new),encoding='utf-8')
+    # Migrate the inherited audit to 175 installed skills and exempt only the four V18 upgrades.
+    migrate_v17_audit(root/'v17/tools/audit_cumulative_package.py')
+    mark_remote_validation_example(root)
     (root/'v17/docs/PACKAGE_INTEGRITY.md').write_text('''# Cumulative Package Integrity After V18
 
 V17 manifests are historical snapshots in V18. The active manifests are `SHA256SUMS.txt`, `V18_SHA256SUMS.txt`, and `V14_SHA256SUMS.txt`. Generate in that order: root excludes all three; V18 includes root and excludes itself plus V14; V14 covers every file except itself. See `v18/docs/PACKAGE_INTEGRITY.md`.
@@ -120,6 +187,11 @@ def finalize(root):
     (root/'README.md').write_text(f'''# Roblox Codex Game Studio Kit
 
 **Current cumulative release: V{version}.** This is the complete V1–V18 package; earlier versions do not need separate downloads.
+
+## Requirements
+- Python 3.13 is the supported and CI-validated runtime. The inherited package uses `tomllib` (standard library since Python 3.11).
+- From the package root, install validation dependencies with `python -m pip install -r requirements-ci.txt -r v18/requirements-ci.txt`.
+- The basic `doctor` and `route` commands use only the Python standard library; schema validation and full verification require the installed packages.
 
 ## Start with Codex
 1. Extract this archive and open the extracted folder in Codex.

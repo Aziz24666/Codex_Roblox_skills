@@ -3,15 +3,15 @@
 [![V18 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v18-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v18-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V18.0.0 — Connected Automation and Cross-Skill Orchestration.** This is the complete cumulative V1–V18 Roblox game-development toolkit for Codex. You only need the current V18 release; earlier versions do not need separate downloads.
+**Current release: V18.0.1 — Connected Automation and Cross-Skill Orchestration.** This is the complete cumulative V1–V18 Roblox game-development toolkit for Codex. You only need the current V18 release; earlier versions do not need separate downloads.
 
 ## Download
 
-The complete package will be attached to the [V18.0.0 GitHub Release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v18.0.0) as ZIP and TAR.XZ archives, with SHA-256 checksums.
+The complete package will be attached to the [V18.0.1 GitHub Release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v18.0.1) as ZIP and TAR.XZ archives, with SHA-256 checksums.
 
 ## What's included
 
-- **179 native Codex skills** spanning Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
+- **175 native Codex skills** spanning Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
 - **16 V18 skills**: 12 workflow/orchestration skills plus four economy specialists for no-gambling monetization, deterministic shops, all-prior-tier ownership progression, and gameplay-earned currency.
 - A strict no-gambling policy: no paid random rewards, wagers, paid rerolls, or Robux-funded chance outcomes. Supported deterministic monetization includes cosmetics, game passes, guaranteed developer products, subscriptions, paid access, and private servers.
 - A shared handoff contract connecting the specialist skill library through one task lifecycle.
@@ -19,6 +19,17 @@ The complete package will be attached to the [V18.0.0 GitHub Release](https://gi
 - A local Python CLI for project inspection, task routing, work-item scaffolding, dependency validation, and package verification.
 - Versioned work-item, project-profile, skill-registry, and workflow-evidence schemas with examples.
 - Reusable Luau patterns, Studio tooling, templates, sample projects, quality gates, and historical migration guides from V1–V17.
+
+## Requirements
+
+- **Python 3.13** is the supported and CI-validated runtime. The inherited package uses `tomllib`, included in Python 3.11 and later.
+- From the extracted package root, install the packaged validation dependencies before running validation or verification:
+
+  ```bash
+  python -m pip install -r requirements-ci.txt -r v18/requirements-ci.txt
+  ```
+
+The basic `doctor` and `route` commands use only the Python standard library. Full validation, schema checks, and `verify` require the installed dependencies.
 
 ## Quick start with Codex
 
@@ -54,7 +65,8 @@ CI does **not** launch Roblox Studio. Studio playtests, multiplayer runtime chec
 - [Task contract and state machine](v18/docs/TASK_CONTRACT_AND_STATE_MACHINE.md)
 - [Approval boundaries](v18/docs/APPROVAL_BOUNDARIES.md)
 - [No-gambling and fair monetization policy](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
-- [V18 release notes](RELEASE_NOTES_V18.md)
+- [V18.0.1 release notes](RELEASE_NOTES_V18_0_1.md)
+- [V18.0.0 original release notes](RELEASE_NOTES_V18.md)
 - [MIT License](LICENSE)
 
 ## License and affiliation
