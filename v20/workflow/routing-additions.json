@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "additions": {
+    "security": {
+      "signals": ["server authority", "server authoritative", "remote allowlist", "remote rate limit", "server validation", "server owned state", "request idempotency"],
+      "skills": ["roblox-server-authority-and-remote-boundaries"]
+    },
+    "persistence": {
+      "signals": ["data loss", "session lock", "save recovery", "retry policy", "migration chain", "schema compatibility", "data resilience"],
+      "skills": ["roblox-player-data-resilience-and-migrations"]
+    },
+    "economy": {
+      "signals": ["receipt processing", "duplicate receipt", "idempotent grant", "grant ledger", "transaction integrity", "exact grant"],
+      "skills": ["roblox-idempotent-economy-transactions"]
+    },
+    "release": {
+      "signals": ["staged rollout", "canary", "feature flag", "kill switch", "rollback plan", "live operations", "production rollout", "incident response"],
+      "skills": ["roblox-live-operations-and-safe-rollouts", "roblox-production-observability-and-incident-response"]
+    },
+    "performance": {
+      "signals": ["telemetry", "observability", "alerting", "service health", "error budget", "save failure metrics", "transaction failure metrics"],
+      "skills": ["roblox-production-observability-and-incident-response"]
+    }
+  }
+}
