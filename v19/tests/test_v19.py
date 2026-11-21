@@ -35,6 +35,16 @@ def fixture_root(temp):
     skill_names = {name for domain in route["domains"].values() for name in domain["skills"]}
     additions = json.loads((root / "v19/workflow/routing-additions.json").read_text(encoding="utf-8"))
     skill_names |= {name for domain in additions["additions"].values() for name in domain["skills"]}
+    skill_names.update({
+        "roblox-end-to-end-development-orchestrator",
+        "roblox-task-intake-and-requirements",
+        "roblox-impact-aware-skill-routing",
+        "roblox-evidence-first-completion",
+        "roblox-game-builder",
+        "roblox-cross-system-contract-governance",
+        "roblox-dependency-aware-workstream-planning",
+        "roblox-risk-and-approval-gating",
+    })
     for name in skill_names:
         (root / ".agents/skills" / name).mkdir(parents=True)
         (root / ".agents/skills" / name / "SKILL.md").write_text("fixture\n", encoding="utf-8")
