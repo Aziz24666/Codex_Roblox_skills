@@ -46,8 +46,7 @@ def migrate_v17_audit(audit_path: Path):
     upgraded='V18_UPGRADED_SKILLS = {\n'+''.join(f'    "{name}",\n' for name in sorted(UPGRADE_EXISTING_SKILLS))+'}'
     content=content.replace('EXPECTED_INSTALLED_SKILLS = 175\n','EXPECTED_INSTALLED_SKILLS = 175\n'+upgraded+'\n',1)
 
-    # Find the source/installed parity loop by its actual body, not by
-    # V17-specific collection or loop-variable names.
+    # Find V17's skill-name loop by the source/installed byte comparison.
     loop_pattern=re.compile(r'(?m)^(?P<indent>[ \t]*)for (?P<variable>[A-Za-z_]\w*) in [^\n:]+:\s*$')
     source_parity_loops=[]
     lines=content.splitlines(keepends=True)
@@ -59,29 +58,22 @@ def migrate_v17_audit(audit_path: Path):
             base_indent=len(match.group('indent'))
             body_lines=[]
             for body_line in lines[index+1:]:
-                stripped=body_line.strip()
-                if stripped:
+                if body_line.strip():
                     body_indent=len(body_line)-len(body_line.lstrip(' \t'))
                     if body_indent<=base_indent:
                         break
                 body_lines.append(body_line)
             body=''.join(body_lines)
-            byte_readers=re.findall(r'\b([A-Za-z_]\w*)\.read_bytes\(\)',body)
-            variable=match.group('variable')
-            if 'installed' in body.lower() and variable in byte_readers:
+            if re.search(r'\bsource\.read_bytes\(\)',body) and re.search(r'\binstalled\.read_bytes\(\)',body):
                 source_parity_loops.append((offset,offset+len(line),match))
         offset+=len(line)
     if len(source_parity_loops)!=1:
-        candidates=[line.strip() for line in lines if 'read_bytes()' in line or line.lstrip().startswith('for ')]
-        raise ValueError(
-            f'Expected exactly one V17 source/installed byte-parity loop; found {len(source_parity_loops)}. '
-            f'Candidate audit lines: {candidates[:20]}'
-        )
+        raise ValueError(f'Expected exactly one V17 source/installed byte-parity loop; found {len(source_parity_loops)}')
     loop_start,loop_end,loop_match=source_parity_loops[0]
     indent=loop_match.group('indent')
     variable=loop_match.group('variable')
-    replacement=(f'{indent}for {variable} in {loop_match.group(0).split(" in ",1)[1].rsplit(":",1)[0]}:\n'
-                 f'{indent}    if {variable}.parent.name in V18_UPGRADED_SKILLS:\n'
+    replacement=(loop_match.group(0)+'\n'
+                 f'{indent}    if {variable} in V18_UPGRADED_SKILLS:\n'
                  f'{indent}        continue\n')
     content=content[:loop_start]+replacement+content[loop_end:]
 
