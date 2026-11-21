@@ -3,11 +3,11 @@
 [![V18 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v18-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v18-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V18.0.0 — Connected Automation and Cross-Skill Orchestration.** This is the complete cumulative V1–V18 Roblox game-development toolkit for Codex. You only need the current V18 release; earlier versions do not need separate downloads.
+**Current release: V18.0.1 — Connected Automation and Cross-Skill Orchestration.** This is the complete cumulative V1–V18 Roblox game-development toolkit for Codex. You only need the current V18 release; earlier versions do not need separate downloads.
 
 ## Download
 
-The complete package will be attached to the [V18.0.0 GitHub Release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v18.0.0) as ZIP and TAR.XZ archives, with SHA-256 checksums.
+The complete package will be attached to the [V18.0.1 GitHub Release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v18.0.1) as ZIP and TAR.XZ archives, with SHA-256 checksums.
 
 ## What's included
 
@@ -65,7 +65,8 @@ CI does **not** launch Roblox Studio. Studio playtests, multiplayer runtime chec
 - [Task contract and state machine](v18/docs/TASK_CONTRACT_AND_STATE_MACHINE.md)
 - [Approval boundaries](v18/docs/APPROVAL_BOUNDARIES.md)
 - [No-gambling and fair monetization policy](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
-- [V18 release notes](RELEASE_NOTES_V18.md)
+- [V18.0.1 release notes](RELEASE_NOTES_V18_0_1.md)
+- [V18.0.0 original release notes](RELEASE_NOTES_V18.md)
 - [MIT License](LICENSE)
 
 ## License and affiliation

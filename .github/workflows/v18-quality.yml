@@ -9,6 +9,7 @@ on:
       - '.github/workflows/v18-quality.yml'
       - 'README.md'
       - 'RELEASE_NOTES_V18.md'
+      - 'RELEASE_NOTES_V18_0_1.md'
   pull_request:
     branches: [main]
     paths:
@@ -17,6 +18,7 @@ on:
       - '.github/workflows/v18-quality.yml'
       - 'README.md'
       - 'RELEASE_NOTES_V18.md'
+      - 'RELEASE_NOTES_V18_0_1.md'
   workflow_dispatch:
 
 permissions:
@@ -126,8 +128,8 @@ jobs:
           retention-days: 14
 
   publish:
-    name: Publish V18.0.0 GitHub Release
-    if: github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v18]')
+    name: Publish versioned V18 GitHub Release
+    if: github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v18:')
     runs-on: ubuntu-24.04
     needs: [package]
     permissions:
@@ -149,7 +151,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag="v18.0.0"
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\\[release-v18:(v18\\.[0-9]+\\.[0-9]+)\\].*/\\1/p' | head -n1)"
+          if [[ ! "$tag" =~ ^v18\\.[0-9]+\\.[0-9]+$ ]]; then
+            echo "No valid [release-v18:v18.x.y] marker found in the main-branch commit message."
+            exit 1
+          fi
+          version="${tag#v}"
+          test "$(tr -d '\\r\\n' < v18/VERSION)" = "$version"
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             echo "Release $tag already exists; refusing to overwrite it."
             exit 1
@@ -160,5 +168,5 @@ jobs:
             "$RUNNER_TEMP/v18-release-assets/SHA256SUMS-RELEASE.txt" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "V18.0.0 — Roblox Codex Game Studio Kit" \
-            --notes-file RELEASE_NOTES_V18.md
+            --title "$tag — Roblox Codex Game Studio Kit" \
+            --notes-file RELEASE_NOTES_V18_0_1.md
