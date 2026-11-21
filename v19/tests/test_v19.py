@@ -21,6 +21,7 @@ def fixture_root(temp):
     root = Path(temp)
     (root / "v18/tools").mkdir(parents=True)
     (root / "v18/workflow").mkdir(parents=True)
+    (root / "v19/workflow").mkdir(parents=True)
     (root / "v19/evals").mkdir(parents=True)
     (root / "v19/schemas").mkdir(parents=True)
     shutil.copy2(REPO / "v18/tools/v18.py", root / "v18/tools/v18.py")
