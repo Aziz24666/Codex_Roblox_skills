@@ -102,7 +102,6 @@ def main():
         raise SystemExit("Compiled Python bytecode remains in the release tree")
     counts = check_manifests(root)
     print("Cumulative V19 audit passed.")
-    import json
     print(json.dumps({
         "installed_skills": len(skills),
         "v19_skills": len(source_skills),
