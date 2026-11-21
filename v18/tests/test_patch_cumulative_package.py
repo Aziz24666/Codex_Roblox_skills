@@ -24,10 +24,10 @@ class CumulativePatchTests(unittest.TestCase):
 
 def run_audit():
     source_files = []
-    for path in source_files:
-        installed = installed_root / path.parent.name / "SKILL.md"
-        if not installed.is_file() or installed.read_bytes() != path.read_bytes():
-            errors.append(f"V17 source/installed skill mismatch: {path.parent.name}")
+    for source_skill in source_files:
+        installed = installed_root / source_skill.parent.name / "SKILL.md"
+        if not installed.is_file() or installed.read_bytes() != source_skill.read_bytes():
+            errors.append(f"V17 source/installed skill mismatch: {source_skill.parent.name}")
 '''
 
     def test_v17_audit_migration_updates_count_manifests_and_only_exempts_upgrades(self):
@@ -39,7 +39,7 @@ def run_audit():
             self.assertIn('EXPECTED_INSTALLED_SKILLS = 175',migrated)
             self.assertIn('V18_SHA256SUMS.txt',migrated)
             self.assertNotIn('"V17_SHA256SUMS.txt"',migrated)
-            self.assertIn('if path.parent.name in V18_UPGRADED_SKILLS:',migrated)
+            self.assertIn('if source_skill.parent.name in V18_UPGRADED_SKILLS:',migrated)
             self.assertIn('continue',migrated)
             for name in PATCHER.UPGRADE_EXISTING_SKILLS:
                 self.assertIn(f'"{name}"',migrated)

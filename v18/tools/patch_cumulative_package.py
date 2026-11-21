@@ -46,13 +46,20 @@ def migrate_v17_audit(audit_path: Path):
     upgraded='V18_UPGRADED_SKILLS = {\n'+''.join(f'    "{name}",\n' for name in sorted(UPGRADE_EXISTING_SKILLS))+'}'
     content=content.replace('EXPECTED_INSTALLED_SKILLS = 175\n','EXPECTED_INSTALLED_SKILLS = 175\n'+upgraded+'\n',1)
 
-    loop_pattern=re.compile(r'(?m)^(?P<indent>[ \t]*)for path in source_files:\s*$')
-    loops=list(loop_pattern.finditer(content))
+    # V17's loop variable name is not part of the audit contract; locate the
+    # source_files loop whose body performs byte-for-byte parity.
+    loop_pattern=re.compile(r'(?m)^(?P<indent>[ \t]*)for (?P<variable>[A-Za-z_]\w*) in source_files:\s*$')
+    loops=[]
+    for match in loop_pattern.finditer(content):
+        body=content[match.end():match.end()+1800]
+        if 'read_bytes()' in body and 'installed' in body:
+            loops.append(match)
     if len(loops)!=1:
-        raise ValueError(f'Expected exactly one V17 source/installed parity loop; found {len(loops)}')
+        raise ValueError(f'Expected exactly one V17 source/installed byte-parity loop; found {len(loops)}')
     indent=loops[0].group('indent')
-    replacement=(f'{indent}for path in source_files:\n'
-                 f'{indent}    if path.parent.name in V18_UPGRADED_SKILLS:\n'
+    variable=loops[0].group('variable')
+    replacement=(f'{indent}for {variable} in source_files:\n'
+                 f'{indent}    if {variable}.parent.name in V18_UPGRADED_SKILLS:\n'
                  f'{indent}        continue')
     content=loop_pattern.sub(lambda _: replacement,content,count=1)
 
