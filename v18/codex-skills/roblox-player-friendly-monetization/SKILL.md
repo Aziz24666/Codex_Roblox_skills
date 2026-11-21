@@ -3,7 +3,39 @@ name: roblox-player-friendly-monetization
 description: Design transparent Roblox monetization with deterministic products, fair pricing, and a strict no-gambling policy.
 ---
 
-# Player-friendly Roblox monetization
+## Mandatory current-source research gate
+
+Before substantive implementation, refresh the official Roblox Creator Hub documentation, Community Standards, Terms, and relevant update/deprecation notes for the exact systems involved. Check upstream tool documentation as well. Record exact source URLs, access dates, verified claims, alternatives, decisions, and a verification plan in `research/decisions/`. Re-open version-sensitive sources for every new task; do not invent citations or claim research was completed when it was not. When a platform rule or API cannot be verified, mark the affected work `BLOCKED — RESEARCH NOT VERIFIED` rather than guessing. Treat current platform policies as hard constraints, not optional suggestions.
+
+# Roblox Player-Friendly Monetization
+
+## When to use
+Use when planning or reviewing a game's store, direct purchases, passes, catalog items, progression purchases, or revenue design.
+
+## Principles
+- Sell a clearly identified item or benefit, never an unknown outcome.
+- Show the full contents, price, duration, eligibility, and important limitations before purchase.
+- Prefer optional vanity, customization, emotes, titles, and non-combat convenience features.
+- Never use simulated or actual gambling activities, wagers, paid random outcomes, or chance-based purchase flows.
+- Do not use fake scarcity, misleading countdowns, coercive prompts, or confusing purchase buttons.
+- Keep the core game understandable and enjoyable without purchases.
+
+## Procedure
+1. Identify target audience, platform purchase types, and current Roblox monetization policies.
+2. Map every offer to a named catalog item and guaranteed delivery behavior.
+3. Separate gameplay-earned currency from any platform purchase currency and prevent accidental conversion paths.
+4. Check that product descriptions match actual runtime grants.
+5. Use server-side purchase receipt processing and durable idempotent fulfillment where platform developer products are involved; re-read current official docs.
+6. Make cancellation, entitlement re-check, refunds/receipt retries, and support handling explicit.
+7. Review accessibility, regional eligibility, age/platform restrictions, and non-pushy presentation.
+8. Measure retention and user sentiment alongside revenue; remove offers that damage core play.
+
+## Output contract
+Provide offer matrix, exact benefits, purchase/fulfillment flow, platform-policy checklist, non-purchase route, and test evidence.
+
+## V18 policy and implementation update
+
+### V18 updated guidance
 
 ## Non-negotiable V18 policy: no gambling
 

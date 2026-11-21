@@ -3,7 +3,33 @@ name: roblox-earned-currency-economy
 description: Design a fair Roblox economy where gameplay earns currency through fixed, server-validated rewards.
 ---
 
-# Earned-currency economy
+## Mandatory current-source research gate
+
+Before substantive implementation, refresh the official Roblox Creator Hub documentation, Community Standards, Terms, and relevant update/deprecation notes for the exact systems involved. Check upstream tool documentation as well. Record exact source URLs, access dates, verified claims, alternatives, decisions, and a verification plan in `research/decisions/`. Re-open version-sensitive sources for every new task; do not invent citations or claim research was completed when it was not. When a platform rule or API cannot be verified, mark the affected work `BLOCKED — RESEARCH NOT VERIFIED` rather than guessing. Treat current platform policies as hard constraints, not optional suggestions.
+
+# Roblox Earned Currency Economy
+
+## When to use
+Use when designing non-redeemable gameplay currency, rewards, shops, economy balancing, or player progression.
+
+## Procedure
+1. Define each currency, intended use, earn sources, sinks, caps, expiration, and whether it is transferable.
+2. For the requested free progression currency, allow only validated gameplay-earned grants; do not add a real-money purchase route or cash conversion.
+3. Keep all balances and grants server-authoritative. Never trust client-submitted balance deltas, reward amounts, or completed objectives.
+4. Record each transaction with a unique ID, player/account key, source, amount, before/after balance, timestamp, catalog/version reference, and result.
+5. Enforce nonnegative balances, integer/range bounds, rate limits, and source-specific eligibility.
+6. Make reward and purchase handlers idempotent under retries, reconnects, and duplicate remote calls.
+7. Define conflict resolution and atomic persistence using documented Roblox data APIs and current limits.
+8. Create synthetic tests for duplicated grants, replay, concurrency, disconnects, malformed amounts, overflows, and datastore failure.
+9. Add economy telemetry for inflation, concentration, bottlenecks, and unintended farming using privacy-minimizing aggregates.
+10. Document migration and rollback for persistent schema changes.
+
+## Output contract
+Provide currency definitions, source/sink table, transaction ledger, abuse controls, balance invariants, synthetic tests, and measured economy assumptions.
+
+## V18 policy and implementation update
+
+### V18 updated guidance
 
 ## Economy principles
 

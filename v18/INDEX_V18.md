@@ -1,6 +1,6 @@
 # Roblox Codex Game Studio Kit — V18 Index
 
-V18 adds a connected development control plane to the complete V1–V17 package. After integration, the cumulative package includes 179 native Codex skills. V18 adds 16 skills: 12 workflow/orchestration specialists and four economy/monetization specialists, alongside task graphs, shared contracts, agent coordination, validation, safe autonomy, and evidence-backed completion.
+V18 adds a connected development control plane to the complete V1–V17 package. After integration, the cumulative package includes 175 native Codex skills. V18 provides 16 specialist definitions: 12 new workflow/orchestration skills and updated versions of four economy/monetization skills already present in V17, alongside task graphs, shared contracts, agent coordination, validation, safe autonomy, and evidence-backed completion.
 
 ## Start here
 - Root `AGENTS.md` — operating contract.

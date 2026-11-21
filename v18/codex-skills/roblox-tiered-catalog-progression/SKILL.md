@@ -3,7 +3,38 @@ name: roblox-tiered-catalog-progression
 description: Implement clear catalog tiers where all items in every earlier tier must be owned before the next tier unlocks.
 ---
 
-# Tiered catalog progression
+## Mandatory current-source research gate
+
+Before substantive implementation, refresh the official Roblox Creator Hub documentation, Community Standards, Terms, and relevant update/deprecation notes for the exact systems involved. Check upstream tool documentation as well. Record exact source URLs, access dates, verified claims, alternatives, decisions, and a verification plan in `research/decisions/`. Re-open version-sensitive sources for every new task; do not invent citations or claim research was completed when it was not. When a platform rule or API cannot be verified, mark the affected work `BLOCKED — RESEARCH NOT VERIFIED` rather than guessing. Treat current platform policies as hard constraints, not optional suggestions.
+
+# Roblox Tiered Catalog Progression
+
+## When to use
+Use for deterministic unlock tracks, collection completion, catalog tiers, and transparent sequential storefronts.
+
+## Required behavior
+- Every item in a tier is listed before the player starts that tier.
+- Each item has a fixed, visible price and a guaranteed grant.
+- Tier N+1 remains locked until the player owns every required item in Tier N.
+- A locked tier explains the exact missing prerequisites.
+- No chance, spin, wager, or random reward is used.
+
+## Procedure
+1. Create a versioned catalog with stable item IDs and strictly ordered tier IDs.
+2. Validate unique IDs, nonnegative integer prices, known prerequisites, no cycles, and no gaps in tier order.
+3. Compute completion from server-persisted ownership, not client UI or client-supplied flags.
+4. On purchase, re-check the previous tier's completion in the same authoritative transaction as the debit/grant.
+5. Make purchase operations idempotent and safe under duplicate/concurrent requests.
+6. Add catalog migration rules for renamed, removed, or retired items. Never silently reset existing ownership.
+7. Add tests for partial completion, exact completion, duplicate purchase, concurrent final item purchases, and catalog updates.
+8. Display owned, available, locked, and insufficient-currency states accessibly.
+
+## Output contract
+Provide tier graph, catalog, per-tier completion rules, persistence model, migration policy, UI states, and tests.
+
+## V18 policy and implementation update
+
+### V18 updated guidance
 
 ## Required V18 unlock rule
 
