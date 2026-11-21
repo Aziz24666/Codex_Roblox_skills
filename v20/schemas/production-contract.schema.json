@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v20/production-contract.schema.json",
+  "title": "Roblox Production Reliability Contract",
+  "description": "A reviewable declaration of server authority, player-data, economy, rollout, and observability controls. It does not prove those controls are deployed or tested.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "project", "environments", "authority", "persistence", "economy", "rollout", "observability"],
+  "properties": {
+    "contract_version": { "const": 1 },
+    "project": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "owner_team", "criticality"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "owner_team": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "criticality": { "type": "string", "enum": ["low", "moderate", "high", "critical"] }
+      }
+    },
+    "environments": {
+      "type": "object", "additionalProperties": false,
+      "required": ["development", "staging", "canary", "production"],
+      "properties": {
+        "development": { "$ref": "#/$defs/environment" },
+        "staging": { "$ref": "#/$defs/environment" },
+        "canary": { "$ref": "#/$defs/environment" },
+        "production": { "$ref": "#/$defs/environment" }
+      }
+    },
+    "authority": {
+      "type": "object", "additionalProperties": false,
+      "required": ["server_owned_state", "client_can_write_server_owned_state", "reject_unknown_remote_operations", "remote_operations"],
+      "properties": {
+        "server_owned_state": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "client_can_write_server_owned_state": { "const": false },
+        "reject_unknown_remote_operations": { "const": true },
+        "remote_operations": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/remoteOperation" } }
+      }
+    },
+    "persistence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "write_api", "retry_policy", "load_failure_policy", "backup_strategy", "recovery_runbook", "migrations"],
+      "properties": {
+        "schema_version": { "type": "integer", "minimum": 1 },
+        "write_api": { "const": "UpdateAsync" },
+        "retry_policy": {
+          "type": "object", "additionalProperties": false,
+          "required": ["max_attempts", "initial_delay_seconds", "max_delay_seconds", "jitter"],
+          "properties": {
+            "max_attempts": { "type": "integer", "minimum": 1, "maximum": 10 },
+            "initial_delay_seconds": { "type": "number", "minimum": 0, "maximum": 60 },
+            "max_delay_seconds": { "type": "number", "minimum": 1, "maximum": 300 },
+            "jitter": { "const": true }
+          }
+        },
+        "load_failure_policy": { "type": "string", "enum": ["fail_closed", "safe_defaults_with_notice", "retry_then_safe_mode"] },
+        "backup_strategy": { "type": "string", "minLength": 10 },
+        "recovery_runbook": { "type": "string", "minLength": 10 },
+        "migrations": { "type": "array", "items": { "$ref": "#/$defs/migration" } }
+      }
+    },
+    "economy": {
+      "type": "object", "additionalProperties": false,
+      "required": ["paid_random_rewards", "receipt_processing_idempotent", "products"],
+      "properties": {
+        "paid_random_rewards": { "const": false },
+        "receipt_processing_idempotent": { "const": true },
+        "products": { "type": "array", "items": { "$ref": "#/$defs/product" } }
+      }
+    },
+    "rollout": {
+      "type": "object", "additionalProperties": false,
+      "required": ["stages", "feature_flags_enabled", "kill_switch", "rollback_plan", "compatibility_window_days"],
+      "properties": {
+        "stages": {
+          "type": "array", "minItems": 4, "maxItems": 4,
+          "items": { "type": "string", "enum": ["development", "staging", "canary", "production"] }
+        },
+        "feature_flags_enabled": { "const": true },
+        "kill_switch": { "$ref": "#/$defs/killSwitch" },
+        "rollback_plan": { "type": "string", "minLength": 20 },
+        "compatibility_window_days": { "type": "integer", "minimum": 0, "maximum": 90 }
+      }
+    },
+    "observability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["required_metrics", "alerts", "redacts_personal_data", "access_controlled_dashboards", "incident_runbook"],
+      "properties": {
+        "required_metrics": {
+          "type": "array", "uniqueItems": true,
+          "items": { "type": "string", "enum": ["server_errors", "remote_rejections", "data_save_failures", "transaction_failures", "request_latency", "player_session_health"] }
+        },
+        "alerts": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 5 } },
+        "redacts_personal_data": { "const": true },
+        "access_controlled_dashboards": { "const": true },
+        "incident_runbook": { "type": "string", "minLength": 20 }
+      }
+    }
+  },
+  "$defs": {
+    "environment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["place_identity", "data_store_mode", "purpose"],
+      "properties": {
+        "place_identity": { "type": "string", "minLength": 3 },
+        "data_store_mode": { "type": "string", "enum": ["isolated", "production"] },
+        "purpose": { "type": "string", "minLength": 5 }
+      }
+    },
+    "remoteOperation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["operation_id", "remote_name", "direction", "rate_limit_per_minute", "server_validates_input", "checks_ownership", "checks_context", "side_effect", "idempotency_key"],
+      "properties": {
+        "operation_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$" },
+        "remote_name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "direction": { "const": "client_to_server" },
+        "rate_limit_per_minute": { "type": "integer", "minimum": 1, "maximum": 600 },
+        "server_validates_input": { "const": true },
+        "checks_ownership": { "const": true },
+        "checks_context": { "const": true },
+        "side_effect": { "type": "string", "enum": ["none", "persistent_write", "value_grant", "purchase_fulfillment"] },
+        "idempotency_key": { "type": "boolean" }
+      }
+    },
+    "migration": {
+      "type": "object", "additionalProperties": false,
+      "required": ["from_version", "to_version", "deterministic", "idempotent", "reversible", "validation_scenario"],
+      "properties": {
+        "from_version": { "type": "integer", "minimum": 1 },
+        "to_version": { "type": "integer", "minimum": 2 },
+        "deterministic": { "const": true },
+        "idempotent": { "const": true },
+        "reversible": { "type": "boolean" },
+        "validation_scenario": { "type": "string", "minLength": 10 },
+        "rollback_plan": { "type": "string", "minLength": 10 }
+      }
+    },
+    "product": {
+      "type": "object", "additionalProperties": false,
+      "required": ["product_id", "grant_id", "grant_definition", "price_robux"],
+      "properties": {
+        "product_id": { "type": "string", "minLength": 1 },
+        "grant_id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{2,63}$" },
+        "grant_definition": { "type": "string", "minLength": 5 },
+        "price_robux": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "killSwitch": {
+      "type": "object", "additionalProperties": false,
+      "required": ["enabled", "owner", "activation_procedure"],
+      "properties": {
+        "enabled": { "const": true },
+        "owner": { "type": "string", "minLength": 2 },
+        "activation_procedure": { "type": "string", "minLength": 10 }
+      }
+    }
+  }
+}

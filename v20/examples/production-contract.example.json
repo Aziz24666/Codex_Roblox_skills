@@ -1,0 +1,55 @@
+{
+  "contract_version": 1,
+  "project": {"name":"Example Roblox Experience","owner_team":"Game Operations","criticality":"high"},
+  "environments": {
+    "development": {"place_identity":"replace-with-development-place","data_store_mode":"isolated","purpose":"Developer iteration and automated tests"},
+    "staging": {"place_identity":"replace-with-staging-place","data_store_mode":"isolated","purpose":"Pre-release integration and regression tests"},
+    "canary": {"place_identity":"replace-with-canary-place","data_store_mode":"isolated","purpose":"Limited rollout validation using isolated test data"},
+    "production": {"place_identity":"replace-with-production-place","data_store_mode":"production","purpose":"Live player experience and production data"}
+  },
+  "authority": {
+    "server_owned_state":["currency","inventory","progression","purchaseReceipts"],
+    "client_can_write_server_owned_state":false,
+    "reject_unknown_remote_operations":true,
+    "remote_operations":[{
+      "operation_id":"purchase-fixed-product","remote_name":"RequestPurchase","direction":"client_to_server",
+      "rate_limit_per_minute":12,"server_validates_input":true,"checks_ownership":true,"checks_context":true,
+      "side_effect":"purchase_fulfillment","idempotency_key":true
+    }]
+  },
+  "persistence": {
+    "schema_version":2,"write_api":"UpdateAsync",
+    "retry_policy":{"max_attempts":5,"initial_delay_seconds":1,"max_delay_seconds":30,"jitter":true},
+    "load_failure_policy":"retry_then_safe_mode",
+    "backup_strategy":"Keep versioned backups and verify a restore rehearsal before destructive migrations.",
+    "recovery_runbook":"Quarantine the affected profile, preserve the last known good backup, and require owner approval before restoring player state.",
+    "migrations":[{
+      "from_version":1,"to_version":2,"deterministic":true,"idempotent":true,"reversible":true,
+      "validation_scenario":"Run the migration twice against an isolated fixture and compare the resulting version-two profile.",
+      "rollback_plan":"Restore the captured version-one fixture and confirm no production profile was modified."
+    }]
+  },
+  "economy": {
+    "paid_random_rewards":false,"receipt_processing_idempotent":true,
+    "products":[{
+      "product_id":"replace-with-developer-product-id","grant_id":"starter-currency-pack",
+      "grant_definition":"Grant exactly the configured fixed currency amount once per verified receipt.","price_robux":99
+    }]
+  },
+  "rollout": {
+    "stages":["development","staging","canary","production"],"feature_flags_enabled":true,
+    "kill_switch":{"enabled":true,"owner":"On-call game engineer","activation_procedure":"Disable the named feature flag, confirm server acknowledgement, and record the change."},
+    "rollback_plan":"Stop promotion, disable the feature flag, restore the last compatible release, and follow the approved data recovery procedure. Never roll back by overwriting newer player data.",
+    "compatibility_window_days":14
+  },
+  "observability": {
+    "required_metrics":["server_errors","remote_rejections","data_save_failures","transaction_failures","request_latency"],
+    "alerts":[
+      "Alert on sustained player data save failures above the agreed baseline.",
+      "Alert on purchase receipt processing errors and unexpected grant mismatches.",
+      "Alert on abnormal remote rejection or server error rates."
+    ],
+    "redacts_personal_data":true,"access_controlled_dashboards":true,
+    "incident_runbook":"Triage impact, preserve evidence, contain the affected feature, notify the owner, roll back safely, and document recovery and follow-up actions."
+  }
+}
