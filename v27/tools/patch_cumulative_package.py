@@ -35,6 +35,13 @@ def patch(package_root: Path, source_root: Path | None = None) -> int:
     existing = len(list(target_skills.glob("*/SKILL.md")))
     if existing not in {210, 213}:
         raise ValueError(f"Expected 210 pre-V27 skills or an already-patched 213-skill package, found {existing}.")
+    collisions = [
+        skill_file.parent.name
+        for skill_file in skill_files
+        if (target_skills / skill_file.parent.name / "SKILL.md").is_file()
+    ]
+    if collisions:
+        raise ValueError("V27 skill name collision(s) with inherited skills: " + ", ".join(sorted(collisions)))
 
     shutil.copytree(
         source_root, package_root / "v27", dirs_exist_ok=True,
