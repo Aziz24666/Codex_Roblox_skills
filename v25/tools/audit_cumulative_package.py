@@ -5,7 +5,7 @@ import argparse
 from pathlib import Path
 EXPECTED_SKILLS = 207
 REQUIRED_FILES = (
-    "AGENTS.md", "README.md", "INDEX_V25.md", "v25/VERSION", "v25/tools/v25.py",
+    "AGENTS.md", "README.md", "INDEX.md", "INDEX_V25.md", "v25/VERSION", "v25/tools/v25.py",
     "v25/tools/patch_cumulative_package.py", "v25/docs/SESSION_CONTINUITY.md",
     "v25/tests/test_v25.py",
     ".agents/skills/roblox-codex-session-continuity/SKILL.md",
@@ -24,6 +24,9 @@ def audit(root: Path) -> list[str]:
     version = (root / "v25" / "VERSION").read_text(encoding="utf-8").strip() if (root / "v25" / "VERSION").is_file() else ""
     if version != "25.0.0":
         problems.append(f"Unexpected V25 version: {version!r}.")
+    readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
+    if "V25" not in readme:
+        problems.append("README.md does not identify the V25 package.")
     return problems
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
