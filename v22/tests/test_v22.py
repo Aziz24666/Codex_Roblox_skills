@@ -78,6 +78,32 @@ class PricingAuditTests(unittest.TestCase):
             rows = V22.audit_pricing(root)["findings"]
             self.assertEqual([row["line"] for row in rows], [2, 3])
 
+
+    def test_file_limit_is_reported_as_truncated(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for index in range(3):
+                (root / f"Script{index}.lua").write_text("print('hello')\\n", encoding="utf-8")
+            previous_limit = V22.MAX_FILES
+            try:
+                V22.MAX_FILES = 2
+                report = V22.audit_pricing(root)
+            finally:
+                V22.MAX_FILES = previous_limit
+            self.assertTrue(report["summary"]["scan_truncated"])
+            self.assertEqual(report["summary"]["files_considered"], 2)
+            self.assertTrue(any("stopped at 2" in item for item in report["next_steps"]))
+
+    def test_report_matches_published_json_schema(self):
+        import jsonschema
+
+        with tempfile.TemporaryDirectory() as temporary:
+            report = V22.audit_pricing(Path(temporary))
+        schema = json.loads(
+            (ROOT / "v22/schemas/pricing-readiness-report.schema.json").read_text(encoding="utf-8")
+        )
+        jsonschema.Draft202012Validator(schema).validate(report)
+
     def test_missing_project_root_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
             missing = Path(temporary) / "does-not-exist"
