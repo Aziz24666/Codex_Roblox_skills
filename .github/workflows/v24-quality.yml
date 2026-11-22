@@ -31,7 +31,7 @@ jobs:
           set -euo pipefail
           archive="$RUNNER_TEMP/v24-source-overlay.zip"
           cp .github/workflows/v24-quality.yml "$RUNNER_TEMP/v24-quality.yml"
-          cat dist/v24-source-overlay-b64parts/part-*.b64 | base64 --decode > "$archive"
+          cat dist/v24-source-overlay-b64parts/part-01.b64 dist/v24-source-overlay-b64parts/part-02.b64 dist/v24-source-overlay-b64parts/part-03.b64 dist/v24-source-overlay-b64parts/part-04.b64 dist/v24-source-overlay-b64parts/part-05.b64 dist/v24-source-overlay-b64parts/part-06a.b64 dist/v24-source-overlay-b64parts/part-06b.b64 dist/v24-source-overlay-b64parts/part-07.b64 dist/v24-source-overlay-b64parts/part-08.b64 dist/v24-source-overlay-b64parts/part-09.b64 dist/v24-source-overlay-b64parts/part-10.b64 | base64 --decode > "$archive"
           echo "fe9b3539fc33a11c0d5da3b6362e78a1ab16ebde76c9db768a3fe75a14561a93  $archive" | sha256sum --check
           unzip -t "$archive"
           unzip -oq "$archive" -d .
