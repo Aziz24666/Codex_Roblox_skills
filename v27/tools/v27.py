@@ -117,7 +117,10 @@ def iter_luau_files(root: Path, max_files: int, warnings: list[str]) -> list[Pat
         kept_dirs: list[str] = []
         for dirname in sorted(dirnames):
             item = current / dirname
-            if dirname in SKIP_DIRS or item.is_symlink():
+            if dirname in SKIP_DIRS:
+                continue
+            if item.is_symlink():
+                warnings.append(f"Skipped symlinked source directory: {item.relative_to(root)}")
                 continue
             if not path_is_within(item, root):
                 warnings.append(f"Skipped directory outside project root: {item.relative_to(root)}")
@@ -214,43 +217,50 @@ def resolve_script_require(
 
 
 def find_cycles(graph: dict[str, set[str]]) -> list[list[str]]:
-    index = 0
-    indices: dict[str, int] = {}
-    lowlinks: dict[str, int] = {}
-    stack: list[str] = []
-    on_stack: set[str] = set()
+    """Return strongly connected components without recursive Python calls."""
+    nodes = set(graph)
+    reverse: dict[str, set[str]] = defaultdict(set)
+    for source, targets in graph.items():
+        nodes.update(targets)
+        for target in targets:
+            reverse[target].add(source)
+
+    visited: set[str] = set()
+    finish_order: list[str] = []
+    for start_node in sorted(nodes):
+        if start_node in visited:
+            continue
+        stack: list[tuple[str, bool]] = [(start_node, False)]
+        while stack:
+            node, expanded = stack.pop()
+            if expanded:
+                finish_order.append(node)
+                continue
+            if node in visited:
+                continue
+            visited.add(node)
+            stack.append((node, True))
+            for target in sorted(graph.get(node, set()), reverse=True):
+                if target not in visited:
+                    stack.append((target, False))
+
+    visited.clear()
     cycles: list[list[str]] = []
-
-    def visit(node: str) -> None:
-        nonlocal index
-        indices[node] = index
-        lowlinks[node] = index
-        index += 1
-        stack.append(node)
-        on_stack.add(node)
-        for target in sorted(graph.get(node, set())):
-            if target not in indices:
-                visit(target)
-                lowlinks[node] = min(lowlinks[node], lowlinks[target])
-            elif target in on_stack:
-                lowlinks[node] = min(lowlinks[node], indices[target])
-        if lowlinks[node] == indices[node]:
-            component: list[str] = []
-            while stack:
-                member = stack.pop()
-                on_stack.remove(member)
-                component.append(member)
-                if member == node:
-                    break
-            if len(component) > 1 or (len(component) == 1 and component[0] in graph.get(component[0], set())):
-                cycles.append(sorted(component))
-
-    all_nodes = set(graph)
-    for targets in graph.values():
-        all_nodes.update(targets)
-    for node in sorted(all_nodes):
-        if node not in indices:
-            visit(node)
+    for start_node in reversed(finish_order):
+        if start_node in visited:
+            continue
+        component: list[str] = []
+        stack = [start_node]
+        visited.add(start_node)
+        while stack:
+            node = stack.pop()
+            component.append(node)
+            for target in sorted(reverse.get(node, set()), reverse=True):
+                if target not in visited:
+                    visited.add(target)
+                    stack.append(target)
+        if len(component) > 1 or (len(component) == 1 and component[0] in graph.get(component[0], set())):
+            cycles.append(sorted(component))
     return sorted(cycles)
 
 
@@ -372,6 +382,16 @@ def validate_rojo_project(project_path: Path, root: Path) -> dict[str, Any]:
                 else:
                     resolved = (project_path.parent / candidate)
                     try:
+                        probe = project_path.parent
+                        has_symlink = False
+                        for part in candidate.parts:
+                            probe = probe / part
+                            if probe.is_symlink():
+                                has_symlink = True
+                                break
+                        if has_symlink:
+                            result["errors"].append(f"$path traverses a symlink at {logical_path or '<root>'}: {raw_path}")
+                            return
                         resolved_final = resolved.resolve(strict=True)
                     except (OSError, RuntimeError):
                         result["errors"].append(f"Missing or unresolvable $path at {logical_path or '<root>'}: {raw_path}")
@@ -467,10 +487,6 @@ def build_report(root: Path, max_files: int = 10_000) -> dict[str, Any]:
     possible_unused = sorted(candidates - referenced)
     project_paths = discover_rojo_projects(root)
     rojo_projects = [validate_rojo_project(path, root) for path in project_paths]
-    strict_candidates = [
-        path for path in possible_unused
-        if modes  # keep this list deterministic while ensuring no mutation
-    ]
     strict_percent = round((modes["strict"] / max(1, len(sources))) * 100, 2)
 
     remote_report = inspect_remotes(sources, root)
