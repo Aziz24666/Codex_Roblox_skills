@@ -1,57 +1,61 @@
 # Roblox Codex Game Studio Kit
 
-[![V25 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v25-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v25-quality.yml)
+[![V26 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v26-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v26-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V25.0.1 — Toolkit Audit and Reliability Fixes.** This is the complete cumulative V1-V25 toolkit. Only the current release is required.
+**Current release: V26.0.0 — Roblox Studio MCP and Automated Testing.** This is the complete cumulative V1-V26 toolkit. Only the current release is required.
 
-[Open the V25 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v25.0.1).
+[Open the V26 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v26.0.0).
 
 ## What's included
 
-- **207 native Codex skills** for Roblox engineering, Luau, gameplay, characters, UI, networking, persistence, economy, procedural content, NPCs, Studio tools, testing, performance, release engineering, and monetization.
+- **210 native Codex skills** for Roblox engineering, Luau, gameplay, characters, UI, networking, persistence, economy, procedural content, NPCs, Studio tools, testing, performance, release engineering, and monetization.
 - V23-V24 sustainable monetization discovery, opportunity ranking, backlog creation, and growth-roadmap automation.
-- V25 durable checkpoints, recoverable handoff prompts, backup recovery, a validated hash-chained event journal, project-root binding, and bounded-stage task execution.
-- Hardened V23 opportunity scanning that excludes toolkit/session metadata, skips symlinks, validates catalogue data, and limits report paths to the selected project.
-- Atomic checkpoint writes, concurrent-write protection, integrity checks, and automatic Git-ignore rules for local session files.
-- Existing V18-V24 no-gambling, fair-monetization, server-authority, evidence, and Roblox platform-compliance safeguards.
+- V25 durable checkpoints, recoverable handoff prompts, backup recovery, validated journal integrity, project-root binding, and bounded-stage task execution.
+- V26 Studio MCP workflow skills for safe inspection/editing, multiplayer/device/network testing, and evidence-based change review.
+- A read-only V26 MCP configuration doctor and a review-only test-plan generator/verifier.
+- Cumulative Luau compilation, Rojo builds, regression suites, package audits, archive integrity checks, and release checks.
 
 ## Start a Roblox development session
 
-1. Download and extract the V25 release, then open the cumulative package root in Codex.
-2. Read AGENTS.md and INDEX_V25.md.
-3. Initialize a checkpoint in the **actual game project folder**:
+1. Download and extract the V26 release, then open the cumulative package root in Codex.
+2. Read `AGENTS.md` and `INDEX_V26.md`.
+3. Initialize session continuity in the **actual game project folder**:
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v25\v25\tools\v25.py" start --root "C:\Path\To\YourGame" --goal "Build and ship my Roblox game"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v26\v25\tools\v25.py" start --root "C:\Path\To\YourGame" --goal "Build and ship my Roblox game"
 
-4. After each independently verified implementation stage, save progress:
+4. Check the Studio MCP configuration without executing it (optional):
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v25\v25\tools\v25.py" checkpoint --root "C:\Path\To\YourGame" --stage "Server validation" --completed "Added server-side validation" --next "Run Studio integration tests" --test "Unit tests: PASS"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v26\v26\tools\v26.py" doctor --root "C:\Path\To\YourGame" --config "C:\Path\To\mcp.json"
 
-5. Before ending a conversation or after a significant stage, create a handoff:
+5. Generate a review-only Studio test plan:
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v25\v25\tools\v25.py" handoff --root "C:\Path\To\YourGame" --stage "Server validation" --next "Run Studio integration tests"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v26\v26\tools\v26.py" plan --root "C:\Path\To\YourGame"
 
-6. In a new conversation, paste C:\Path\To\YourGame\.codex\session\RESUME_PROMPT.md. Verify the repository and tests before continuing.
+6. Follow the Studio MCP workflow in `v26/docs/STUDIO_MCP_WORKFLOW.md`. Keep Studio testing on an isolated test place and review edits before saving.
 
-Commands: start, checkpoint, handoff, resume, status, verify, and recover. Full instructions are in v25/docs/SESSION_CONTINUITY.md. V25.0.1 adds project-root protection and stronger recovery/journal validation.
+V25 commands: `start`, `checkpoint`, `handoff`, `resume`, `status`, `verify`, and `recover`. V26 commands: `doctor`, `plan`, and `verify-plan`.
+
+## Studio MCP and testing boundaries
+
+Roblox Studio's MCP server is local to the developer's machine. Enable it in Studio and connect a trusted Codex client using Studio's Quick Connect or its documented configuration. The V26 doctor only checks a JSON config's structure; it does not start Studio or prove a live connection. GitHub Actions cannot automatically control your local Studio session.
+
+StudioTestService supports up to eight simulated clients in one Studio multiplayer test. Device and Network Simulator features apply to Studio playtests, not published experiences. V26 creates a test plan; actual Studio runs must be performed and evidenced in the connected Studio environment.
+
+Saving a modified place, publishing, production DataStore writes, and player-impacting Open Cloud operations require explicit human review and approval. Use least privilege and isolated test data.
 
 ## Growth principles
 
 Maximize sustainable player value and discover viable opportunities—not pressure. Keep the core game enjoyable without spending, show fixed outcomes and honest prices, improve genuine retention, and use aggregate analytics. Paid random outcomes and gambling-like mechanics remain prohibited. Do not use artificial playtime, AFK loops, fake scarcity, forced ads, or individual-spender targeting.
 
-## Automation and validation boundaries
-
-V25 saves and restores local development context; it does **not** prevent ChatGPT conversation limits or network failures, recover unsaved work from a deleted workspace, or replace Git/source backups. V24 creates reviewable plans; it does not edit game source, create live products, change prices, access Creator Dashboard, automate in-game player activity, or publish experiences. Roblox Studio runtime, Creator Dashboard eligibility, live Marketplace behavior, platform configuration, and actual earnings require live verification and human approval.
-
 ## Documentation
 
-- INDEX_V25.md and v25/INDEX_V25.md
-- v25/docs/SESSION_CONTINUITY.md
-- v24/docs/AUTOMATED_GROWTH_PIPELINE.md
-- v23/docs/ROBLOX_REVENUE_OPPORTUNITY_PLAYBOOK.md
-- v22/docs/MANAGED_PRICING_AND_SUBSCRIPTIONS.md
-- v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md
+- V26 feature index: `INDEX_V26.md`
+- V26 Studio MCP workflow: `v26/docs/STUDIO_MCP_WORKFLOW.md`
+- V26 multiplayer/device testing: `v26/docs/MULTIPLAYER_DEVICE_TESTING.md`
+- V26 safe automation boundaries: `v26/docs/SAFE_AUTOMATION_BOUNDARIES.md`
+- V25 session continuity guide: `v25/docs/SESSION_CONTINUITY.md`
+- [V18 no-gambling and fair monetization](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
 - MIT License
 
 Released under MIT. This is an independent community toolkit, not affiliated with or endorsed by Roblox Corporation or OpenAI.

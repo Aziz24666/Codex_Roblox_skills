@@ -9,7 +9,8 @@ import sys
 from pathlib import Path
 from urllib.parse import unquote
 
-EXPECTED_SKILLS = 207
+EXPECTED_SKILLS_V25 = 207
+EXPECTED_SKILLS_V26 = 210
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -107,8 +108,10 @@ def audit(root: Path) -> list[str]:
 
     skills_root = root / ".agents" / "skills"
     skills = sorted(skills_root.glob("*/SKILL.md")) if skills_root.is_dir() else []
-    if len(skills) != EXPECTED_SKILLS:
-        problems.append(f"Expected {EXPECTED_SKILLS} native skills, found {len(skills)}.")
+    is_v26 = (root / "v26" / "VERSION").is_file()
+    expected_skills = EXPECTED_SKILLS_V26 if is_v26 else EXPECTED_SKILLS_V25
+    if len(skills) != expected_skills:
+        problems.append(f"Expected {expected_skills} native skills, found {len(skills)}.")
     names: dict[str, str] = {}
     for skill in skills:
         relative = skill.relative_to(root).as_posix()
@@ -137,6 +140,11 @@ def audit(root: Path) -> list[str]:
         "v23/schemas/opportunity-discovery-report.schema.json",
         "v25/tools/v25.py", "v25/tests/test_v25.py",
     )
+    if is_v26:
+        required += (
+            "INDEX_V26.md", "v26/VERSION", "v26/tools/v26.py", "v26/tests/test_v26.py",
+            "v26/tools/audit_cumulative_package.py", "v26/docs/STUDIO_MCP_WORKFLOW.md",
+        )
     for item in required:
         if not (root / item).is_file():
             problems.append(f"Missing required cumulative-package file: {item}")
