@@ -34,3 +34,16 @@ https://create.roblox.com/docs/production/monetization
 
 ## Shared contracts
 Preserve V18 no-gambling, V19 evidence, V20 production controls, and V21 sustainable monetization.
+
+
+## V18 shared workflow and handoff contract
+Follow root `AGENTS.md` and `v18/docs/SKILL_INTEROPERABILITY.md`. Own the assigned scope, preserve shared interfaces, and return a structured handoff with changed files, decisions, evidence, risks, blockers, and next owner.
+
+## V19 verification and evaluation contract
+Select checks from changed paths, impact, and trust boundaries. A plan is not a test result. Keep unexecuted Studio, device, marketplace, and live-service checks `NOT_RUN` or `BLOCKED`; never label them PASS without evidence.
+
+## V20 production reliability contract
+Keep consequential state server-authoritative. Use bounded retries, idempotent transactions, exact grants, safe migrations, operational observability, and recoverable rollouts. Preserve the mandatory no-gambling policy.
+
+## V21 sustainable monetization contract
+Discover opportunities from project evidence, rank by genuine player value and game fit, and use aggregate measurements. Do not fabricate revenue forecasts, use manipulative monetization, or degrade the free experience.
