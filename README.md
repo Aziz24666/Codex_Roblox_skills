@@ -54,7 +54,7 @@ Maximize sustainable player value and discover viable opportunities—not pressu
 - V26 Studio MCP workflow: `v26/docs/STUDIO_MCP_WORKFLOW.md`
 - V26 multiplayer/device testing: `v26/docs/MULTIPLAYER_DEVICE_TESTING.md`
 - V26 safe automation boundaries: `v26/docs/SAFE_AUTOMATION_BOUNDARIES.md`
-- [V25 session continuity](v25/docs/SESSION_CONTINUITY.md)
+- V25 session continuity guide: `v25/docs/SESSION_CONTINUITY.md`
 - [V18 no-gambling and fair monetization](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
 - MIT License
 
