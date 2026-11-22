@@ -116,15 +116,15 @@ class V26PlanTests(unittest.TestCase):
     def test_plan_rejects_path_traversal_and_symlinked_parent(self):
         with self.assertRaises(ValueError):
             v26.plan_output_path(self.root, "../escape.json")
-        outside = Path(self.temp.name).parent / (Path(self.temp.name).name + "-outside")
-        outside.mkdir(exist_ok=True)
-        link = self.root / "linked"
-        try:
-            link.symlink_to(outside, target_is_directory=True)
-        except (OSError, NotImplementedError):
-            self.skipTest("Symlinks are not supported in this environment.")
-        with self.assertRaises(ValueError):
-            v26.plan_output_path(self.root, "linked/escape.json")
+        with tempfile.TemporaryDirectory() as outside_temp:
+            outside = Path(outside_temp)
+            link = self.root / "linked"
+            try:
+                link.symlink_to(outside, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("Symlinks are not supported in this environment.")
+            with self.assertRaises(ValueError):
+                v26.plan_output_path(self.root, "linked/escape.json")
 
     def test_verify_plan_rejects_removed_approval_or_unsafe_mutation(self):
         plan = v26.build_test_plan(self.root)
