@@ -35,14 +35,11 @@ Prioritize genuine player value, accurate dynamic pricing, clearly disclosed rec
 CI validates metadata, tests, schemas, routing, cumulative audits, checksums, and archives. It does not inspect a live Creator Dashboard or prove eligibility, Managed Pricing behavior, live purchases, subscriptions, or earnings. Mark unexecuted live checks NOT_RUN or BLOCKED.
 
 ## Documentation
-- [V22 index](INDEX_V22.md)
-- [Platform earnings and Creator Rewards](v22/docs/PLATFORM_EARNINGS_AND_CREATOR_REWARDS.md)
-- [Managed Pricing and subscriptions](v22/docs/MANAGED_PRICING_AND_SUBSCRIPTIONS.md)
-- [Monetization launch gate](v22/docs/LAUNCH_GATE_AND_EVIDENCE.md)
-- [V21 discovery/player value](v21/docs/MONETIZATION_DISCOVERY_AND_PLAYER_VALUE.md)
-- [V20 production reliability](v20/docs/PRODUCTION_RELIABILITY.md)
-- [V19 testing/evidence](v19/docs/TESTING_AND_EVIDENCE.md)
-- [V18 no-gambling/fair monetization](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
-- [MIT License](LICENSE)
+The extracted package contains the V22 index and guides at `INDEX_V22.md`, `v22/INDEX_V22.md`, and:
+- `v22/docs/PLATFORM_EARNINGS_AND_CREATOR_REWARDS.md`
+- `v22/docs/MANAGED_PRICING_AND_SUBSCRIPTIONS.md`
+- `v22/docs/LAUNCH_GATE_AND_EVIDENCE.md`
+
+Earlier reference guides: [V21 discovery/player value](v21/docs/MONETIZATION_DISCOVERY_AND_PLAYER_VALUE.md), [V20 production reliability](v20/docs/PRODUCTION_RELIABILITY.md), [V19 testing/evidence](v19/docs/TESTING_AND_EVIDENCE.md), [V18 no-gambling/fair monetization](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md), and [MIT License](LICENSE).
 
 Released under MIT. This is an independent community toolkit, not affiliated with or endorsed by Roblox Corporation or OpenAI.
