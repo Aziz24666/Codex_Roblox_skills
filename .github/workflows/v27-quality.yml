@@ -34,7 +34,7 @@ jobs:
           cp .github/workflows/v25-quality.yml "$RUNNER_TEMP/v25-quality.yml"
           cp .github/workflows/v26-quality.yml "$RUNNER_TEMP/v26-quality.yml"
           cp .github/workflows/v27-quality.yml "$RUNNER_TEMP/v27-quality.yml"
-          for file in README.md INDEX.md INDEX_V25.md INDEX_V26.md INDEX_V27.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md RELEASE_NOTES_V27.md RELEASE_NOTES_V27.md; do cp "$file" "$RUNNER_TEMP/$file"; done
+          for file in README.md INDEX.md INDEX_V25.md INDEX_V26.md INDEX_V27.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md RELEASE_NOTES_V26.md RELEASE_NOTES_V27.md; do cp "$file" "$RUNNER_TEMP/$file"; done
           cp -a v26 "$RUNNER_TEMP/v26-source"
           cp -a v27 "$RUNNER_TEMP/v27-source"
           mkdir -p "$RUNNER_TEMP/pre-overlay"
