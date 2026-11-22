@@ -31,13 +31,13 @@ jobs:
           set -euo pipefail
           archive="$RUNNER_TEMP/v24-source-overlay.zip"
           cp .github/workflows/v24-quality.yml "$RUNNER_TEMP/v24-quality.yml"
-          for file in README.md INDEX.md INDEX_V25.md RELEASE_NOTES_V25.md; do cp "$file" "$RUNNER_TEMP/$file"; done
+          for file in README.md INDEX.md INDEX_V25.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md; do cp "$file" "$RUNNER_TEMP/$file"; done
           cat dist/v24-source-overlay-b64parts/part-*.b64 | base64 --decode > "$archive"
           echo "fe9b3539fc33a11c0d5da3b6362e78a1ab16ebde76c9db768a3fe75a14561a93  $archive" | sha256sum --check
           unzip -t "$archive"
           unzip -oq "$archive" -d .
           cp "$RUNNER_TEMP/v24-quality.yml" .github/workflows/v24-quality.yml
-          for file in README.md INDEX.md INDEX_V25.md RELEASE_NOTES_V25.md; do cp "$RUNNER_TEMP/$file" "$file"; done
+          for file in README.md INDEX.md INDEX_V25.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md; do cp "$RUNNER_TEMP/$file" "$file"; done
       - name: Install validation dependencies
         run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
       - name: Validate overlays and regression suites
@@ -76,6 +76,7 @@ jobs:
           python -m unittest discover -s "$PACKAGE_ROOT/v20/tests" -v
           python "$PACKAGE_ROOT/v20/tools/v20.py" verify --root "$PACKAGE_ROOT"
           python v21/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v21/tests" -v
           python "$PACKAGE_ROOT/v21/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
           test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "191"
           python v22/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
@@ -104,9 +105,10 @@ jobs:
         run: |
           set -euo pipefail
           python v25/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
-          python -m py_compile v25/tools/v25.py v25/tools/patch_cumulative_package.py v25/tools/audit_cumulative_package.py
+          python -m py_compile v25/tools/v25.py v25/tools/patch_cumulative_package.py v25/tools/audit_cumulative_package.py v23/tools/v23.py tools/repository_audit.py
           python -m unittest discover -s "$PACKAGE_ROOT/v25/tests" -v
           python "$PACKAGE_ROOT/v25/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python tools/repository_audit.py --root "$PACKAGE_ROOT"
           test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "207"
       - name: Build and compare release archives
         shell: bash
@@ -166,4 +168,4 @@ jobs:
             "$RUNNER_TEMP/v25-release-assets/roblox-codex-game-studio-kit-v25.tar.xz" \
             "$RUNNER_TEMP/v25-release-assets/SHA256SUMS-RELEASE.txt" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
-            --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V25.md
+            --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V25_0_1.md

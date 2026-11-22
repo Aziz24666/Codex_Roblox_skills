@@ -8,6 +8,9 @@ REQUIRED_FILES = (
     "AGENTS.md", "README.md", "INDEX.md", "INDEX_V25.md", "v25/VERSION", "v25/tools/v25.py",
     "v25/tools/patch_cumulative_package.py", "v25/docs/SESSION_CONTINUITY.md",
     "v25/tests/test_v25.py",
+    "v23/tools/v23.py", "v23/tests/test_v23.py",
+    "v23/schemas/opportunity-discovery-report.schema.json", "v23/data/opportunity-catalog.json",
+    "v24/tools/v24.py", "v24/docs/AUTOMATED_GROWTH_PIPELINE.md",
     ".agents/skills/roblox-codex-session-continuity/SKILL.md",
     ".agents/skills/roblox-resumable-task-execution/SKILL.md",
 )
@@ -22,7 +25,7 @@ def audit(root: Path) -> list[str]:
     if "<!-- V25_SESSION_CONTINUITY_RULES -->" not in agents:
         problems.append("AGENTS.md is missing the V25 continuity instructions.")
     version = (root / "v25" / "VERSION").read_text(encoding="utf-8").strip() if (root / "v25" / "VERSION").is_file() else ""
-    if version != "25.0.0":
+    if version != "25.0.1":
         problems.append(f"Unexpected V25 version: {version!r}.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
     if "V25" not in readme:

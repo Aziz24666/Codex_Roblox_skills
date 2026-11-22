@@ -3,15 +3,16 @@
 [![V25 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v25-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v25-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release candidate: V25.0.0 — Session Continuity and Interruption Recovery.** This is the complete cumulative V1-V25 toolkit. Only the current release is required.
+**Current release: V25.0.1 — Toolkit Audit and Reliability Fixes.** This is the complete cumulative V1-V25 toolkit. Only the current release is required.
 
-[Open the V25 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v25.0.0).
+[Open the V25 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v25.0.1).
 
 ## What's included
 
 - **207 native Codex skills** for Roblox engineering, Luau, gameplay, characters, UI, networking, persistence, economy, procedural content, NPCs, Studio tools, testing, performance, release engineering, and monetization.
 - V23-V24 sustainable monetization discovery, opportunity ranking, backlog creation, and growth-roadmap automation.
-- V25 durable checkpoints, recoverable handoff prompts, backup recovery, a hash-chained event journal, and bounded-stage task execution.
+- V25 durable checkpoints, recoverable handoff prompts, backup recovery, a validated hash-chained event journal, project-root binding, and bounded-stage task execution.
+- Hardened V23 opportunity scanning that excludes toolkit/session metadata, skips symlinks, validates catalogue data, and limits report paths to the selected project.
 - Atomic checkpoint writes, concurrent-write protection, integrity checks, and automatic Git-ignore rules for local session files.
 - Existing V18-V24 no-gambling, fair-monetization, server-authority, evidence, and Roblox platform-compliance safeguards.
 
@@ -33,7 +34,7 @@
 
 6. In a new conversation, paste C:\Path\To\YourGame\.codex\session\RESUME_PROMPT.md. Verify the repository and tests before continuing.
 
-Commands: start, checkpoint, handoff, resume, status, verify, and recover. Full instructions are in v25/docs/SESSION_CONTINUITY.md.
+Commands: start, checkpoint, handoff, resume, status, verify, and recover. Full instructions are in v25/docs/SESSION_CONTINUITY.md. V25.0.1 adds project-root protection and stronger recovery/journal validation.
 
 ## Growth principles
 

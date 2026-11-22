@@ -1,51 +1,298 @@
 {
-  "$schema":"https://json-schema.org/draft/2020-12/schema",
-  "title":"V23 Monetization Opportunity Discovery Report",
-  "type":"object","additionalProperties":false,
-  "required":["schema_version","project_root","summary","opportunities","risk_findings","excluded_mechanics","next_steps","interpretation"],
-  "properties":{
-    "schema_version":{"const":1},"project_root":{"type":"string","minLength":1},
-    "summary":{"type":"object","additionalProperties":false,
-      "required":["files_considered","files_scanned","files_skipped_oversize","files_unreadable","scan_truncated","max_files","catalogue_options","evidence_supported","weak_evidence","not_detected","platform_review","risk_findings"],
-      "properties":{
-        "files_considered":{"type":"integer","minimum":0},"files_scanned":{"type":"integer","minimum":0},
-        "files_skipped_oversize":{"type":"integer","minimum":0},"files_unreadable":{"type":"integer","minimum":0},
-        "scan_truncated":{"type":"boolean"},"max_files":{"type":"integer","minimum":1},
-        "catalogue_options":{"type":"integer","minimum":1},"evidence_supported":{"type":"integer","minimum":0},
-        "weak_evidence":{"type":"integer","minimum":0},"not_detected":{"type":"integer","minimum":0},
-        "platform_review":{"type":"integer","minimum":0},"risk_findings":{"type":"integer","minimum":0}
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V23 Monetization Opportunity Discovery Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "project_root",
+    "summary",
+    "opportunities",
+    "risk_findings",
+    "excluded_mechanics",
+    "next_steps",
+    "interpretation"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "project_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "files_considered",
+        "files_scanned",
+        "files_skipped_oversize",
+        "files_unreadable",
+        "files_skipped_symlink",
+        "scan_truncated",
+        "max_files",
+        "catalogue_options",
+        "evidence_supported",
+        "weak_evidence",
+        "not_detected",
+        "platform_review",
+        "risk_findings"
+      ],
+      "properties": {
+        "files_considered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_scanned": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_skipped_oversize": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_unreadable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scan_truncated": {
+          "type": "boolean"
+        },
+        "max_files": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "catalogue_options": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "evidence_supported": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "weak_evidence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "not_detected": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "platform_review": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "risk_findings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_skipped_symlink": {
+          "type": "integer",
+          "minimum": 0
+        }
       }
     },
-    "opportunities":{"type":"array","items":{"type":"object","additionalProperties":false,
-      "required":["id","category","name","monetization_route","player_value","offer_shape","implementation_effort","risk_level","guardrail","deterministic","fit_score","status","priority","matched_signals","evidence"],
-      "properties":{
-        "id":{"type":"string","minLength":1},"category":{"type":"string","minLength":1},
-        "name":{"type":"string","minLength":1},"monetization_route":{"type":"string","minLength":1},
-        "player_value":{"type":"string","minLength":1},"offer_shape":{"type":"string","minLength":1},
-        "implementation_effort":{"enum":["low","medium","high"]},"risk_level":{"enum":["Low","Medium","High"]},
-        "guardrail":{"type":"string","minLength":1},"deterministic":{"const":true},
-        "always_review":{"type":"boolean"},"fit_score":{"type":"integer","minimum":0,"maximum":100},
-        "status":{"enum":["evidence_supported","weak_evidence","not_detected","platform_review"]},
-        "priority":{"enum":["HIGH","MEDIUM","EXPLORE","NOT_DETECTED","PLATFORM_REVIEW"]},
-        "matched_signals":{"type":"array","items":{"type":"string"}},
-        "evidence":{"type":"array","items":{"type":"object","additionalProperties":false,
-          "required":["path","line","signal","excerpt"],
-          "properties":{"path":{"type":"string","minLength":1},"line":{"type":"integer","minimum":1},
-            "signal":{"type":"string","minLength":1},"excerpt":{"type":"string","minLength":1,"maxLength":240}}
-        }}
+    "opportunities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "category",
+          "name",
+          "monetization_route",
+          "player_value",
+          "offer_shape",
+          "implementation_effort",
+          "risk_level",
+          "guardrail",
+          "deterministic",
+          "fit_score",
+          "status",
+          "priority",
+          "matched_signals",
+          "evidence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "monetization_route": {
+            "type": "string",
+            "minLength": 1
+          },
+          "player_value": {
+            "type": "string",
+            "minLength": 1
+          },
+          "offer_shape": {
+            "type": "string",
+            "minLength": 1
+          },
+          "implementation_effort": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "risk_level": {
+            "enum": [
+              "Low",
+              "Medium",
+              "High"
+            ]
+          },
+          "guardrail": {
+            "type": "string",
+            "minLength": 1
+          },
+          "deterministic": {
+            "const": true
+          },
+          "always_review": {
+            "type": "boolean"
+          },
+          "fit_score": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "status": {
+            "enum": [
+              "evidence_supported",
+              "weak_evidence",
+              "not_detected",
+              "platform_review"
+            ]
+          },
+          "priority": {
+            "enum": [
+              "HIGH",
+              "MEDIUM",
+              "EXPLORE",
+              "NOT_DETECTED",
+              "PLATFORM_REVIEW"
+            ]
+          },
+          "matched_signals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "path",
+                "line",
+                "signal",
+                "excerpt"
+              ],
+              "properties": {
+                "path": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "line": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "signal": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "excerpt": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        }
       }
-    }},
-    "risk_findings":{"type":"array","items":{"type":"object","additionalProperties":false,
-      "required":["code","path","line","severity","evidence","message"],
-      "properties":{
-        "code":{"enum":["PAID_RANDOM_OUTCOME","PRESSURE_COPY_OR_TIMER","ARTIFICIAL_PLAYTIME_LOOP","FORCED_AD_PATTERN","ACCESS_MODEL_COLLISION"]},
-        "path":{"type":"string","minLength":1},"line":{"type":"integer","minimum":1},
-        "severity":{"enum":["review","blocker"]},"evidence":{"type":"string","minLength":1,"maxLength":300},
-        "message":{"type":"string","minLength":1}
+    },
+    "risk_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "path",
+          "line",
+          "severity",
+          "evidence",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "enum": [
+              "PAID_RANDOM_OUTCOME",
+              "PRESSURE_COPY_OR_TIMER",
+              "ARTIFICIAL_PLAYTIME_LOOP",
+              "FORCED_AD_PATTERN",
+              "ACCESS_MODEL_COLLISION"
+            ]
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "severity": {
+            "enum": [
+              "review",
+              "blocker"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
-    }},
-    "excluded_mechanics":{"type":"array","items":{"type":"string","minLength":1}},
-    "next_steps":{"type":"array","items":{"type":"string","minLength":1}},
-    "interpretation":{"type":"string","minLength":1}
+    },
+    "excluded_mechanics": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "next_steps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "interpretation": {
+      "type": "string",
+      "minLength": 1
+    }
   }
 }

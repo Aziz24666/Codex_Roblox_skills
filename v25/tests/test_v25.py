@@ -123,6 +123,19 @@ class PackagePatchTests(unittest.TestCase):
                 skill.parent.mkdir(parents=True)
                 skill.write_text(f"# Legacy skill {index}\n", encoding="utf-8")
             (package / "AGENTS.md").write_text("# Agent rules\n\nInherited V18 no-gambling rules remain active.\n", encoding="utf-8")
+            # Model the inherited cumulative files required by the stronger package audit.
+            required_stubs = (
+                "v23/tools/v23.py",
+                "v23/tests/test_v23.py",
+                "v23/schemas/opportunity-discovery-report.schema.json",
+                "v23/data/opportunity-catalog.json",
+                "v24/tools/v24.py",
+                "v24/docs/AUTOMATED_GROWTH_PIPELINE.md",
+            )
+            for relative in required_stubs:
+                stub = package / relative
+                stub.parent.mkdir(parents=True, exist_ok=True)
+                stub.write_text("# cumulative package fixture\\n", encoding="utf-8")
             patch_cumulative_package.patch(package, source)
             patch_cumulative_package.patch(package, source)
             agents = (package / "AGENTS.md").read_text(encoding="utf-8")

@@ -7,7 +7,7 @@ V20 adds a production-readiness layer to the cumulative V1–V19 toolkit. It mak
 1. **Server authority:** the server owns currency, inventory, progression, purchases, character-critical state, and other consequential state. Treat client input as a request, not an instruction.
 2. **Explicit remote contracts:** keep an allowlist of client-to-server operations. Validate input shape and size, player ownership, context, distance where relevant, cooldowns, and per-player rate limits on the server. Unknown operations fail closed.
 3. **Resilient persistence:** use an UpdateAsync-based write path, bounded retries with jitter, explicit load-failure behavior, schema versions, deterministic/idempotent migrations, and an owner-reviewed recovery procedure.
-4. **Idempotent economy:** fulfill paid products from server-verified receipts, grant the exact configured product once, and preserve receipt/grant identifiers so duplicate delivery is harmless. The inherited V18 no-gambling policy remains mandatory.
+4. **Idempotent economy:** fulfill developer products from server-verified receipts, grant the exact configured product once, and preserve receipt/grant identifiers so duplicate delivery is harmless. Roblox's current MarketplaceService API exposes both the established `ProcessReceipt` callback and `BindReceiptHandler()` for typed receipt handling; choose one deliberate integration, follow the current API contract, and keep fulfillment idempotent. Do not process the same receipt through competing handlers. The inherited V18 no-gambling policy remains mandatory.
 5. **Safe rollout:** promote through development, staging, canary, and production. Use feature flags for reversible behavior changes, retain a kill switch, monitor promotion, and document a rollback that does not overwrite newer player data.
 6. **Operational visibility:** track server errors, remote rejections, save failures, transaction failures, and latency. Alert on meaningful deviations, restrict dashboard access, and redact personal data and secrets from logs.
 
@@ -21,7 +21,7 @@ python v20/tools/v20.py validate-contract --root . --file path/to/production-con
 
 The validator checks JSON Schema and cross-field invariants: environment isolation, remote-operation uniqueness and server checks, idempotency for side effects, adjacent migration versions, the no-paid-random-rewards rule, fixed-grant identifiers, promotion order, kill-switch/rollback declarations, and minimum operational metrics.
 
-The output is only a static contract-validation result. It does not connect to Roblox, inspect live configuration, test DataStore budgets, execute ProcessReceipt, verify a remote implementation, confirm a feature flag, or prove that an alert fired.
+The output is only a static contract-validation result. It does not connect to Roblox, inspect live configuration, test DataStore budgets, execute `ProcessReceipt` or a `BindReceiptHandler` callback, verify a remote implementation, confirm a feature flag, or prove that an alert fired.
 
 ## Data and migration workflow
 
@@ -56,5 +56,6 @@ The output is only a static contract-validation result. It does not connect to R
 - UpdateAsync: https://create.roblox.com/docs/reference/engine/classes/GlobalDataStore#UpdateAsync
 - MarketplaceService: https://create.roblox.com/docs/reference/engine/classes/MarketplaceService
 - ProcessReceipt: https://create.roblox.com/docs/reference/engine/classes/MarketplaceService#ProcessReceipt
+- BindReceiptHandler: https://create.roblox.com/docs/reference/engine/classes/MarketplaceService#BindReceiptHandler
 - Remote events and callbacks: https://create.roblox.com/docs/scripting/events/remote
 - Security tactics: https://create.roblox.com/docs/scripting/security/security-tactics

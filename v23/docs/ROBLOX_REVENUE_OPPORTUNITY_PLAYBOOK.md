@@ -24,13 +24,13 @@ The catalogue has 48 candidate routes. The CLI always reports the full catalogue
 - Paid access and private servers are mutually exclusive experience-level configurations in Roblox's documented model. Verify current settings before choosing one; do not plan to enable both simultaneously.
 
 ### Platform-funded and creator-business routes
-- Creator Rewards for genuine, satisfying engagement.
-- Share-link and audience expansion programs where available.
+- Creator Rewards for genuine, satisfying engagement. Current Daily Engagement Rewards pay 5 Robux when an Active Spender plays the experience for at least 10 minutes and it is one of the first three experiences they play that day. Active Spender status requires at least $9.99 of platform spend in the previous 60 days.
+- Audience Expansion Rewards can provide a 35% revenue share on a referred New or Reactivated User's first $100 of qualifying purchases during their first 60 days, subject to attribution, experience engagement/DAU conditions, ID-verification, good-standing, and other current program requirements. Verify eligibility and current rules in Creator Dashboard.
 - Immersive ads only when the experience and owner satisfy current eligibility.
 - Avatar catalog or affiliate products only when current marketplace features and permissions support them.
 - Creator Store models, plugins, and assets as a separate creator-business revenue line.
 
-These streams have different eligibility, reporting, payout, and accounting rules. Never combine their Robux into one unexplained revenue number.
+These streams have different eligibility, reporting, payout, and accounting rules. Creator Rewards depend on genuine qualifying users, not just raw playtime. Never encourage artificial activity, bots, teleport manipulation, or alternate accounts to generate rewards. Never combine the streams into one unexplained Robux number.
 
 ## Prioritization model
 Evaluate each opportunity on evidence that the underlying feature exists, player value and game fit, a fair free alternative, build/support cost, platform eligibility, technical reliability, and aggregate demand evidence from playtests and analytics.

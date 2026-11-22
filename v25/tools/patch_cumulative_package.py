@@ -42,7 +42,7 @@ def patch(package_root: Path, source_root: Path | None = None) -> int:
     if MARKER not in agents_text:
         agents_file.write_text(agents_text.rstrip() + "\n\n" + RULES, encoding="utf-8")
     repository_root = source_root.parent
-    for filename in ("README.md", "INDEX.md", "INDEX_V25.md", "RELEASE_NOTES_V25.md"):
+    for filename in ("README.md", "INDEX.md", "INDEX_V25.md", "RELEASE_NOTES_V25.md", "RELEASE_NOTES_V25_0_1.md"):
         source = repository_root / filename
         if source.is_file():
             shutil.copy2(source, package_root / filename)

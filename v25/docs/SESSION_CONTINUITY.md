@@ -48,7 +48,9 @@ To resume, paste .codex/session/RESUME_PROMPT.md into the next Codex or ChatGPT 
 - resume --root "<game-project-root>": print the latest resume prompt and recover from the previous valid backup if the primary file is damaged.
 - recover --root "<game-project-root>": explicitly restore the previous valid backup.
 
-Writes use a same-directory temporary file followed by atomic replacement. A short-lived lock prevents overlapping writes. The event journal detects complete-record tampering and repairs only an incomplete final line before the next append.
+Writes use a same-directory temporary file followed by atomic replacement. A process-aware lock prevents overlapping writes and does not break a stale-looking lock owned by a live process. Checkpoints are bound to the original canonical project path: every command refuses to read or mutate a checkpoint when --root points at a different project.
+
+The event journal validates each complete record's JSON shape, sequence number, digest, previous hash, and checkpoint reference. verify also confirms that the current checkpoint is represented in the verified journal. Only an unterminated final record is discarded during the next append; malformed complete records are reported as corruption and are never silently repaired. recover restores the previous valid backup, regenerates the resume prompt, and records a recovery event where the journal remains writable.
 
 ## Data and privacy
 
