@@ -1,6 +1,6 @@
 # Roblox Codex Game Studio Kit — V25 Index
 
-V25 is the current cumulative release candidate. It builds on V1-V24 and adds recoverable session continuity for long-running Roblox development work.
+V25.0.1 is the current cumulative release. It builds on V1-V24 and adds recoverable session continuity for long-running Roblox development work.
 
 ## V25 additions
 
@@ -10,6 +10,9 @@ V25 is the current cumulative release candidate. It builds on V1-V24 and adds re
 - A ready-to-paste RESUME_PROMPT.md containing the project goal, current stage, completed evidence, decisions, blockers, tests, changed files, and next actions.
 - Two Codex skills for session continuity and bounded, independently testable task execution.
 - Checkpoint privacy safeguards: no raw chat capture; credential-like strings are rejected; session data is Git-ignored by default.
+- Checkpoints are bound to the selected project root, and every command refuses to load a session from a different path.
+- Recovery refreshes the resume prompt and records a recovery event. Complete journal corruption is reported rather than silently discarded.
+- The V23 scanner skips toolkit/session/build metadata and symlinks, validates catalogue inputs, and restricts generated reports to the chosen project root.
 
 ## Quick start
 

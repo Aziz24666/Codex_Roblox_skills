@@ -6,13 +6,14 @@ The strongest sustainable monetization starts with a game players choose to revi
 Measure whether players enjoy the experience. Do not artificially stretch a session to reach a platform reward threshold, force attendance, punish players for missing a day, or use AFK loops. Never use player spending history to decide who deserves pressure, discounts, or prompts.
 
 ## Store discovery
-Roblox documents product-intelligence APIs for product discovery:
-- RankProductsAsync can rank a supplied set of eligible product IDs for a player. It has a strict rate limit; load results once at join rather than repeatedly.
-- RecommendTopProductsAsync can return top product recommendations, but may return an empty list when the experience has no item sales in the previous 28 days. Build a useful fallback catalogue instead of an empty storefront.
+Roblox currently documents the following product-intelligence APIs for product discovery:
+- `RankProductsAsync` accepts up to 50 pass/developer-product IDs, returns a personalized order, and is throttled to 10 requests per minute on the client. Load results once at join rather than repeatedly.
+- `RecommendTopProductsAsync` accepts pass and developer-product types, returns up to 50 recommendations, and is throttled to 5 requests per minute on the client. Roblox documents that it returns an empty list when the experience has had no item sales in the previous 28 days. Build a useful fixed fallback catalogue instead of an empty storefront.
+- `MarketplaceService:OpenShop()` is available for opening Roblox's personalized in-game shop in response to a player action; assess whether the built-in shop is simpler and more reliable than a custom storefront.
 - Run recommendation work non-blockingly where appropriate and handle empty, unavailable, or slow results gracefully.
 - Do not call ranking APIs on every frame, every UI redraw, or every shop open.
 
-Use recommendations to improve relevance and discovery. Keep the offer, price, benefits, and purchase choice transparent. Do not implement spending-based player profiling or pressure tactics.
+Use recommendations to improve relevance and discovery, but treat returned items as suggestions: filter unavailable or already-owned products, handle errors and empty results, and never guarantee a recommendation or purchase. Keep the offer, price, benefits, and purchase choice transparent. Do not implement spending-based player profiling or pressure tactics.
 
 ## Store UX and funnel
 Players should be able to browse without interruptions. Show the exact item and preview, exact quantity/benefit, price, duration, recurrence, and limitations. Let the player deliberately open the Roblox purchase prompt. Respect cancellation. Verify delivery on the server and reconcile ownership after reconnecting.

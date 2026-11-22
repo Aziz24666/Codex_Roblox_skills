@@ -62,4 +62,72 @@ class OpportunityDiscoveryTests(unittest.TestCase):
         schema=json.loads((ROOT/"schemas/opportunity-discovery-report.schema.json").read_text(encoding="utf-8"))
         jsonschema.Draft202012Validator(schema).validate(report)
 
+    def test_scanner_excludes_toolkit_and_private_checkpoint_metadata(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "Game.server.lua").write_text("print('game')\\n", encoding="utf-8")
+            for folder in ("v24", "v25", ".codex/session", "reports"):
+                excluded = root / folder
+                excluded.mkdir(parents=True, exist_ok=True)
+                (excluded / "Shop.server.lua").write_text(
+                    "PromptProductPurchase random loot box AFK reward buy now\\n", encoding="utf-8"
+                )
+            report = V23.discover_opportunities(root)
+            self.assertEqual(report["summary"]["files_scanned"], 1)
+            self.assertEqual(report["summary"]["files_skipped_symlink"], 0)
+            self.assertEqual(report["risk_findings"], [])
+
+    def test_scanner_skips_symlinked_files(self):
+        with tempfile.TemporaryDirectory() as temporary, tempfile.TemporaryDirectory() as external:
+            root = Path(temporary)
+            outside = Path(external) / "Outside.server.lua"
+            outside.write_text("PromptProductPurchase loot box random\\n", encoding="utf-8")
+            link = root / "Linked.server.lua"
+            try:
+                link.symlink_to(outside)
+            except (OSError, NotImplementedError):
+                self.skipTest("Symbolic links are unavailable in this environment")
+            report = V23.discover_opportunities(root)
+            self.assertEqual(report["summary"]["files_skipped_symlink"], 1)
+            self.assertEqual(report["summary"]["files_scanned"], 0)
+            self.assertEqual(report["risk_findings"], [])
+
+    def test_report_output_cannot_escape_project_root(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with self.assertRaises(ValueError):
+                V23.resolve_output_path(root, Path("../outside-report.json"))
+
+    def test_catalog_rejects_malformed_fields_and_paid_random_recommendations(self):
+        catalog = V23.load_catalog()
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "catalog.json"
+            malformed = [dict(row) for row in catalog]
+            malformed[0]["signals"] = [None]
+            path.write_text(json.dumps(malformed), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                V23.load_catalog(path)
+            forbidden = [dict(row) for row in catalog]
+            forbidden[0]["offer_shape"] = "paid mystery purchase"
+            path.write_text(json.dumps(forbidden), encoding="utf-8")
+            with self.assertRaises(ValueError):
+                V23.load_catalog(path)
+
+
+    def test_callers_can_exclude_output_directories_compatibly(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "src").mkdir()
+            (root / "generated" / "reports").mkdir(parents=True)
+            (root / "src" / "Game.server.lua").write_text("print('game')\\n", encoding="utf-8")
+            (root / "generated" / "reports" / "old.lua").write_text(
+                "PromptProductPurchase random loot box\\n", encoding="utf-8"
+            )
+            report = V23.discover_opportunities(root, exclude_paths={Path("generated/reports")})
+            self.assertEqual(report["summary"]["files_scanned"], 1)
+            report = V23.discover_opportunities(root, exclude_paths={root / "generated"})
+            self.assertEqual(report["summary"]["files_scanned"], 1)
+            with self.assertRaises(ValueError):
+                V23.discover_opportunities(root, exclude_paths={"../outside"})
+
 if __name__=="__main__": unittest.main()

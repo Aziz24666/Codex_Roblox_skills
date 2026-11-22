@@ -8,7 +8,8 @@
 - roblox-monetization-growth-compliance — scale monetization without gambling, coercion, policy violations, or unreliable fulfillment.
 
 ## CLI
-- tools/v23.py discover-opportunities — search project code and design files against the full monetization opportunity catalogue.
+- tools/v23.py discover-opportunities — search project code and design files against the full monetization opportunity catalogue. It excludes toolkit/session/build metadata, skips symlinks, and only writes reports inside the selected project root.
+- Optional scan bounds: `--max-files` and `--max-file-bytes`.
 - tools/v23.py evaluate-routing — evaluate V23 skill-routing regressions.
 - tools/v23.py verify — validate catalogue, routing, and cumulative package.
 

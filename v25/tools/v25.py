@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-VERSION = "25.0.0"
+VERSION = "25.0.1"
 SCHEMA_VERSION = 1
 SESSION_RELATIVE = Path(".codex") / "session"
 SECRET_PATTERNS = (
@@ -35,23 +35,57 @@ def seal_state(state: dict[str, Any]) -> dict[str, Any]:
     sealed["_integrity"] = state_digest(sealed)
     return sealed
 
-def validate_state(state: Any) -> dict[str, Any]:
+def validate_state(state: Any, expected_root: Path | None = None) -> dict[str, Any]:
+    """Validate the checkpoint schema, integrity, privacy rules, and project identity."""
     if not isinstance(state, dict):
         raise ValueError("Checkpoint must be a JSON object.")
-    if state.get("schema_version") != SCHEMA_VERSION:
+    if state.get("schema_version") != SCHEMA_VERSION or isinstance(state.get("schema_version"), bool):
         raise ValueError(f"Unsupported checkpoint schema: {state.get('schema_version')!r}.")
     expected = state.get("_integrity")
     if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
         raise ValueError("Checkpoint is missing a valid integrity digest.")
     if state_digest(state) != expected:
         raise ValueError("Checkpoint integrity check failed; file may be incomplete or modified.")
+
     required = ("goal", "project_root", "project_name", "current_stage", "status")
     missing = [key for key in required if not isinstance(state.get(key), str)]
     if missing:
         raise ValueError("Checkpoint is missing required string fields: " + ", ".join(missing))
+    for key in required:
+        safe_text(state[key], key)
+    if not Path(state["project_root"]).is_absolute():
+        raise ValueError("Checkpoint project_root must be an absolute path.")
+    if expected_root is not None:
+        stored_root = os.path.normcase(str(Path(state["project_root"]).expanduser().resolve()))
+        selected_root = os.path.normcase(str(expected_root.expanduser().resolve()))
+        if stored_root != selected_root:
+            raise ValueError(
+                f"Checkpoint belongs to a different project root ({state['project_root']!r}); "
+                f"selected root is {str(expected_root)!r}."
+            )
+
+    if state["status"] not in {"active", "paused", "blocked", "completed"}:
+        raise ValueError(f"Unsupported checkpoint status: {state['status']!r}.")
+    count = state.get("checkpoint_count")
+    if not isinstance(count, int) or isinstance(count, bool) or count < 1:
+        raise ValueError("Checkpoint checkpoint_count must be a positive integer.")
+    for key in ("created_at", "updated_at"):
+        if not isinstance(state.get(key), str) or not state[key]:
+            raise ValueError(f"Checkpoint field {key!r} must be a non-empty string.")
     for key in ("completed", "next_actions", "decisions", "blockers", "tests", "changed_files"):
-        if not isinstance(state.get(key), list) or not all(isinstance(item, str) for item in state[key]):
-            raise ValueError(f"Checkpoint field {key!r} must be a list of strings.")
+        values = state.get(key)
+        if not isinstance(values, list) or len(values) > 1000:
+            raise ValueError(f"Checkpoint field {key!r} must be a list with at most 1,000 entries.")
+        for item in values:
+            if not isinstance(item, str):
+                raise ValueError(f"Checkpoint field {key!r} must contain only strings.")
+            safe_text(item, key)
+    for key in ("git_branch", "git_commit", "last_checkpoint_note"):
+        value = state.get(key)
+        if value is not None:
+            if not isinstance(value, str):
+                raise ValueError(f"Checkpoint field {key!r} must be a string or null.")
+            safe_text(value, key)
     return state
 
 def safe_text(value: str, field: str) -> str:
@@ -97,33 +131,72 @@ def resolve_root(raw: str) -> Path:
 
 def session_paths(root: Path) -> dict[str, Path]:
     session_dir = root / SESSION_RELATIVE
-    resolved = session_dir.resolve()
-    if os.path.commonpath((str(root), str(resolved))) != str(root):
-        raise ValueError("Session directory resolves outside the project root; refusing to write.")
-    return {"dir": session_dir, "state": session_dir / "checkpoint.json",
-            "backup": session_dir / "checkpoint.json.bak", "events": session_dir / "events.jsonl",
-            "resume": session_dir / "RESUME_PROMPT.md", "lock": session_dir / ".write.lock",
-            "gitignore": session_dir / ".gitignore"}
+    paths = {
+        "dir": session_dir,
+        "state": session_dir / "checkpoint.json",
+        "backup": session_dir / "checkpoint.json.bak",
+        "events": session_dir / "events.jsonl",
+        "resume": session_dir / "RESUME_PROMPT.md",
+        "lock": session_dir / ".write.lock",
+        "gitignore": session_dir / ".gitignore",
+    }
+    root_key = os.path.normcase(str(root.resolve()))
+    for label, path in paths.items():
+        try:
+            resolved_key = os.path.normcase(str(path.resolve()))
+            if os.path.commonpath((root_key, resolved_key)) != root_key:
+                raise ValueError(f"Session {label} path resolves outside the project root; refusing to use it.")
+        except ValueError as exc:
+            raise ValueError(f"Unsafe session {label} path: {path}") from exc
+    return paths
 
 @contextmanager
 def session_lock(lock_path: Path, timeout: float = 10.0):
+    """Serialize local writers without deleting a lock owned by a live process."""
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     deadline = time.monotonic() + timeout
     descriptor: int | None = None
     while descriptor is None:
         try:
             descriptor = os.open(str(lock_path), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-            os.write(descriptor, f"pid={os.getpid()} time={now_iso()}\n".encode("utf-8"))
+            lock_record = f"pid={os.getpid()} time={now_iso()}\n".encode("utf-8")
+            os.write(descriptor, lock_record)
+            os.fsync(descriptor)
         except FileExistsError:
             try:
-                if time.time() - lock_path.stat().st_mtime > 180:
-                    lock_path.unlink(missing_ok=True)
-                    continue
+                stale = time.time() - lock_path.stat().st_mtime > 180
+                if stale:
+                    try:
+                        lock_text = lock_path.read_text(encoding="utf-8")
+                    except (OSError, UnicodeError):
+                        lock_text = ""
+                    match = re.search(r"\bpid=(\d+)\b", lock_text)
+                    # If the owner cannot be identified, do not break the lock automatically.
+                    owner_alive = match is None
+                    if match:
+                        try:
+                            os.kill(int(match.group(1)), 0)
+                            owner_alive = True
+                        except ProcessLookupError:
+                            owner_alive = False
+                        except PermissionError:
+                            owner_alive = True
+                        except OSError:
+                            # Unknown OS errors are not sufficient reason to break another writer's lock.
+                            owner_alive = True
+                    if not owner_alive:
+                        lock_path.unlink(missing_ok=True)
+                        continue
             except FileNotFoundError:
                 continue
             if time.monotonic() >= deadline:
                 raise RuntimeError("Another checkpoint operation holds the session lock. Retry shortly.")
             time.sleep(0.1)
+        except OSError:
+            if descriptor is not None:
+                os.close(descriptor)
+                descriptor = None
+            raise
     try:
         yield
     finally:
@@ -136,25 +209,30 @@ def ensure_session_dir(paths: dict[str, Path]) -> None:
     if not paths["gitignore"].exists():
         atomic_write(paths["gitignore"], b"*\n!.gitignore\n")
 
-def parse_state_file(path: Path) -> tuple[dict[str, Any] | None, str | None]:
+def parse_state_file(
+    path: Path, expected_root: Path | None = None
+) -> tuple[dict[str, Any] | None, str | None]:
     if not path.exists():
         return None, f"Checkpoint not found: {path}"
     try:
         state = json.loads(path.read_text(encoding="utf-8"))
-        return validate_state(state), None
-    except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+        return validate_state(state, expected_root), None
+    except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
         return None, str(exc)
 
-def load_state(paths: dict[str, Path], allow_backup: bool = False) -> tuple[dict[str, Any], bool]:
-    state, error = parse_state_file(paths["state"])
+def load_state(
+    paths: dict[str, Path], expected_root: Path, allow_backup: bool = False
+) -> tuple[dict[str, Any], bool]:
+    state, error = parse_state_file(paths["state"], expected_root)
     if state is not None:
         return state, False
     if allow_backup:
-        backup, backup_error = parse_state_file(paths["backup"])
+        backup, backup_error = parse_state_file(paths["backup"], expected_root)
         if backup is not None:
             return backup, True
         raise ValueError(f"Primary checkpoint is invalid ({error}); backup is unavailable ({backup_error}).")
     raise ValueError(error or "Unable to read checkpoint.")
+
 
 def save_state(paths: dict[str, Path], state: dict[str, Any]) -> dict[str, Any]:
     current, _ = parse_state_file(paths["state"])
@@ -165,6 +243,7 @@ def save_state(paths: dict[str, Path], state: dict[str, Any]) -> dict[str, Any]:
     return sealed
 
 def read_events(path: Path, repair_tail: bool = False) -> tuple[list[dict[str, Any]], bool, str]:
+    """Validate the complete hash chain and optionally discard only an incomplete trailing record."""
     if not path.exists():
         return [], False, "0" * 64
     raw = path.read_bytes()
@@ -175,15 +254,29 @@ def read_events(path: Path, repair_tail: bool = False) -> tuple[list[dict[str, A
     previous = "0" * 64
     for line_number, raw_line in enumerate(complete.splitlines(), 1):
         if not raw_line.strip():
-            continue
+            raise ValueError(f"Event journal contains an empty complete record at line {line_number}.")
         try:
             event = json.loads(raw_line.decode("utf-8"))
         except (UnicodeError, json.JSONDecodeError) as exc:
             raise ValueError(f"Event journal is corrupt at complete line {line_number}: {exc}") from exc
+        if not isinstance(event, dict):
+            raise ValueError(f"Event journal record at line {line_number} must be a JSON object.")
+        sequence = event.get("sequence")
+        if not isinstance(sequence, int) or isinstance(sequence, bool) or sequence != len(events) + 1:
+            raise ValueError(f"Event journal sequence is invalid at line {line_number}.")
         expected = event.get("hash")
-        body = {key: value for key, value in event.items() if key != "hash"}
+        if not isinstance(expected, str) or not re.fullmatch(r"[0-9a-f]{64}", expected):
+            raise ValueError(f"Event journal hash is invalid at line {line_number}.")
         if event.get("previous_hash") != previous:
             raise ValueError(f"Event journal chain mismatch at line {line_number}.")
+        state_hash = event.get("state_integrity")
+        if not isinstance(state_hash, str) or not re.fullmatch(r"[0-9a-f]{64}", state_hash):
+            raise ValueError(f"Event journal state reference is invalid at line {line_number}.")
+        if not isinstance(event.get("type"), str) or not event["type"]:
+            raise ValueError(f"Event journal type is invalid at line {line_number}.")
+        if not isinstance(event.get("timestamp"), str) or not event["timestamp"]:
+            raise ValueError(f"Event journal timestamp is invalid at line {line_number}.")
+        body = {key: value for key, value in event.items() if key != "hash"}
         actual = hashlib.sha256(canonical_json(body)).hexdigest()
         if expected != actual:
             raise ValueError(f"Event journal digest mismatch at line {line_number}.")
@@ -195,20 +288,33 @@ def read_events(path: Path, repair_tail: bool = False) -> tuple[list[dict[str, A
 
 def append_event(paths: dict[str, Path], state: dict[str, Any], event_type: str, note: str = "") -> None:
     events, _, previous = read_events(paths["events"], repair_tail=True)
-    body = {"sequence": len(events) + 1, "timestamp": now_iso(), "type": event_type,
-            "stage": state["current_stage"], "status": state["status"],
-            "checkpoint_count": state["checkpoint_count"], "state_integrity": state["_integrity"],
-            "note": note, "previous_hash": previous}
+    body = {
+        "sequence": len(events) + 1,
+        "timestamp": now_iso(),
+        "type": event_type,
+        "stage": state["current_stage"],
+        "status": state["status"],
+        "checkpoint_count": state["checkpoint_count"],
+        "state_integrity": state["_integrity"],
+        "note": note,
+        "previous_hash": previous,
+    }
     record = dict(body)
     record["hash"] = hashlib.sha256(canonical_json(body)).hexdigest()
     encoded = canonical_json(record) + b"\n"
     paths["events"].parent.mkdir(parents=True, exist_ok=True)
     descriptor = os.open(str(paths["events"]), os.O_CREAT | os.O_APPEND | os.O_WRONLY, 0o600)
     try:
-        os.write(descriptor, encoded)
+        remaining = memoryview(encoded)
+        while remaining:
+            written = os.write(descriptor, remaining)
+            if written <= 0:
+                raise OSError("Short write while appending the event journal.")
+            remaining = remaining[written:]
         os.fsync(descriptor)
     finally:
         os.close(descriptor)
+
 
 def make_initial_state(root: Path, args: argparse.Namespace) -> dict[str, Any]:
     goal = safe_text(args.goal, "goal")
@@ -324,7 +430,7 @@ def command_checkpoint(args: argparse.Namespace, handoff: bool = False) -> int:
     paths = session_paths(root)
     ensure_session_dir(paths)
     with session_lock(paths["lock"]):
-        state, recovered = load_state(paths, allow_backup=True)
+        state, recovered = load_state(paths, root, allow_backup=True)
         if recovered:
             print("WARNING: restored the previous valid backup because the primary checkpoint was invalid.", file=sys.stderr)
             atomic_json(paths["state"], seal_state(state))
@@ -342,36 +448,56 @@ def command_checkpoint(args: argparse.Namespace, handoff: bool = False) -> int:
 def command_resume(args: argparse.Namespace) -> int:
     root = resolve_root(args.root)
     paths = session_paths(root)
-    state, recovered = load_state(paths, allow_backup=True)
-    if recovered:
-        atomic_json(paths["state"], seal_state(state))
-        print("WARNING: recovered from checkpoint.json.bak; the primary checkpoint was unreadable.", file=sys.stderr)
-    prompt = write_resume(paths, state)
-    print(paths["resume"].read_text(encoding="utf-8"), end="")
+    with session_lock(paths["lock"]):
+        state, recovered = load_state(paths, root, allow_backup=True)
+        if recovered:
+            atomic_json(paths["state"], seal_state(state))
+            try:
+                append_event(paths, state, "recovery", "Restored the previous valid checkpoint during resume.")
+            except (OSError, ValueError) as exc:
+                print(f"WARNING: checkpoint recovered, but the event journal could not be updated: {exc}", file=sys.stderr)
+            print("WARNING: recovered from checkpoint.json.bak; the primary checkpoint was unreadable.", file=sys.stderr)
+        prompt = write_resume(paths, state)
+        content = paths["resume"].read_text(encoding="utf-8")
+    print(content, end="")
     print(f"\nSaved handoff file: {prompt}", file=sys.stderr)
     return 0
 
 def command_recover(args: argparse.Namespace) -> int:
     root = resolve_root(args.root)
     paths = session_paths(root)
-    if not paths["backup"].exists():
-        raise ValueError("No previous checkpoint backup exists.")
-    backup, error = parse_state_file(paths["backup"])
-    if backup is None:
-        raise ValueError(f"Backup checkpoint is invalid: {error}")
-    atomic_json(paths["state"], seal_state(backup))
+    with session_lock(paths["lock"]):
+        if not paths["backup"].exists():
+            raise ValueError("No previous checkpoint backup exists.")
+        backup, error = parse_state_file(paths["backup"], root)
+        if backup is None:
+            raise ValueError(f"Backup checkpoint is invalid: {error}")
+        atomic_json(paths["state"], seal_state(backup))
+        prompt = write_resume(paths, backup)
+        try:
+            append_event(paths, backup, "recovery", "Restored checkpoint.json.bak explicitly.")
+        except (OSError, ValueError) as exc:
+            print(f"WARNING: checkpoint recovered, but the event journal could not be updated: {exc}", file=sys.stderr)
     print(f"Restored checkpoint {backup['checkpoint_count']} from {paths['backup']}")
+    print(f"Updated resume prompt: {prompt}")
     return 0
 
 def command_status(args: argparse.Namespace) -> int:
     root = resolve_root(args.root)
     paths = session_paths(root)
-    state, recovered = load_state(paths, allow_backup=True)
-    for label, value in (("Project", state["project_name"]), ("Goal", state["goal"]),
-                         ("Status", state["status"]), ("Stage", state["current_stage"]),
-                         ("Checkpoint count", state["checkpoint_count"]),
-                         ("Completed items", len(state["completed"])), ("Next actions", len(state["next_actions"])),
-                         ("Open blockers", len(state["blockers"])), ("Updated", state["updated_at"])):
+    with session_lock(paths["lock"]):
+        state, recovered = load_state(paths, root, allow_backup=True)
+    for label, value in (
+        ("Project", state["project_name"]),
+        ("Goal", state["goal"]),
+        ("Status", state["status"]),
+        ("Stage", state["current_stage"]),
+        ("Checkpoint count", state["checkpoint_count"]),
+        ("Completed items", len(state["completed"])),
+        ("Next actions", len(state["next_actions"])),
+        ("Open blockers", len(state["blockers"])),
+        ("Updated", state["updated_at"]),
+    ):
         print(f"{label}: {value}")
     if recovered:
         print("WARNING: primary checkpoint is invalid; showing the last valid backup.")
@@ -380,30 +506,35 @@ def command_status(args: argparse.Namespace) -> int:
 def command_verify(args: argparse.Namespace) -> int:
     root = resolve_root(args.root)
     paths = session_paths(root)
-    state, error = parse_state_file(paths["state"])
-    if state is None:
-        print(f"FAIL: {error}", file=sys.stderr)
-        backup, backup_error = parse_state_file(paths["backup"])
-        if backup is not None:
-            print(f"RECOVERY AVAILABLE: checkpoint.json.bak (checkpoint {backup['checkpoint_count']}).", file=sys.stderr)
-        elif backup_error:
-            print(f"Backup: {backup_error}", file=sys.stderr)
-        return 1
-    if Path(state["project_root"]).resolve() != root:
-        print("FAIL: checkpoint project_root does not match the selected project.", file=sys.stderr)
-        return 1
-    try:
-        events, tail_incomplete, _ = read_events(paths["events"])
-    except (OSError, ValueError) as exc:
-        print(f"FAIL: {exc}", file=sys.stderr)
-        return 1
-    if tail_incomplete:
-        print("WARNING: event journal has an incomplete final line; the next checkpoint will repair it.")
-    backup, backup_error = parse_state_file(paths["backup"])
-    if paths["backup"].exists() and backup is None:
-        print(f"WARNING: backup checkpoint is invalid: {backup_error}")
-    print(f"PASS: V25 checkpoint integrity verified; checkpoint={state['checkpoint_count']}; journal_events={len(events)}; project={state['project_name']}")
+    with session_lock(paths["lock"]):
+        state, error = parse_state_file(paths["state"], root)
+        if state is None:
+            print(f"FAIL: {error}", file=sys.stderr)
+            backup, backup_error = parse_state_file(paths["backup"], root)
+            if backup is not None:
+                print(f"RECOVERY AVAILABLE: checkpoint.json.bak (checkpoint {backup['checkpoint_count']}).", file=sys.stderr)
+            elif backup_error:
+                print(f"Backup: {backup_error}", file=sys.stderr)
+            return 1
+        try:
+            events, tail_incomplete, _ = read_events(paths["events"])
+        except (OSError, ValueError) as exc:
+            print(f"FAIL: {exc}", file=sys.stderr)
+            return 1
+        if not events:
+            print("FAIL: the event journal is missing or empty.", file=sys.stderr)
+            return 1
+        if events[-1].get("state_integrity") != state["_integrity"]:
+            print("FAIL: the latest verified journal event does not reference the current checkpoint.", file=sys.stderr)
+            return 1
+        if tail_incomplete:
+            print("WARNING: event journal has an incomplete final line; the next checkpoint will repair it.")
+        backup, backup_error = parse_state_file(paths["backup"], root)
+        if paths["backup"].exists() and backup is None:
+            print(f"WARNING: backup checkpoint is invalid: {backup_error}")
+        print(f"PASS: V25 checkpoint integrity verified; checkpoint={state['checkpoint_count']}; journal_events={len(events)}; project={state['project_name']}")
     return 0
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="V25: durable session checkpoints and recoverable Codex handoffs for Roblox projects.")
