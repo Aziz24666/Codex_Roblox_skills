@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "additions": {
+    "economy": {
+      "signals": [
+        "monetization opportunity audit",
+        "find monetization opportunities",
+        "revenue opportunity discovery",
+        "robux earning strategy",
+        "broad monetization portfolio",
+        "monetization catalogue",
+        "monetization catalog",
+        "monetization growth",
+        "store conversion",
+        "monetized engagement",
+        "earn more robux",
+        "maximize robux",
+        "revenue opportunities"
+      ],
+      "skills": [
+        "roblox-monetization-opportunity-discovery",
+        "roblox-value-led-engagement-design",
+        "roblox-store-product-discovery-and-conversion",
+        "roblox-revenue-analytics-and-experimentation",
+        "roblox-monetization-growth-compliance"
+      ]
+    },
+    "ui": {
+      "signals": [
+        "product discovery ranking",
+        "top picks store",
+        "store funnel",
+        "product recommendation api",
+        "shop conversion audit",
+        "product detail views"
+      ],
+      "skills": [
+        "roblox-store-product-discovery-and-conversion"
+      ]
+    },
+    "performance": {
+      "signals": [
+        "retention cohort",
+        "engagement loop",
+        "creator rewards optimization",
+        "revenue analytics",
+        "arpdau",
+        "arppu",
+        "payer conversion"
+      ],
+      "skills": [
+        "roblox-value-led-engagement-design",
+        "roblox-revenue-analytics-and-experimentation"
+      ]
+    },
+    "release": {
+      "signals": [
+        "monetization growth compliance",
+        "monetization opportunity release gate",
+        "revenue compliance audit",
+        "robux portfolio launch"
+      ],
+      "skills": [
+        "roblox-monetization-growth-compliance",
+        "roblox-monetization-opportunity-discovery"
+      ]
+    },
+    "multiplayer": {
+      "signals": [
+        "social monetization",
+        "party cosmetics",
+        "guild customization",
+        "private server revenue",
+        "cooperative cosmetic bundle"
+      ],
+      "skills": [
+        "roblox-value-led-engagement-design",
+        "roblox-monetization-opportunity-discovery"
+      ]
+    },
+    "character": {
+      "signals": [
+        "cosmetic monetization",
+        "avatar cosmetics shop",
+        "emote monetization",
+        "character skin store"
+      ],
+      "skills": [
+        "roblox-monetization-opportunity-discovery",
+        "roblox-store-product-discovery-and-conversion"
+      ]
+    },
+    "assets": {
+      "signals": [
+        "creator store product",
+        "sell roblox models",
+        "creator store plugin",
+        "asset monetization"
+      ],
+      "skills": [
+        "roblox-monetization-opportunity-discovery"
+      ]
+    }
+  }
+}
