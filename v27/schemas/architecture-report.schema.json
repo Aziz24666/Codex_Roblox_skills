@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v27/schemas/architecture-report.schema.json",
+  "title": "V27 Luau Architecture Report",
+  "description": "Conservative, read-only static inventory for a Roblox Luau project.",
+  "type": "object",
+  "required": [
+    "schema_version", "toolkit_version", "generated_at_utc", "project_root",
+    "inventory", "dependencies", "remote_contracts", "rojo_projects", "tools",
+    "warnings", "limitations"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "toolkit_version": { "const": "27.0.0" },
+    "generated_at_utc": { "type": "string", "format": "date-time" },
+    "project_root": { "type": "string", "minLength": 1 },
+    "inventory": {
+      "type": "object",
+      "required": ["luau_files_discovered", "luau_files_read", "read_failures", "type_mode_counts", "strict_mode_percent"],
+      "properties": {
+        "luau_files_discovered": { "type": "integer", "minimum": 0 },
+        "luau_files_read": { "type": "integer", "minimum": 0 },
+        "read_failures": { "type": "array", "items": { "type": "string" } },
+        "type_mode_counts": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 0 } },
+        "strict_mode_percent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "recommended_migration_policy": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "dependencies": {
+      "type": "object",
+      "required": ["resolution_basis", "resolved_edges", "unresolved_static_requires", "dynamic_or_non_script_requires", "cycles", "possible_unreferenced_modules"],
+      "properties": {
+        "resolution_basis": { "type": "string" },
+        "resolved_edges": { "type": "array", "items": { "type": "object" } },
+        "unresolved_static_requires": { "type": "array", "items": { "type": "object" } },
+        "dynamic_or_non_script_requires": { "type": "integer", "minimum": 0 },
+        "cycles": { "type": "array", "items": { "type": "array", "items": { "type": "string" } } },
+        "possible_unreferenced_modules": { "type": "array", "items": { "type": "string" } },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "remote_contracts": { "type": "object" },
+    "rojo_projects": { "type": "array", "items": { "type": "object" } },
+    "tools": {
+      "type": "object",
+      "properties": {
+        "luau_analyze": { "type": ["string", "null"] },
+        "rojo": { "type": ["string", "null"] }
+      },
+      "additionalProperties": false
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}
