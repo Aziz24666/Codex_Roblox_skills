@@ -20,9 +20,9 @@ REQUIRED_FILES = (
     "v27/docs/LUAU_STATIC_ANALYSIS.md", "v27/docs/DEPENDENCY_AND_REMOTE_CONTRACTS.md",
     "v27/docs/ROJO_PROJECT_VALIDATION.md", "v27/docs/STRICT_TYPING_MIGRATION.md",
     "v27/schemas/architecture-report.schema.json",
-    ".agents/skills/roblox-luau-static-analysis/SKILL.md",
-    ".agents/skills/roblox-luau-architecture-and-dependency-governance/SKILL.md",
-    ".agents/skills/roblox-remote-contract-and-rojo-validation/SKILL.md",
+    ".agents/skills/roblox-luau-static-analysis-v27/SKILL.md",
+    ".agents/skills/roblox-luau-architecture-and-dependency-governance-v27/SKILL.md",
+    ".agents/skills/roblox-remote-contract-and-rojo-validation-v27/SKILL.md",
 )
 
 
