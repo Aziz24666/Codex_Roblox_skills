@@ -225,8 +225,8 @@ jobs:
           test "$(tr -d '\r\n' < v28/VERSION)" = "${tag#v}"
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
           gh release create "$tag" \
-            "$RUNNER_TEMP/v25-release-assets/roblox-codex-game-studio-kit-v28.zip" \
-            "$RUNNER_TEMP/v25-release-assets/roblox-codex-game-studio-kit-v28.tar.xz" \
-            "$RUNNER_TEMP/v25-release-assets/SHA256SUMS-RELEASE.txt" \
+            "$RUNNER_TEMP/v28-release-assets/roblox-codex-game-studio-kit-v28.zip" \
+            "$RUNNER_TEMP/v28-release-assets/roblox-codex-game-studio-kit-v28.tar.xz" \
+            "$RUNNER_TEMP/v28-release-assets/SHA256SUMS-RELEASE.txt" \
             --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V28.md

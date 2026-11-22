@@ -358,7 +358,7 @@ def validate_manifest_data(data: Any) -> list[str]:
         return errors
     if data["schema_version"] != 1:
         errors.append("schema_version must equal 1.")
-    if data["environment"] not in {"synthetic", "staging"}:
+    if not isinstance(data["environment"], str) or data["environment"] not in {"synthetic", "staging"}:
         errors.append("environment must be synthetic or staging; production is not permitted.")
     if data["dry_run"] is not True:
         errors.append("dry_run must be true.")
@@ -408,7 +408,7 @@ def validate_manifest_data(data: Any) -> list[str]:
         else:
             kinds = {
                 item.get("kind") for item in tests
-                if isinstance(item, dict) and isinstance(item.get("name"), str) and item["name"].strip()
+                if isinstance(item, dict) and isinstance(item.get("name"), str) and item["name"].strip() and isinstance(item.get("kind"), str)
             }
             missing = KNOWN_TEST_KINDS - kinds
             if missing:
@@ -426,6 +426,14 @@ def validate_manifest(root: Path, raw_path: str) -> tuple[list[str], Path]:
     if path.is_symlink() or not is_within(path, root):
         return ["Manifest path must be a regular file inside the selected project root; symlinks are not allowed."], path
     try:
+        input_relative = path.relative_to(root)
+        if not input_relative.parts or ".." in input_relative.parts:
+            return ["Manifest path must be a safe relative path inside the selected project root."], path
+        cursor = root
+        for part in input_relative.parts:
+            cursor = cursor / part
+            if cursor.is_symlink():
+                return ["Manifest path cannot traverse a symlink."], path
         resolved = path.resolve(strict=True)
         if not resolved.is_file() or not resolved.is_relative_to(root):
             return ["Manifest must resolve to a regular file inside the selected project root."], path
