@@ -22,9 +22,15 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
+        "files_considered",
         "files_scanned",
+        "files_skipped_oversize",
+        "files_unreadable",
+        "scan_truncated",
+        "max_files",
         "hard_coded_price_literals",
         "dynamic_price_lookup_sites",
+        "legacy_product_info_sites",
         "price_level_api_sites",
         "subscription_api_sites"
       ],
@@ -46,6 +52,29 @@
           "minimum": 0
         },
         "subscription_api_sites": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_considered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_skipped_oversize": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_unreadable": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "scan_truncated": {
+          "type": "boolean"
+        },
+        "max_files": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "legacy_product_info_sites": {
           "type": "integer",
           "minimum": 0
         }
@@ -70,7 +99,8 @@
               "HARDCODED_PRICE_LITERAL",
               "DYNAMIC_PRICE_LOOKUP",
               "PRICE_LEVEL_API",
-              "SUBSCRIPTION_API"
+              "SUBSCRIPTION_API",
+              "LEGACY_PRODUCT_INFO_API"
             ]
           },
           "path": {
