@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "roblox-codex-v23-monetization-growth",
+  "cases": [
+    {
+      "id": "v23-full-opportunity-search",
+      "task": "Run a monetization opportunity audit and find monetization opportunities across my whole Roblox game; maximize the viable Robux portfolio.",
+      "required_skills": [
+        "roblox-monetization-opportunity-discovery",
+        "roblox-monetization-growth-compliance"
+      ],
+      "required_domains": [
+        "economy"
+      ]
+    },
+    {
+      "id": "v23-healthy-retention",
+      "task": "Improve the engagement loops and retention cohorts without artificial session length or AFK rewards.",
+      "required_skills": [
+        "roblox-value-led-engagement-design",
+        "roblox-revenue-analytics-and-experimentation"
+      ],
+      "required_domains": [
+        "performance"
+      ]
+    },
+    {
+      "id": "v23-store-recommendations",
+      "task": "Build product discovery ranking and a top picks store using RankProductsAsync and transparent purchase flows.",
+      "required_skills": [
+        "roblox-store-product-discovery-and-conversion"
+      ],
+      "required_domains": [
+        "ui",
+        "economy"
+      ]
+    },
+    {
+      "id": "v23-revenue-funnel",
+      "task": "Analyze monetization, ARPDAU, ARPPU, payer conversion, revenue analytics, and player retention with aggregate metrics.",
+      "required_skills": [
+        "roblox-revenue-analytics-and-experimentation"
+      ],
+      "required_domains": [
+        "performance",
+        "economy"
+      ]
+    },
+    {
+      "id": "v23-social-revenue",
+      "task": "Explore private server revenue, guild customization, and cooperative cosmetic bundles without paywalling friend play.",
+      "required_skills": [
+        "roblox-value-led-engagement-design",
+        "roblox-monetization-opportunity-discovery"
+      ],
+      "required_domains": [
+        "multiplayer",
+        "economy"
+      ]
+    },
+    {
+      "id": "v23-cosmetic-portfolio",
+      "task": "Find cosmetic monetization opportunities for avatar skins, emotes, and character customization.",
+      "required_skills": [
+        "roblox-monetization-opportunity-discovery",
+        "roblox-store-product-discovery-and-conversion"
+      ],
+      "required_domains": [
+        "character",
+        "economy"
+      ]
+    },
+    {
+      "id": "v23-creator-store",
+      "task": "Find monetization opportunities for Creator Store models, reusable Roblox assets, and Studio plugins.",
+      "required_skills": [
+        "roblox-monetization-opportunity-discovery"
+      ],
+      "required_domains": [
+        "assets",
+        "economy"
+      ]
+    }
+  ]
+}

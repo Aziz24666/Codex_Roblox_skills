@@ -1,0 +1,893 @@
+[
+  {
+    "id": "character-skins",
+    "category": "Cosmetics",
+    "name": "Fixed character skins",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "avatar",
+      "character customization",
+      "skin",
+      "appearance"
+    ],
+    "player_value": "Player expression and identity",
+    "offer_shape": "Named skins with exact contents; permanent ownership",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Cosmetic only; no combat advantage.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "outfit-bundles",
+    "category": "Cosmetics",
+    "name": "Outfit and clothing bundles",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "outfit",
+      "clothing",
+      "wardrobe",
+      "costume"
+    ],
+    "player_value": "More ways to personalize a character",
+    "offer_shape": "List every included item",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Show preview and exact pieces.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "emote-packs",
+    "category": "Cosmetics",
+    "name": "Emote and gesture packs",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "emote",
+      "gesture",
+      "dance"
+    ],
+    "player_value": "Self-expression and social play",
+    "offer_shape": "Fixed set of named emotes",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Every emote is known before purchase.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "animation-packs",
+    "category": "Cosmetics",
+    "name": "Animation style packs",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "animation",
+      "idle animation",
+      "walk animation"
+    ],
+    "player_value": "Personalized movement and presentation",
+    "offer_shape": "Fixed animation set",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Visual-only; preserve readability.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "visual-effect-packs",
+    "category": "Cosmetics",
+    "name": "Auras, trails, and visual effects",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "aura",
+      "trail",
+      "particles",
+      "visual effect"
+    ],
+    "player_value": "Personalization and collection goals",
+    "offer_shape": "Fixed cosmetic effect with preview",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Keep effects readable.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "titles-nameplates",
+    "category": "Cosmetics",
+    "name": "Titles and nameplates",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "title",
+      "nameplate",
+      "badge",
+      "rank display"
+    ],
+    "player_value": "Recognition and self-expression",
+    "offer_shape": "Fixed title or nameplate style",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "No misleading competitive rank claims.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "character-presets",
+    "category": "Cosmetics",
+    "name": "Character appearance presets",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "character preset",
+      "appearance preset",
+      "avatar editor"
+    ],
+    "player_value": "Faster personalization",
+    "offer_shape": "Fixed named preset",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Do not imply gameplay power.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "vehicle-cosmetics",
+    "category": "Cosmetics",
+    "name": "Vehicle paint and decoration",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "vehicle",
+      "car",
+      "racing",
+      "garage"
+    ],
+    "player_value": "Personal identity in vehicle-focused play",
+    "offer_shape": "Fixed paint, decal, or vehicle accessory",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Cosmetic only; list compatibility.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "pet-cosmetics",
+    "category": "Cosmetics",
+    "name": "Pet and companion cosmetics",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "pet",
+      "companion",
+      "familiar"
+    ],
+    "player_value": "Attachment and expression",
+    "offer_shape": "Fixed pet appearance or accessory",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Never sell a randomized pet outcome.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "housing-decor",
+    "category": "Cosmetics",
+    "name": "Housing furniture and decorations",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "house",
+      "housing",
+      "furniture",
+      "decoration"
+    ],
+    "player_value": "Creative ownership and self-expression",
+    "offer_shape": "Named furniture/decor pack",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Keep a meaningful free building route.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "base-themes",
+    "category": "Cosmetics",
+    "name": "Base and plot themes",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "base building",
+      "plot",
+      "base theme"
+    ],
+    "player_value": "Personalization of a player's space",
+    "offer_shape": "Fixed theme and exact contents",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "No competitive map advantage.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "photo-mode",
+    "category": "Cosmetics",
+    "name": "Photo poses and photo-mode extras",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "photo mode",
+      "screenshot",
+      "camera pose"
+    ],
+    "player_value": "Sharing creative moments",
+    "offer_shape": "Fixed poses, frames, or filters",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Keep ordinary camera controls free.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "collection-showcases",
+    "category": "Cosmetics",
+    "name": "Display cases and collection showcases",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "collection",
+      "trophy room",
+      "display case",
+      "showcase"
+    ],
+    "player_value": "Showcase earned achievements",
+    "offer_shape": "Fixed display theme or cosmetic layout",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "No fake achievement status.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "seasonal-cosmetics",
+    "category": "Live operations",
+    "name": "Seasonal and event cosmetics",
+    "monetization_route": "Fixed pass or developer product",
+    "signals": [
+      "seasonal event",
+      "holiday event",
+      "festival"
+    ],
+    "player_value": "Fresh content and event identity",
+    "offer_shape": "Fixed, dated cosmetic offer",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "Dates must be real; no fake scarcity.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "guaranteed-season-pass",
+    "category": "Live operations",
+    "name": "Season pass with guaranteed rewards",
+    "monetization_route": "One-time pass",
+    "signals": [
+      "season pass",
+      "battle pass",
+      "season progression",
+      "reward track"
+    ],
+    "player_value": "Long-term goals and transparent progression",
+    "offer_shape": "Publish every paid reward and milestone",
+    "implementation_effort": "high",
+    "risk_level": "Medium",
+    "guardrail": "Worthwhile free track; no random paid rewards.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "story-mission-pack",
+    "category": "Content",
+    "name": "Story and mission expansions",
+    "monetization_route": "One-time pass or paid access",
+    "signals": [
+      "story",
+      "mission",
+      "quest",
+      "campaign"
+    ],
+    "player_value": "Additional authored content",
+    "offer_shape": "Named chapter or mission set",
+    "implementation_effort": "high",
+    "risk_level": "Medium",
+    "guardrail": "Do not deceptively paywall core story.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "map-expansion",
+    "category": "Content",
+    "name": "New map and area packs",
+    "monetization_route": "One-time pass",
+    "signals": [
+      "map",
+      "world",
+      "zone",
+      "region",
+      "exploration"
+    ],
+    "player_value": "More authored places to explore",
+    "offer_shape": "Named map or area with clear access terms",
+    "implementation_effort": "high",
+    "risk_level": "Medium",
+    "guardrail": "Do not fragment essential matchmaking.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "challenge-pack",
+    "category": "Content",
+    "name": "Additional challenge and quest packs",
+    "monetization_route": "Fixed developer product or pass",
+    "signals": [
+      "challenge",
+      "daily quest",
+      "weekly quest",
+      "mission board"
+    ],
+    "player_value": "More meaningful goals",
+    "offer_shape": "Fixed authored challenges and rewards",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "No paid rerolls or chance modifiers.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "new-game-modes",
+    "category": "Content",
+    "name": "Optional game-mode access",
+    "monetization_route": "One-time pass",
+    "signals": [
+      "game mode",
+      "minigame",
+      "arena mode",
+      "race mode",
+      "survival mode"
+    ],
+    "player_value": "Variety for interested players",
+    "offer_shape": "Clearly described optional mode",
+    "implementation_effort": "high",
+    "risk_level": "Medium",
+    "guardrail": "Do not split essential population.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "extra-loadout-slots",
+    "category": "Convenience",
+    "name": "Additional loadout slots",
+    "monetization_route": "Pass",
+    "signals": [
+      "loadout",
+      "build",
+      "class setup",
+      "equipment preset"
+    ],
+    "player_value": "Convenience for multiple play styles",
+    "offer_shape": "Fixed number of extra saved slots",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "No stronger equipment.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "extra-profile-slots",
+    "category": "Convenience",
+    "name": "Additional profile or save slots",
+    "monetization_route": "Pass",
+    "signals": [
+      "save slot",
+      "profile slot",
+      "multiple profiles"
+    ],
+    "player_value": "More room for separate playthroughs",
+    "offer_shape": "Fixed number of save slots",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Protect save data and recovery.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "inventory-expansion",
+    "category": "Convenience",
+    "name": "Inventory capacity expansion",
+    "monetization_route": "Pass",
+    "signals": [
+      "inventory",
+      "storage",
+      "capacity",
+      "backpack"
+    ],
+    "player_value": "Less inventory management",
+    "offer_shape": "Fixed capacity increase",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "Do not make free capacity frustratingly low.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "unlocked-fast-travel",
+    "category": "Convenience",
+    "name": "Fast travel between unlocked locations",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "fast travel",
+      "teleport menu",
+      "waypoint"
+    ],
+    "player_value": "Saves navigation time",
+    "offer_shape": "Travel only to already-unlocked destinations",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Never sell unearned core progression.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "fixed-currency-packs",
+    "category": "Consumables",
+    "name": "Exact-quantity in-game currency packs",
+    "monetization_route": "Developer product",
+    "signals": [
+      "currency",
+      "coins",
+      "gems",
+      "credits",
+      "soft currency"
+    ],
+    "player_value": "Optional convenience with a known amount",
+    "offer_shape": "State the exact amount and restrictions",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "Currency cannot feed chance-based purchases.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "fixed-crafting-materials",
+    "category": "Consumables",
+    "name": "Exact-quantity crafting material packs",
+    "monetization_route": "Developer product",
+    "signals": [
+      "crafting",
+      "materials",
+      "ore",
+      "wood",
+      "resource nodes"
+    ],
+    "player_value": "Convenience for crafters",
+    "offer_shape": "List exact resource and quantity",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "No chance-based crafting outcome.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "fixed-effect-consumables",
+    "category": "Consumables",
+    "name": "Deterministic consumables",
+    "monetization_route": "Developer product",
+    "signals": [
+      "consumable",
+      "potion",
+      "boost",
+      "temporary effect",
+      "power-up"
+    ],
+    "player_value": "Known short-lived utility",
+    "offer_shape": "Disclose exact effect, duration, and quantity",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "No random duration or strength.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "deterministic-respec",
+    "category": "Convenience",
+    "name": "Deterministic build reset service",
+    "monetization_route": "Developer product",
+    "signals": [
+      "respec",
+      "skill tree",
+      "talent tree",
+      "stat allocation"
+    ],
+    "player_value": "Correct a build choice",
+    "offer_shape": "One clearly defined reset",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "No paid random upgrade success.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "convenience-services",
+    "category": "Convenience",
+    "name": "Optional convenience services",
+    "monetization_route": "Pass or developer product",
+    "signals": [
+      "fast queue",
+      "extra preset",
+      "organize inventory"
+    ],
+    "player_value": "Reduce repetitive administration",
+    "offer_shape": "Precise service with no hidden limits",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "Do not create friction to sell its removal.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "member-subscription",
+    "category": "Subscriptions",
+    "name": "Subscription membership with recurring benefits",
+    "monetization_route": "Roblox subscription",
+    "signals": [
+      "subscription",
+      "membership",
+      "monthly benefit",
+      "subscriber"
+    ],
+    "player_value": "Reliable recurring value",
+    "offer_shape": "List benefits, cadence, cancellation and expiry",
+    "implementation_effort": "high",
+    "risk_level": "Medium",
+    "guardrail": "Only promise benefits deliverable each period.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "monthly-cosmetic-subscription",
+    "category": "Subscriptions",
+    "name": "Monthly cosmetic membership",
+    "monetization_route": "Roblox subscription",
+    "signals": [
+      "monthly cosmetics",
+      "cosmetic club",
+      "monthly outfit"
+    ],
+    "player_value": "Regular identity content",
+    "offer_shape": "Name the monthly delivery and fallback",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Fixed benefits; no mystery bundles.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "supporter-membership",
+    "category": "Subscriptions",
+    "name": "Supporter membership",
+    "monetization_route": "Roblox subscription",
+    "signals": [
+      "supporter",
+      "founder club",
+      "supporter badge"
+    ],
+    "player_value": "Lets fans support development",
+    "offer_shape": "Cosmetic recognition and published recurring extras",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Core content never requires support.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "private-servers",
+    "category": "Social",
+    "name": "Private servers for friends and communities",
+    "monetization_route": "Roblox private servers",
+    "signals": [
+      "private server",
+      "private session",
+      "friends-only",
+      "private match"
+    ],
+    "player_value": "More control over playing with friends",
+    "offer_shape": "Disclose price, renewal, and join controls",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Mutually exclusive with paid access configuration.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "robux-beta-access",
+    "category": "Access",
+    "name": "Robux paid access for a genuine closed beta",
+    "monetization_route": "Experience-level paid access",
+    "signals": [
+      "closed beta",
+      "paid beta",
+      "early access",
+      "beta access"
+    ],
+    "player_value": "Funds a limited testing cohort",
+    "offer_shape": "One-time access fee and explicit beta scope",
+    "implementation_effort": "high",
+    "risk_level": "Medium",
+    "guardrail": "Only for genuine beta; no pressure tactics.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "creator-rewards",
+    "category": "Platform programs",
+    "name": "Creator Rewards and organic engagement",
+    "monetization_route": "Roblox creator program",
+    "signals": [],
+    "player_value": "Platform-funded reward for genuine value",
+    "offer_shape": "Improve onboarding, reliability, replay variety, and social play",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "No fake traffic or manufactured playtime.",
+    "always_review": true,
+    "deterministic": true
+  },
+  {
+    "id": "audience-expansion",
+    "category": "Growth",
+    "name": "Share-link and audience expansion opportunities",
+    "monetization_route": "Roblox creator program",
+    "signals": [],
+    "player_value": "Helps interested players discover the game",
+    "offer_shape": "Clear share links and authentic community promotion",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "No spam, bots, alt accounts, or bought traffic.",
+    "always_review": true,
+    "deterministic": true
+  },
+  {
+    "id": "immersive-ads",
+    "category": "Advertising",
+    "name": "Eligible immersive billboard advertising",
+    "monetization_route": "Roblox immersive ads",
+    "signals": [],
+    "player_value": "Separate platform-funded revenue stream",
+    "offer_shape": "Use only natural placements that do not obstruct play",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "Check current eligibility; never bypass requirements.",
+    "always_review": true,
+    "deterministic": true
+  },
+  {
+    "id": "opt-in-rewarded-video",
+    "category": "Advertising",
+    "name": "Optional rewarded video with fixed reward",
+    "monetization_route": "Roblox immersive ads",
+    "signals": [
+      "rewarded video",
+      "ad reward",
+      "watch ad",
+      "video ad"
+    ],
+    "player_value": "Optional exchange chosen by player",
+    "offer_shape": "State exact reward before opt-in",
+    "implementation_effort": "medium",
+    "risk_level": "Medium",
+    "guardrail": "Never force ads or hide reward.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "avatar-item-catalog",
+    "category": "Marketplace",
+    "name": "Fixed-price avatar item catalog",
+    "monetization_route": "Avatar item sales",
+    "signals": [
+      "avatar item",
+      "avatar catalog",
+      "marketplace item",
+      "accessory catalog"
+    ],
+    "player_value": "Take an identity item beyond one experience",
+    "offer_shape": "Named items with clear creator and price",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Check current marketplace permissions.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "avatar-affiliate-sales",
+    "category": "Marketplace",
+    "name": "Eligible creator-item affiliate sales",
+    "monetization_route": "Marketplace affiliate feature",
+    "signals": [
+      "affiliate item",
+      "creator item",
+      "catalog affiliate"
+    ],
+    "player_value": "Connect players to relevant creator-made items",
+    "offer_shape": "Curated fixed-price items with attribution",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Verify current eligibility and commission.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "creator-store-models",
+    "category": "Creator Store",
+    "name": "Creator Store model and asset products",
+    "monetization_route": "Creator Store sales",
+    "signals": [
+      "model pack",
+      "asset pack",
+      "toolkit",
+      "module",
+      "prefab",
+      "template"
+    ],
+    "player_value": "Monetizes reusable assets for developers",
+    "offer_shape": "Document licenses, dependencies, and contents",
+    "implementation_effort": "high",
+    "risk_level": "Low",
+    "guardrail": "Separate creator-business revenue.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "creator-store-plugins",
+    "category": "Creator Store",
+    "name": "Creator Store plugin products",
+    "monetization_route": "Creator Store sales",
+    "signals": [
+      "studio plugin",
+      "plugin development",
+      "editor tool",
+      "developer tool"
+    ],
+    "player_value": "Creator-facing development tools",
+    "offer_shape": "Document features, compatibility, and license",
+    "implementation_effort": "high",
+    "risk_level": "Low",
+    "guardrail": "Separate creator-business revenue.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "guild-cosmetics",
+    "category": "Social",
+    "name": "Guild and clan customization",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "guild",
+      "clan",
+      "crew",
+      "faction"
+    ],
+    "player_value": "Shared identity for social groups",
+    "offer_shape": "Fixed banner, emblem, or nameplate",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Cosmetic only.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "party-social-cosmetics",
+    "category": "Social",
+    "name": "Party and social cosmetic packs",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "party",
+      "friends",
+      "social hub",
+      "group emote"
+    ],
+    "player_value": "Celebrate together",
+    "offer_shape": "Fixed party emotes or lobby effects",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Do not gate ordinary friend play.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "team-identity-cosmetics",
+    "category": "Social",
+    "name": "Team identity customization",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "team color",
+      "team uniform",
+      "team banner"
+    ],
+    "player_value": "Personalize team identity",
+    "offer_shape": "Fixed visual options",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Maintain competitive readability.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "cooperative-cosmetic-packs",
+    "category": "Social",
+    "name": "Co-op themed cosmetic bundles",
+    "monetization_route": "Pass or fixed developer product",
+    "signals": [
+      "co-op",
+      "cooperative",
+      "raid party",
+      "squad"
+    ],
+    "player_value": "Shared identity for co-op players",
+    "offer_shape": "Fixed disclosed bundle",
+    "implementation_effort": "medium",
+    "risk_level": "Low",
+    "guardrail": "Keep co-op roles accessible.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "customization-capacity",
+    "category": "Convenience",
+    "name": "More saved customization presets",
+    "monetization_route": "Pass",
+    "signals": [
+      "customization preset",
+      "outfit slot",
+      "character slot",
+      "wardrobe slot"
+    ],
+    "player_value": "Save looks for different activities",
+    "offer_shape": "Fixed number of extra presets",
+    "implementation_effort": "low",
+    "risk_level": "Low",
+    "guardrail": "Basic customization stays available.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "seasonal-live-ops",
+    "category": "Live operations",
+    "name": "Seasonal live-ops content calendar",
+    "monetization_route": "Mixed deterministic offers",
+    "signals": [
+      "live ops",
+      "content update",
+      "seasonal update",
+      "weekly event",
+      "community event"
+    ],
+    "player_value": "New authored reasons to return",
+    "offer_shape": "Publish schedule and fixed optional rewards",
+    "implementation_effort": "high",
+    "risk_level": "Low",
+    "guardrail": "No attendance penalties or fake countdowns.",
+    "always_review": false,
+    "deterministic": true
+  },
+  {
+    "id": "ugc-creation-tools",
+    "category": "Creator Store",
+    "name": "Creator-facing UGC creation tools",
+    "monetization_route": "Creator Store plugin or model",
+    "signals": [
+      "ugc",
+      "ugc creator",
+      "avatar creator",
+      "asset pipeline"
+    ],
+    "player_value": "Helps creators build and publish",
+    "offer_shape": "Documented tool or asset pack",
+    "implementation_effort": "high",
+    "risk_level": "Low",
+    "guardrail": "Never promise marketplace approval or sales.",
+    "always_review": false,
+    "deterministic": true
+  }
+]
