@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "additions": {
+    "economy": {
+      "signals": [
+        "creator rewards",
+        "creator reward eligibility",
+        "managed pricing",
+        "regional pricing",
+        "subscription lifecycle",
+        "subscription entitlement",
+        "creator revenue portfolio",
+        "platform monetization",
+        "monetization readiness",
+        "monetization launch audit"
+      ],
+      "skills": [
+        "roblox-creator-rewards-and-healthy-engagement",
+        "roblox-managed-pricing-and-regional-readiness",
+        "roblox-subscription-lifecycle-and-entitlement-operations",
+        "roblox-platform-revenue-portfolio-and-creator-economics",
+        "roblox-monetization-launch-and-policy-readiness"
+      ]
+    },
+    "ui": {
+      "signals": [
+        "regional dynamic pricing",
+        "regional price display",
+        "dynamic product price",
+        "subscription disclosure",
+        "renewal disclosure",
+        "pricing ui audit"
+      ],
+      "skills": [
+        "roblox-managed-pricing-and-regional-readiness",
+        "roblox-subscription-lifecycle-and-entitlement-operations"
+      ]
+    },
+    "performance": {
+      "signals": [
+        "creator rewards analytics",
+        "price optimization readiness",
+        "subscription retention metrics",
+        "revenue portfolio analysis"
+      ],
+      "skills": [
+        "roblox-creator-rewards-and-healthy-engagement",
+        "roblox-platform-revenue-portfolio-and-creator-economics"
+      ]
+    },
+    "release": {
+      "signals": [
+        "monetization launch audit",
+        "monetization launch gate",
+        "monetization policy audit",
+        "creator dashboard eligibility",
+        "subscription launch checklist"
+      ],
+      "skills": [
+        "roblox-monetization-launch-and-policy-readiness",
+        "roblox-platform-revenue-portfolio-and-creator-economics"
+      ]
+    }
+  }
+}

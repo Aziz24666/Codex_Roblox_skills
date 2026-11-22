@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "roblox-codex-v22-platform-monetization",
+  "cases": [
+    {
+      "id": "v22-creator-rewards",
+      "task": "Check Creator Rewards eligibility and improve organic player engagement without artificial playtime.",
+      "required_skills": [
+        "roblox-creator-rewards-and-healthy-engagement"
+      ],
+      "required_domains": [
+        "economy"
+      ]
+    },
+    {
+      "id": "v22-managed-pricing",
+      "task": "Audit hard-coded Robux prices and add regional dynamic pricing with safe gifting checks.",
+      "required_skills": [
+        "roblox-managed-pricing-and-regional-readiness"
+      ],
+      "required_domains": [
+        "economy",
+        "ui"
+      ]
+    },
+    {
+      "id": "v22-subscriptions",
+      "task": "Design subscription renewals and server-authoritative monthly entitlements with idempotent grants.",
+      "required_skills": [
+        "roblox-subscription-lifecycle-and-entitlement-operations"
+      ],
+      "required_domains": [
+        "economy"
+      ]
+    },
+    {
+      "id": "v22-revenue-portfolio",
+      "task": "Compare Creator Rewards, subscriptions and in-game products for a sustainable Roblox revenue strategy.",
+      "required_skills": [
+        "roblox-platform-revenue-portfolio-and-creator-economics"
+      ],
+      "required_domains": [
+        "economy"
+      ]
+    },
+    {
+      "id": "v22-launch-gate",
+      "task": "Prepare a monetization launch audit with eligibility evidence and GO/NO-GO gates.",
+      "required_skills": [
+        "roblox-monetization-launch-and-policy-readiness"
+      ],
+      "required_domains": [
+        "release"
+      ]
+    }
+  ]
+}

@@ -1,71 +1,45 @@
 # Roblox Codex Game Studio Kit
 
-[![V21 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v21-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v21-quality.yml)
+[![V22 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v22-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v22-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V21.0.0 — Game-aware Monetization Discovery and Sustainable Revenue.** This is the complete cumulative V1–V21 Roblox game-development toolkit for Codex. You only need the current V21 release; earlier versions do not need separate downloads.
-
-## Download
-
-The complete V1–V21 package will be attached to the [V21.0.0 GitHub Release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v21.0.0) as ZIP and TAR.XZ archives, with SHA-256 checksums after the V21 release workflow succeeds.
+**Current release: V22.0.0 — Platform Monetization Readiness and Creator Economics.** This is the complete cumulative V1–V22 toolkit. Only the current release is required.
 
 ## What's included
-
-- **191 native Codex skills** covering Roblox architecture, Luau, gameplay systems, characters and avatars, UI/input/accessibility, multiplayer/networking, security, persistence, economy, procedural content, NPCs, Studio plugins/MCP, performance, testing, research, and release engineering.
-- **Six V21 monetization specialists** for game-aware discovery, product strategy, pricing experiments, purchase integrity, aggregate revenue analytics, and storefront UX/policy.
-- A local Python CLI that scans readable project files, records evidence, ranks suitable direct-purchase ideas, and optionally analyzes aggregate store metrics.
-- All V20 production reliability, V19 verification/evidence, and V18 workflow orchestration and fair economy controls.
-- Versioned schemas, examples, documentation, regression tests, CI package audits, hierarchical SHA-256 manifests, and reproducible archive checks.
+- **196 native Codex skills** covering Roblox engineering, Luau, gameplay, characters, UI, networking, persistence, economy, procedural content, NPCs, Studio tooling, testing, performance, release engineering, and monetization.
+- Five V22 specialists for Creator Rewards, Managed Pricing, subscription operations, creator-revenue portfolios, and monetization launch readiness.
+- A local Luau scanner for likely hard-coded Robux prices and evidence of dynamic price, price-level, and subscription APIs.
+- A subscription-contract schema and validator for recurring benefits, renewal/cancellation disclosures, server-confirmed entitlements, and idempotent period grants.
+- V21 game-aware offer discovery, V20 production reliability, V19 evidence verification, and V18 workflow/fair-economy controls.
 
 ## Requirements
+Python 3.13 is the supported CI runtime. Install dependencies from the package root:
+```bash
+python -m pip install -r requirements-ci.txt -r v18/requirements-ci.txt
+```
 
-- **Python 3.13** is the supported and CI-validated runtime.
-- Install validation dependencies from the extracted package root:
+## Quick start
+1. Extract the V22 package and open its root in Codex.
+2. Read `AGENTS.md` and `INDEX_V22.md`.
+3. Start substantial tasks with `$roblox-end-to-end-development-orchestrator`.
+4. Inspect the project with `python v18/tools/v18.py doctor --root .`.
+5. Run V21 discovery: `python v21/tools/v21.py discover --root . --output reports/monetization-discovery.json`.
+6. Audit price handling: `python v22/tools/v22.py audit-pricing --root . --output reports/v22-pricing-readiness.json`.
+7. Validate a subscription declaration: `python v22/tools/v22.py validate-subscription-contract --root . --file v22/examples/subscription-contract.example.json`.
+8. Complete the V22 launch gate and test live platform flows in an authorized Roblox environment.
 
-  ```bash
-  python -m pip install -r requirements-ci.txt -r v18/requirements-ci.txt
-  ```
+## Monetization principles
+Prioritize genuine player value, accurate dynamic pricing, clearly disclosed recurring benefits, and verified program eligibility. Keep Creator Rewards, player purchases, advertising, and marketplace earnings as distinct accounting streams. Never fabricate earnings or target individuals by spending history. V18's no-gambling rule remains mandatory.
 
-## Quick start with Codex
+## Validation boundaries
+CI validates metadata, tests, schemas, routing, cumulative audits, checksums, and archives. It does not inspect a live Creator Dashboard or prove eligibility, Managed Pricing behavior, live purchases, subscriptions, or earnings. Mark unexecuted live checks NOT_RUN or BLOCKED.
 
-1. Download and extract the complete V21 ZIP.
-2. Open the extracted package root in Codex.
-3. Read `AGENTS.md` and `INDEX_V21.md`.
-4. Start substantial work with `$roblox-end-to-end-development-orchestrator`.
-5. Inspect the project with `python v18/tools/v18.py doctor --root .`.
-6. Run automatic game-aware monetization discovery:
+## Documentation
+The extracted package contains the V22 index and guides at `INDEX_V22.md`, `v22/INDEX_V22.md`, and:
+- `v22/docs/PLATFORM_EARNINGS_AND_CREATOR_REWARDS.md`
+- `v22/docs/MANAGED_PRICING_AND_SUBSCRIPTIONS.md`
+- `v22/docs/LAUNCH_GATE_AND_EVIDENCE.md`
 
-   ```bash
-   python v21/tools/v21.py discover --root . --output reports/monetization-discovery.json
-   ```
+Earlier reference guides: [V21 discovery/player value](v21/docs/MONETIZATION_DISCOVERY_AND_PLAYER_VALUE.md), [V20 production reliability](v20/docs/PRODUCTION_RELIABILITY.md), [V19 testing/evidence](v19/docs/TESTING_AND_EVIDENCE.md), [V18 no-gambling/fair monetization](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md), and [MIT License](LICENSE).
 
-7. Review the evidence-ranked offers with the V21 specialists. Add aggregate metrics only when available:
-
-   ```bash
-   python v21/tools/v21.py discover --root . --metrics-file reports/aggregate-metrics.json --output reports/monetization-discovery.json
-   ```
-
-8. Validate the report with `python v21/tools/v21.py validate-report --root . --file reports/monetization-discovery.json`.
-9. Generate risk-based tests with V19 and run applicable checks in real authorized Roblox environments.
-
-## V21 monetization principles
-
-V21 ranks offers by evidence-backed game fit and player value. Fit is not a revenue forecast. It supports deterministic, clearly described products and privacy-safe aggregate measurement. V18's no-gambling and fair monetization rules remain mandatory; V21 does not add gambling or paid chance mechanics.
-
-## Validation and evidence boundaries
-
-GitHub Actions validates overlay metadata, Python tests, schemas, routing, cumulative package audits, SHA-256 manifests, and ZIP/TAR.XZ extraction integrity. It does **not** launch Roblox Studio, inspect a live game, verify Creator Dashboard configuration, prove live purchase fulfillment, or validate production analytics. Unexecuted runtime checks must remain `NOT_RUN` or `BLOCKED`, not `PASS`.
-
-## Maintainer documentation
-
-- [V21 index](INDEX_V21.md)
-- [V21 monetization discovery and player value](v21/docs/MONETIZATION_DISCOVERY_AND_PLAYER_VALUE.md)
-- [V21 offer selection and experiments](v21/docs/OFFER_SELECTION_AND_EXPERIMENTS.md)
-- [V20 production reliability](v20/docs/PRODUCTION_RELIABILITY.md)
-- [V19 testing and evidence strategy](v19/docs/TESTING_AND_EVIDENCE.md)
-- [V18 no-gambling and fair monetization policy](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
-- [MIT License](LICENSE)
-
-## License and affiliation
-
-Released under the MIT License. Roblox, Roblox Studio, and Luau are trademarks or projects of their respective owners. This independent community toolkit is not affiliated with or endorsed by Roblox Corporation or OpenAI.
+Released under MIT. This is an independent community toolkit, not affiliated with or endorsed by Roblox Corporation or OpenAI.

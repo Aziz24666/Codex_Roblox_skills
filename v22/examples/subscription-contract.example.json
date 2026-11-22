@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "product_id": "REPLACE_WITH_CREATOR_DASHBOARD_PRODUCT_ID",
+  "display_name": "Builder Club",
+  "billing_cadence": "monthly",
+  "billing_currency": "Robux",
+  "benefits": [
+    "One additional saved cosmetic loadout slot during the active subscription term",
+    "One fixed cosmetic theme delivered each billing month"
+  ],
+  "delivery_model": "hybrid",
+  "entitlement_authority": "server_confirmed",
+  "renewal_disclosure": "This subscription renews monthly at the price shown by Roblox before purchase. Benefits are available for the active paid term.",
+  "cancellation_disclosure": "Manage or cancel renewal through the Roblox subscription controls for your account. Cancellation stops future renewals; current-term benefits follow the published subscription terms.",
+  "period_grant_key": "product_id:billing_period_id",
+  "reconciliation_owner": "Economy service owner",
+  "no_gambling": true,
+  "no_paid_random_outcomes": true,
+  "no_hidden_gates": true
+}
