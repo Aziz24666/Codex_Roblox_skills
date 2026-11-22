@@ -106,7 +106,11 @@ jobs:
           unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v22.zip" -d "$RUNNER_TEMP/check-zip"
           tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v22.tar.xz" -C "$RUNNER_TEMP/check-tar"
           diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
-          sha256sum "$RUNNER_TEMP/roblox-codex-game-studio-kit-v22.zip" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v22.tar.xz" > "$RUNNER_TEMP/SHA256SUMS-RELEASE.txt"
+          (
+            cd "$RUNNER_TEMP"
+            sha256sum roblox-codex-game-studio-kit-v22.zip roblox-codex-game-studio-kit-v22.tar.xz > SHA256SUMS-RELEASE.txt
+            sha256sum --check SHA256SUMS-RELEASE.txt
+          )
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: roblox-codex-game-studio-kit-v22
