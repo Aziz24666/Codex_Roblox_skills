@@ -31,11 +31,31 @@ jobs:
           set -euo pipefail
           archive="$RUNNER_TEMP/v24-source-overlay.zip"
           cp .github/workflows/v24-quality.yml "$RUNNER_TEMP/v24-quality.yml"
+          mkdir -p "$RUNNER_TEMP/pre-overlay"
+          preserve_files=(
+            v18/docs/RESEARCH_SNAPSHOT.md
+            v20/docs/PRODUCTION_RELIABILITY.md
+            v23/tools/v23.py
+            v23/tests/test_v23.py
+            v23/schemas/opportunity-discovery-report.schema.json
+            v23/README.md
+            v23/INDEX_V23.md
+            v23/docs/ENGAGEMENT_AND_STORE_OPTIMIZATION.md
+            v23/docs/ROBLOX_REVENUE_OPPORTUNITY_PLAYBOOK.md
+          )
+          for file in "${preserve_files[@]}"; do
+            mkdir -p "$RUNNER_TEMP/pre-overlay/$(dirname "$file")"
+            cp "$file" "$RUNNER_TEMP/pre-overlay/$file"
+          done
           cat dist/v24-source-overlay-b64parts/part-*.b64 | base64 --decode > "$archive"
           echo "fe9b3539fc33a11c0d5da3b6362e78a1ab16ebde76c9db768a3fe75a14561a93  $archive" | sha256sum --check
           unzip -t "$archive"
           unzip -oq "$archive" -d .
           cp "$RUNNER_TEMP/v24-quality.yml" .github/workflows/v24-quality.yml
+          for file in "${preserve_files[@]}"; do
+            mkdir -p "$(dirname "$file")"
+            cp "$RUNNER_TEMP/pre-overlay/$file" "$file"
+          done
       - name: Install validation dependencies
         run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
       - name: Validate overlays and regression suites
