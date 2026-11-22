@@ -27,7 +27,7 @@ def patch_old_python(path):
     content=re.sub(r"(?m)^(\s*if\s+len\(skills\)\s*!=\s*)(?:175|180|185|191)(\s*:)",r"\g<1>196\g<2>",content)
     if content!=original: path.write_text(content,encoding="utf-8")
 def migrate_historical_audits(root):
-    for version in ("v18","v19","v20"):
+    for version in ("v17","v18","v19","v20"):
         folder=root/version/"tools"
         if folder.exists():
             for path in folder.glob("*.py"): patch_old_python(path)
