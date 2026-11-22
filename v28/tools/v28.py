@@ -55,7 +55,7 @@ RATE_LIMIT_RE = re.compile(
     re.I,
 )
 IDEMPOTENCY_RE = re.compile(
-    r"\b(?:request.?id|nonce|receipt|processed|idempot|dedup|already.?handled|UpdateAsync)\b",
+    r"\b(?:request.?id|nonce|receipt|processed\w*|idempot|dedup|already.?handled|UpdateAsync)\b",
     re.I,
 )
 DATA_VERSION_RE = re.compile(r"\b(?:schema.?version|data.?version|current.?version|profileVersion)\b", re.I)
@@ -134,7 +134,7 @@ def safe_output_path(root: Path, raw: str) -> Path:
     except ValueError as exc:
         raise ValueError("Output must be inside the selected project root.") from exc
     if not relative.parts or ".." in relative.parts:
-        raise ValueError("Output must be a safe relative path inside the project root.")
+        raise ValueError("Output must be a safe relative path inside the selected project root.")
     parent = root
     for part in relative.parts[:-1]:
         parent = parent / part

@@ -214,7 +214,7 @@ class PackageTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             package = Path(temp)
             skills_root = package / ".agents" / "skills"
-            for index in range(213):
+            for index in range(210):
                 skill = skills_root / f"legacy-{index:03}" / "SKILL.md"
                 skill.parent.mkdir(parents=True, exist_ok=True)
                 skill.write_text(
