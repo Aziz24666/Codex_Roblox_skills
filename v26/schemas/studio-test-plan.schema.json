@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v26/schemas/studio-test-plan.schema.json",
+  "title": "V26 Roblox Studio Test Plan",
+  "description": "A review-only plan for a developer to execute in an isolated Roblox Studio test place. It is not an automation command.",
+  "type": "object",
+  "required": [
+    "schema_version", "toolkit_version", "project_root", "created_at_utc",
+    "execution_mode", "does_not_execute_tools", "production_data_access",
+    "published_experience_testing", "requires_human_approval_before", "stages", "safety"
+  ],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "toolkit_version": { "const": "26.0.0" },
+    "project_root": { "type": "string", "minLength": 1 },
+    "created_at_utc": { "type": "string", "format": "date-time" },
+    "execution_mode": { "const": "manual_review_only" },
+    "does_not_execute_tools": { "const": true },
+    "production_data_access": { "const": false },
+    "published_experience_testing": { "const": false },
+    "requires_human_approval_before": {
+      "type": "array",
+      "allOf": [
+        { "contains": { "const": "saving a modified place" } },
+        { "contains": { "const": "publishing" } },
+        { "contains": { "const": "production DataStore writes" } },
+        { "contains": { "const": "player-impacting Open Cloud operations" } }
+      ]
+    },
+    "stages": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "client_counts", "checks", "evidence"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "client_counts": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 1, "maximum": 8 }
+          },
+          "checks": { "type": "array", "items": { "type": "string" } },
+          "evidence": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "safety": {
+      "type": "object",
+      "required": [
+        "uses_synthetic_test_data", "isolated_test_place_required",
+        "never_write_production_datastores", "never_publish_automatically",
+        "no_gambling_or_coercive_monetization"
+      ],
+      "properties": {
+        "uses_synthetic_test_data": { "const": true },
+        "isolated_test_place_required": { "const": true },
+        "never_write_production_datastores": { "const": true },
+        "never_publish_automatically": { "const": true },
+        "no_gambling_or_coercive_monetization": { "const": true }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
