@@ -24,6 +24,7 @@
     },
     "ui": {
       "signals": [
+        "regional dynamic pricing",
         "regional price display",
         "dynamic product price",
         "subscription disclosure",
@@ -49,6 +50,7 @@
     },
     "release": {
       "signals": [
+        "monetization launch audit",
         "monetization launch gate",
         "monetization policy audit",
         "creator dashboard eligibility",
