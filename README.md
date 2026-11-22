@@ -1,61 +1,56 @@
 # Roblox Codex Game Studio Kit
 
-[![V27 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v27-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v27-quality.yml)
+[![V28 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v28-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v28-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V27.0.0 — Luau Intelligence and Architecture.** This is the complete cumulative V1-V27 toolkit. Only the current release is required.
+**Current release: V28.0.0 — Server Authority, DataStore Safety, and Multiplayer Reliability.** This is the complete cumulative V1-V28 toolkit. Only the current release is required.
 
-[Open the V27 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v27.0.0).
+[Open the V28 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v28.0.0).
 
 ## What's included
 
-- **213 native Codex skills** for Roblox engineering, Luau, gameplay, characters, UI, networking, persistence, economy, procedural content, NPCs, Studio tools, testing, performance, release engineering, and monetization.
+- **216 native Codex skills** for Roblox engineering, Luau, gameplay, characters, UI, networking, persistence, economy, procedural content, NPCs, Studio tools, testing, performance, release engineering, and sustainable monetization.
 - V23-V24 sustainable monetization discovery, opportunity ranking, backlog creation, and growth-roadmap automation.
-- V25 durable checkpoints, recoverable handoff prompts, backup recovery, validated journal integrity, project-root binding, and bounded-stage task execution.
-- V26 Studio MCP workflow skills for safe inspection/editing, multiplayer/device/network testing, and evidence-based change review.
-- V27 Luau static-analysis and architecture tools for dependency cycles, type-mode inventory, remote contract review, and Rojo project validation.
-- Read-only architecture reports, official `luau-analyze` integration, and optional temporary Rojo builds.
-- Cumulative Luau compilation, Rojo builds, regression suites, package audits, archive integrity checks, and release checks.
+- V25 durable checkpoints, recoverable handoff prompts, backup recovery, validated journal integrity, project-root binding, and bounded-stage task execution (**207 native Codex skills at V25**).
+- V26 Studio MCP workflow skills for safe inspection/editing, multiplayer/device/network testing, and evidence-based change review (**210 native Codex skills at V26**).
+- V27 Luau static-analysis and architecture tools for dependency cycles, type-mode inventory, remote contract review, and Rojo project validation (**213 native Codex skills at V27**).
+- V28 adds server-authority and remote-contract review, rate-limit/idempotency signals, DataStore API and schema-migration review, and a synthetic/staging-only migration-manifest validator.
+- Read-only architecture and security reports, official luau-analyze integration, optional temporary Rojo builds, and safe migration-plan validation.
+- Cumulative regression suites, package audits, archive integrity checks, and release checks.
 
 ## Start a Roblox development session
 
-1. Download and extract the V27 release, then open the cumulative package root in Codex.
-2. Read `AGENTS.md` and `INDEX_V27.md`.
+1. Download and extract the V28 release, then open the cumulative package root in Codex.
+2. Read AGENTS.md and INDEX_V28.md.
 3. Initialize session continuity in the **actual game project folder**:
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v27\v25\tools\v25.py" start --root "C:\Path\To\YourGame" --goal "Build and ship my Roblox game"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v28\v25\tools\v25.py" start --root "C:\Path\To\YourGame" --goal "Build and ship my Roblox game"
 
-4. Check local tooling:
+4. Run the V28 local project check:
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v27\v27\tools\v27.py" doctor --root "C:\Path\To\YourGame"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v28\v28\tools\v28.py" doctor --root "C:\Path\To\YourGame"
 
-5. Generate an architecture report:
+5. Generate the read-only security and persistence review:
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v27\v27\tools\v27.py" audit --root "C:\Path\To\YourGame"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v28\v28\tools\v28.py" audit --root "C:\Path\To\YourGame"
 
-6. Run the official Luau analyzer (requires `luau-analyze` installed on PATH):
+6. Validate a human-authored migration manifest (see v28/tools/manifest-example.json):
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v27\v27\tools\v27.py" typecheck --root "C:\Path\To\YourGame"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v28\v28\tools\v28.py" validate-migration --root "C:\Path\To\YourGame" --manifest ".codex\migration-plan.json"
 
-7. Validate a Rojo project (requires the Rojo CLI for `--build`):
+V25 commands: start, checkpoint, handoff, resume, status, verify, and recover. V26 commands: doctor, plan, and verify-plan. V27 commands: doctor, audit, typecheck, and rojo-check. V28 commands: doctor, audit, and validate-migration.
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v27\v27\tools\v27.py" rojo-check --root "C:\Path\To\YourGame" --build
+## V28 analysis boundaries
 
-V25 commands: `start`, `checkpoint`, `handoff`, `resume`, `status`, `verify`, and `recover`. V26 commands: `doctor`, `plan`, and `verify-plan`. V27 commands: `doctor`, `audit`, `typecheck`, and `rojo-check`.
+The V28 scanner reads local Luau text only. It inventories statically named remote calls and server handler patterns, searches a bounded area near handlers for validation, ownership, rate-limit, and idempotency signals, and records DataStore API calls and nearby migration/retry/backup indicators. It is a conservative heuristic, not a Luau parser, control-flow analyzer, DataModel emulator, security proof, or penetration test. Verify every finding against the full scripts and actual Studio hierarchy.
 
-## V27 analysis boundaries
-
-The offline architecture report is a conservative text-based heuristic, not a full Luau parser or DataModel emulator. It resolves a subset of static `require(script.Parent...)` patterns, identifies possible dependency cycles and unreferenced modules, and inventories statically named remote calls. Check all findings against the actual source and Studio hierarchy.
-
-Use `luau-analyze` for type checking and linting, and Roblox Studio Script Analysis for engine-aware diagnostics. The type checker mode is respected per project/file by default; strict-mode overrides are explicit. V27 does not mass-add `--!strict`, rewrite remotes, or remove modules.
-
-Rojo validation checks the project JSON and path mappings. An optional build writes to a temporary directory and deletes the result. It does not live-sync to a Studio place or publish.
+The migration-manifest command checks that a plan is explicitly synthetic/staging-only, dry-run, non-production-writing, sequential, idempotent, backed up, rollback-planned, and covered by valid/invalid/legacy/repeat cases. It validates structure only: it never executes migrations, connects to Roblox, touches DataStores, or calls Open Cloud.
 
 ## Studio MCP and production boundaries
 
 Roblox Studio's MCP server is local to the developer's machine. Connect only trusted clients and confirm the target Studio instance/place. GitHub Actions cannot automatically control the local Studio session.
 
-Saving a modified place, publishing, production DataStore writes, and player-impacting Open Cloud operations require explicit human review and approval. Use least privilege and isolated test data.
+Saving a modified place, publishing, production DataStore writes, and player-impacting Open Cloud operations require explicit human review and approval. Use least privilege, isolated test places, and synthetic data. A generated test plan or static report must not be represented as an executed Studio test.
 
 ## Growth principles
 
@@ -63,13 +58,14 @@ Maximize sustainable player value and discover viable opportunities—not pressu
 
 ## Documentation
 
-- V27 feature index: `INDEX_V27.md`
-- V27 Luau analysis: `v27/docs/LUAU_STATIC_ANALYSIS.md`
-- V27 dependency and remote contracts: `v27/docs/DEPENDENCY_AND_REMOTE_CONTRACTS.md`
-- V27 Rojo validation: `v27/docs/ROJO_PROJECT_VALIDATION.md`
-- V27 gradual strict typing: `v27/docs/STRICT_TYPING_MIGRATION.md`
-- V26 Studio MCP workflow: `v26/docs/STUDIO_MCP_WORKFLOW.md`
-- V25 session continuity guide: `v25/docs/SESSION_CONTINUITY.md`
+- V28 feature index: INDEX_V28.md
+- V28 server authority and remote security: v28/docs/SERVER_AUTHORITY_AND_REMOTE_SECURITY.md
+- V28 DataStore migration safety: v28/docs/DATASTORE_MIGRATION_SAFETY.md
+- V28 multiplayer reliability: v28/docs/MULTIPLAYER_RELIABILITY_VALIDATION.md
+- V28 report reference: v28/docs/SECURITY_REPORT_REFERENCE.md
+- V27 Luau and architecture: v27/INDEX_V27.md
+- V26 Studio MCP workflow: v26/docs/STUDIO_MCP_WORKFLOW.md
+- V25 session continuity guide: v25/docs/SESSION_CONTINUITY.md
 - [V18 no-gambling and fair monetization](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
 - MIT License
 

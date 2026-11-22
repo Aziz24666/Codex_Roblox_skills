@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "environment": "synthetic",
+  "dry_run": true,
+  "production_writes": false,
+  "current_schema_version": 1,
+  "target_schema_version": 2,
+  "preserve_unknown_fields": true,
+  "backup": {
+    "required": true,
+    "verified_in_staging": true,
+    "strategy": "Verified isolated fixture snapshot and restore rehearsal"
+  },
+  "rollback_plan": "Stop the rollout, restore the verified snapshot, and verify records with fixture checks.",
+  "migrations": [
+    {
+      "from": 1,
+      "to": 2,
+      "idempotent": true,
+      "description": "Normalize the legacy inventory schema and add explicit defaults.",
+      "tests": [
+        {"name": "valid profile", "kind": "valid"},
+        {"name": "malformed profile", "kind": "invalid"},
+        {"name": "legacy profile", "kind": "legacy"},
+        {"name": "repeat migration", "kind": "repeat"}
+      ]
+    }
+  ]
+}

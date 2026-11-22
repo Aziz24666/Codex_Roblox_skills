@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/codex-roblox/v28/security-reliability-report.schema.json",
+  "title": "V28 Security and Reliability Report",
+  "type": "object",
+  "required": ["version", "generated_at_utc", "inventory", "remote_security", "datastore", "review_priorities", "limitations"],
+  "properties": {
+    "version": {"const": "28.0.0"},
+    "generated_at_utc": {"type": "string"},
+    "inventory": {
+      "type": "object",
+      "required": ["luau_files_read", "remote_handlers", "datastore_operations"],
+      "properties": {
+        "luau_files_read": {"type": "integer", "minimum": 0},
+        "remote_handlers": {"type": "integer", "minimum": 0},
+        "datastore_operations": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": true
+    },
+    "remote_security": {"type": "object"},
+    "datastore": {"type": "object"},
+    "review_priorities": {"type": "array", "items": {"type": "string"}},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}
