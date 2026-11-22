@@ -1,0 +1,174 @@
+name: V23 monetization opportunity discovery and growth
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: v23-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  overlay:
+    name: Validate V23 overlay
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
+      - name: Validate V23 overlay
+        run: python v23/tools/validate_v23_overlay.py
+      - name: Run V22 and V23 regression suites
+        run: |
+          python -m unittest discover -s v22/tests -v
+          python -m unittest discover -s v23/tests -v
+
+  package:
+    name: Reconstruct and verify cumulative V1-V23 package
+    runs-on: ubuntu-24.04
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    timeout-minutes: 60
+    needs: overlay
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Reconstruct pinned V17 baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline="$RUNNER_TEMP/roblox-codex-game-studio-kit-v17.tar.xz"
+          cat dist/v17-baseline-b64parts/part-*.b64 | base64 --decode > "$baseline"
+          echo "6679380cdfd962611645bd6b9427690ef7d036784ba033825480847026cf8c61  $baseline" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/v17-extract"
+          tar -xJf "$baseline" -C "$RUNNER_TEMP/v17-extract"
+          mv "$RUNNER_TEMP/v17-extract/roblox-codex-game-studio-kit-v17" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v23"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v23" >> "$GITHUB_ENV"
+      - name: Install cumulative validation dependencies
+        run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt --requirement "$PACKAGE_ROOT/requirements-ci.txt"
+      - name: Integrate and verify V18
+        run: |
+          set -euo pipefail
+          python v18/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          mkdir -p "$PACKAGE_ROOT/.github/workflows"
+          cp .github/workflows/v18-quality.yml "$PACKAGE_ROOT/.github/workflows/v18-quality.yml"
+          python "$PACKAGE_ROOT/v18/tools/v18.py" verify --root "$PACKAGE_ROOT"
+      - name: Integrate and verify V19
+        run: |
+          set -euo pipefail
+          python v19/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v19/tests" -v
+          python "$PACKAGE_ROOT/v19/tools/v19.py" verify --root "$PACKAGE_ROOT"
+      - name: Integrate and verify V20
+        run: |
+          set -euo pipefail
+          python v20/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v20/tests" -v
+          python "$PACKAGE_ROOT/v20/tools/v20.py" verify --root "$PACKAGE_ROOT"
+      - name: Integrate and audit V21
+        run: |
+          set -euo pipefail
+          python v21/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v21/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "191"
+      - name: Integrate and audit V22
+        run: |
+          set -euo pipefail
+          python v22/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v22/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "196"
+      - name: Integrate and verify V23
+        run: |
+          set -euo pipefail
+          python v23/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v23/tests" -v
+          python "$PACKAGE_ROOT/v23/tools/v23.py" verify --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v23/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "201"
+      - name: Build and compare release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          parent="$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          cd "$parent"
+          tar -cJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v23.tar.xz" "$name"
+          zip -qr "$RUNNER_TEMP/roblox-codex-game-studio-kit-v23.zip" "$name"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v23.zip"
+          xz -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v23.tar.xz"
+          mkdir -p "$RUNNER_TEMP/check-zip" "$RUNNER_TEMP/check-tar"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v23.zip" -d "$RUNNER_TEMP/check-zip"
+          tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v23.tar.xz" -C "$RUNNER_TEMP/check-tar"
+          diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
+          (
+            cd "$RUNNER_TEMP"
+            sha256sum roblox-codex-game-studio-kit-v23.zip roblox-codex-game-studio-kit-v23.tar.xz > SHA256SUMS-RELEASE.txt
+            sha256sum --check SHA256SUMS-RELEASE.txt
+          )
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v23
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v23.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v23.tar.xz
+            ${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish versioned V23 GitHub Release
+    if: github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v23:')
+    runs-on: ubuntu-24.04
+    needs: [overlay, package]
+    permissions:
+      contents: write
+      actions: read
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: roblox-codex-game-studio-kit-v23
+          path: ${{ runner.temp }}/v23-release-assets
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v23:(v23[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          if [[ ! "$tag" =~ ^v23[.][0-9]+[.][0-9]+$ ]]; then
+            echo "No valid [release-v23:v23.x.y] marker found."
+            exit 1
+          fi
+          version="${tag#v}"
+          test "$(tr -d '\r\n' < v23/VERSION)" = "$version"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $tag already exists; refusing to overwrite it."
+            exit 1
+          fi
+          gh release create "$tag" \
+            "$RUNNER_TEMP/v23-release-assets/roblox-codex-game-studio-kit-v23.zip" \
+            "$RUNNER_TEMP/v23-release-assets/roblox-codex-game-studio-kit-v23.tar.xz" \
+            "$RUNNER_TEMP/v23-release-assets/SHA256SUMS-RELEASE.txt" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "$tag — Roblox Codex Game Studio Kit" \
+            --notes-file RELEASE_NOTES_V23.md
