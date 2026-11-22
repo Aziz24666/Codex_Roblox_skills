@@ -34,4 +34,4 @@ Return the state model, entitlement table, recurring grant schedule, idempotency
 https://create.roblox.com/docs/production/monetization/subscriptions
 
 ## Shared contracts
-Apply V18 handoffs, V19 evidence, V20 reliability, and V21 purchase-integrity/fair-monetization rules.
+The V18 no-gambling policy remains mandatory. Apply V18 handoffs, V19 evidence, V20 reliability, and V21 purchase-integrity/fair-monetization rules.
