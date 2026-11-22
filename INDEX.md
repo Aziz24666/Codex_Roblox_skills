@@ -1,3 +1,3 @@
 # Current Index
 
-See [INDEX_V23.md](INDEX_V23.md) for the current cumulative release and routing.
+See [INDEX_V24.md](INDEX_V24.md) for the current cumulative release, one-command growth automation, generated outputs, and V18–V23 safeguards.
