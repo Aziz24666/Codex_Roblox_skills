@@ -1,3 +1,3 @@
-# Current Index
+# Current toolkit index
 
-See [INDEX_V24.md](INDEX_V24.md) for the current cumulative release, one-command growth automation, generated outputs, and V18–V23 safeguards.
+The current cumulative release is **V25.0.0**. See INDEX_V25.md for setup, session checkpoints, recovery commands, and the full V1-V25 scope.
