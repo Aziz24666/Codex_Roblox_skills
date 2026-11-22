@@ -29,7 +29,7 @@ TYPE_MODES = {"strict", "nonstrict", "nocheck"}
 
 # Conservative patterns: only constant script-relative require expressions are resolved.
 STATIC_REQUIRE_RE = re.compile(
-    r"""require\s*\(\s*(?P<expr>script(?:\s*(?:\.\s*[A-Za-z_]\w*|\[\s*["'][^"']+["']\s*\]|:\s*WaitForChild\s*\(\s*["'][^"']+["']\s*\))*)\s*\)""",
+    r"""require\s*\(\s*(?P<expr>script(?:(?:\s*\.\s*[A-Za-z_]\w*)|(?:\s*:\s*WaitForChild\s*\(\s*['"][^'"]+['"]\s*\))|(?:\s*\[\s*['"][^'"]+['"]\s*\]))*)\s*\)""",
     re.S,
 )
 CHAIN_SEGMENT_RE = re.compile(
