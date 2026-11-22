@@ -94,7 +94,7 @@ def main():
         elif args.command=="validate-subscription-contract": print(json.dumps(validate_subscription_contract(args.root,args.file),indent=2))
         elif args.command=="evaluate-routing":
             report=evaluate_routing(args.root); target=args.output if args.output.is_absolute() else args.root/args.output; write_json(target,report)
-            print(json.dumps({**report["summary"],"status":report["status"],"output":str(target)},indent=2))
+            print(json.dumps({**report["summary"],"status":report["status"],"output":str(target),"failed_cases":[{"id":row["id"],"missing_skills":row["missing_skills"],"missing_domains":row["missing_domains"]} for row in report["cases"] if not row["passed"]]},indent=2))
             if report["status"]!="PASS": return 1
         else:
             root=args.root.resolve(); validate_subscription_contract(root,Path("v22/examples/subscription-contract.example.json"))
