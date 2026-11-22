@@ -12,6 +12,7 @@ from urllib.parse import unquote
 EXPECTED_SKILLS_V25 = 207
 EXPECTED_SKILLS_V26 = 210
 EXPECTED_SKILLS_V27 = 213
+EXPECTED_SKILLS_V28 = 216
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -109,9 +110,14 @@ def audit(root: Path) -> list[str]:
 
     skills_root = root / ".agents" / "skills"
     skills = sorted(skills_root.glob("*/SKILL.md")) if skills_root.is_dir() else []
+    is_v28 = (root / "v28" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    expected_skills = EXPECTED_SKILLS_V27 if is_v27 else (EXPECTED_SKILLS_V26 if is_v26 else EXPECTED_SKILLS_V25)
+    expected_skills = EXPECTED_SKILLS_V28 if is_v28 else (
+        EXPECTED_SKILLS_V27 if is_v27 else (
+            EXPECTED_SKILLS_V26 if is_v26 else EXPECTED_SKILLS_V25
+        )
+    )
     if len(skills) != expected_skills:
         problems.append(f"Expected {expected_skills} native skills, found {len(skills)}.")
     names: dict[str, str] = {}
@@ -152,6 +158,14 @@ def audit(root: Path) -> list[str]:
             "INDEX_V27.md", "v27/VERSION", "v27/tools/v27.py", "v27/tests/test_v27.py",
             "v27/tools/audit_cumulative_package.py", "v27/docs/LUAU_STATIC_ANALYSIS.md",
             "v27/docs/ROJO_PROJECT_VALIDATION.md",
+        )
+    if is_v28:
+        required += (
+            "INDEX_V28.md", "v28/VERSION", "v28/tools/v28.py", "v28/tests/test_v28.py",
+            "v28/tools/audit_cumulative_package.py",
+            "v28/docs/SERVER_AUTHORITY_AND_REMOTE_SECURITY.md",
+            "v28/docs/DATASTORE_MIGRATION_SAFETY.md",
+            "v28/docs/MULTIPLAYER_RELIABILITY_VALIDATION.md",
         )
     for item in required:
         if not (root / item).is_file():
