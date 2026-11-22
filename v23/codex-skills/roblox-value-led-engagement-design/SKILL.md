@@ -26,3 +26,12 @@ Return a healthy engagement loop map, player-value hypothesis, free/premium boun
 
 ## Shared contracts
 Preserve V18 no-gambling, V19 evidence, V20 server-authority, V21 fair monetization, and V22 platform-monetization rules.
+
+## V23 value-led monetization and opportunity coverage contract
+
+- Search the widest relevant monetization catalogue and rank by game evidence, genuine player value, cost, fairness, and verified demand; never forecast Robux from source code.
+- Keep player purchases, Creator Rewards, ads, avatar/affiliate income, and Creator Store income separate with separate eligibility and accounting.
+- Improve retention through fun, stable, accessible, social, replayable content; never create artificial playtime, AFK loops, forced attendance, coercive prompts, or spending-based player profiling.
+- Preserve V18 no-gambling: no paid random outcomes, mystery purchases, paid chance modifiers, spins, wagers, paid rerolls, or indirect Robux-funded random reward paths.
+- Keep the core game enjoyable without spending; paid outcomes must be deterministic, optional, fixed, and clearly disclosed.
+- Use aggregate analytics and current platform documentation; mark live Studio, Creator Dashboard, marketplace, eligibility, receipt, and subscription checks NOT_RUN or BLOCKED until evidenced.
