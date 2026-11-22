@@ -5,9 +5,9 @@ V27.0.0 extends the cumulative Roblox Codex Game Studio Kit from V1-V26 with pra
 ## New capabilities
 
 - Add three native Codex skills:
-  - `roblox-luau-static-analysis`
-  - `roblox-luau-architecture-and-dependency-governance`
-  - `roblox-remote-contract-and-rojo-validation`
+  - `roblox-luau-static-analysis-v27`
+  - `roblox-luau-architecture-and-dependency-governance-v27`
+  - `roblox-remote-contract-and-rojo-validation-v27`
 - Add `v27/tools/v27.py` with:
   - `doctor`: detect Luau analyzer/Rojo CLI availability and project files.
   - `audit`: generate an offline JSON report of scripts, type modes, static dependency edges, possible cycles, possible unreferenced modules, RemoteEvent/RemoteFunction call-handler inventory, and Rojo mappings.
