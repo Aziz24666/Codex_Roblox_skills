@@ -22,7 +22,10 @@ REQUIRED_APPROVALS = (
 
 
 def resolve_project_root(raw: str) -> Path:
-    root = Path(raw).expanduser().resolve(strict=True)
+    try:
+        root = Path(raw).expanduser().resolve(strict=True)
+    except (OSError, RuntimeError) as exc:
+        raise ValueError("Project root could not be resolved safely.") from exc
     if not root.is_dir():
         raise ValueError("Project root must be an existing directory.")
     return root
@@ -50,7 +53,7 @@ def inspect_mcp_config(path: Path) -> dict[str, Any]:
     """Inspect JSON structure only. Never execute the configured command or reveal its values."""
     try:
         resolved = path.expanduser().resolve(strict=True)
-    except OSError:
+    except (OSError, RuntimeError):
         return {"state": "fail", "command_kind": "unknown",
                 "errors": ["MCP configuration file could not be found or read."], "warnings": []}
     if not resolved.is_file():
@@ -76,9 +79,9 @@ def inspect_mcp_config(path: Path) -> dict[str, Any]:
                 "errors": ["Roblox_Studio args must be an array of strings."], "warnings": []}
 
     normalized_command = command.strip().replace("/", "\\").casefold()
-    normalized_args = [item.replace("/", "\\").casefold() for item in args]
+    normalized_args = [item.casefold() for item in args]
     if normalized_command in {"cmd.exe", "cmd"} and len(normalized_args) >= 2:
-        windows_target = any("%localappdata%\\roblox\\mcp.bat" in item for item in normalized_args[1:])
+        windows_target = any("%localappdata%\\roblox\\mcp.bat" in item.replace("/", "\\") for item in normalized_args[1:])
         if normalized_args[0] == "/c" and windows_target:
             return {"state": "pass", "command_kind": "official_windows_example",
                     "errors": [], "warnings": [
@@ -348,7 +351,7 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         return args.handler(args)
-    except (OSError, ValueError, FileExistsError) as exc:
+    except (OSError, RuntimeError, ValueError, FileExistsError) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1
 
