@@ -1,3 +1,3 @@
 # Current toolkit index
 
-The current cumulative release is **V26.0.0**. See the `INDEX_V26.md` file for Studio MCP setup, read-only preflight, test-plan generation, multiplayer/device testing, and the complete V1-V26 scope.
+The current cumulative release is **V27.0.0**. See the `INDEX_V27.md` file for Luau analysis, dependency and remote contract checks, Rojo validation, gradual strict-typing guidance, and the full V1-V27 scope.

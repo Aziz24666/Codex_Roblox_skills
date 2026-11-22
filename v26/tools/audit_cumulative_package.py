@@ -37,8 +37,9 @@ def audit(root: Path) -> list[str]:
     if "<!-- V26_STUDIO_MCP_RULES -->" not in agents:
         problems.append("AGENTS.md is missing the V26 Studio MCP instructions.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    if "V26" not in readme or "210 native Codex skills" not in readme:
-        problems.append("README.md does not describe the V26 cumulative package.")
+    skill_count_label_present = any(f"{count} native Codex skills" in readme for count in (210, 213))
+    if "V26" not in readme or not skill_count_label_present:
+        problems.append("README.md does not describe the V26 cumulative package or the compatible V27 superset README.")
     return problems
 
 
