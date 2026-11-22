@@ -39,7 +39,7 @@ REMOTE_BIND_RE = re.compile(
     r"""\b(?:local\s+)?(?P<var>[A-Za-z_]\w*)\s*=\s*[^=\n;]*?(?:WaitForChild|FindFirstChild)\s*\(\s*["'](?P<name>[^"']+)["']\s*\)"""
 )
 REMOTE_API_RE = re.compile(
-    r"\b(?P<var>[A-Za-z_]\w*)\s*:\s*(?P<api>FireServer|InvokeServer|OnServerEvent|OnServerInvoke|FireClient|FireAllClients|InvokeClient|OnClientEvent)\b"
+    r"\b(?P<var>[A-Za-z_]\w*)\s*[:.]\s*(?P<api>FireServer|InvokeServer|OnServerEvent|OnServerInvoke|FireClient|FireAllClients|InvokeClient|OnClientEvent)\b"
 )
 REMOTE_INSTANCE_RE = re.compile(r"""Instance\.new\s*\(\s*["'](RemoteEvent|RemoteFunction)["']\s*\)""")
 TYPE_MODE_RE = re.compile(r"^\s*--!\s*(strict|nonstrict|nocheck)\b", re.I)
@@ -380,41 +380,44 @@ def validate_rojo_project(project_path: Path, root: Path) -> dict[str, Any]:
                 if candidate.is_absolute():
                     result["errors"].append(f"Absolute $path is not accepted at {logical_path or '<root>'}.")
                 else:
-                    resolved = (project_path.parent / candidate)
-                    try:
-                        probe = project_path.parent
-                        has_symlink = False
-                        for part in candidate.parts:
-                            probe = probe / part
-                            if probe.is_symlink():
-                                has_symlink = True
-                                break
-                        if has_symlink:
-                            result["errors"].append(f"$path traverses a symlink at {logical_path or '<root>'}: {raw_path}")
-                            return
-                        resolved_final = resolved.resolve(strict=True)
-                    except (OSError, RuntimeError):
-                        result["errors"].append(f"Missing or unresolvable $path at {logical_path or '<root>'}: {raw_path}")
+                    resolved = project_path.parent / candidate
+                    probe = project_path.parent
+                    has_symlink = False
+                    for part in candidate.parts:
+                        probe = probe / part
+                        if probe.is_symlink():
+                            has_symlink = True
+                            break
+                    if has_symlink:
+                        result["errors"].append(
+                            f"$path traverses a symlink at {logical_path or '<root>'}: {raw_path}"
+                        )
                     else:
-                        if not resolved_final.is_relative_to(root):
-                            result["errors"].append(f"$path escapes project root at {logical_path or '<root>'}: {raw_path}")
+                        try:
+                            resolved_candidate = resolved.resolve(strict=False)
+                        except (OSError, RuntimeError):
+                            result["errors"].append(
+                                f"Missing or unresolvable $path at {logical_path or '<root>'}: {raw_path}"
+                            )
                         else:
-                            # Reject symlink traversal even when the final target remains inside the root.
-                            probe = project_path.parent
-                            has_symlink = False
-                            for part in candidate.parts:
-                                probe = probe / part
-                                if probe.is_symlink():
-                                    has_symlink = True
-                                    break
-                            if has_symlink:
-                                result["errors"].append(f"$path traverses a symlink at {logical_path or '<root>'}: {raw_path}")
+                            if not resolved_candidate.is_relative_to(root):
+                                result["errors"].append(
+                                    f"$path escapes project root at {logical_path or '<root>'}: {raw_path}"
+                                )
                             else:
-                                relative = resolved_final.relative_to(root).as_posix()
-                                result["mapped_paths"].append(relative)
-                                if relative in seen_paths:
-                                    result["warnings"].append(f"Path is mapped more than once: {relative}")
-                                seen_paths.add(relative)
+                                try:
+                                    resolved_final = resolved.resolve(strict=True)
+                                except (OSError, RuntimeError):
+                                    result["errors"].append(
+                                        f"Missing or unresolvable $path at {logical_path or '<root>'}: {raw_path}"
+                                    )
+                                else:
+                                    relative = resolved_final.relative_to(root).as_posix()
+                                    result["mapped_paths"].append(relative)
+                                    if relative in seen_paths:
+                                        result["warnings"].append(f"Path is mapped more than once: {relative}")
+                                    seen_paths.add(relative)
+
         class_name = node.get("$className")
         if class_name is not None and not isinstance(class_name, str):
             result["errors"].append(f"$className at {logical_path or '<root>'} must be a string.")
