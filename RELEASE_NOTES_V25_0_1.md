@@ -16,6 +16,7 @@ V25.0.1 is a maintenance release that hardens the V25 continuity CLI, fixes V23 
 - Skip symlinked files and files resolved outside the selected project root.
 - Validate opportunity-catalogue field types, identifiers, and deterministic-outcome requirements before ranking.
 - Validate routing-corpus entries and restrict generated report paths to the chosen project root.
+- Preserve the V24 `exclude_paths` parameter contract so the updated scanner remains compatible with the V24 growth pipeline.
 - Add regression tests for symlinks, excluded metadata, output traversal, and malformed catalogue entries.
 
 ## Documentation and validation

@@ -69,19 +69,45 @@ def load_catalog(path=CATALOG_PATH):
     return catalog
 
 
-def collect_project_files(root, max_files, max_file_bytes):
+def normalize_exclude_paths(root, exclude_paths):
+    """Normalize caller-supplied scan exclusions to project-relative paths."""
+    normalized = set()
+    if isinstance(exclude_paths, (str, Path)):
+        exclude_paths = (exclude_paths,)
+    for raw_path in exclude_paths or ():
+        candidate = Path(raw_path).expanduser()
+        if candidate.is_absolute():
+            candidate = candidate.resolve(strict=False)
+            try:
+                candidate = candidate.relative_to(root)
+            except ValueError:
+                continue
+        else:
+            candidate = Path(*candidate.parts)
+            if any(part == ".." for part in candidate.parts):
+                raise ValueError(f"Exclude path must not escape the project root: {raw_path!r}")
+        if candidate == Path("."):
+            raise ValueError("Exclude path cannot be the project root.")
+        normalized.add(candidate)
+    return normalized
+
+
+def collect_project_files(root, max_files, max_file_bytes, exclude_paths=None):
     root = Path(root).expanduser().resolve()
     if not root.is_dir():
         raise ValueError(f"Project root is not an existing directory: {root}")
     if max_files < 1 or max_file_bytes < 1:
         raise ValueError("Scan limits must be positive integers")
 
+    excluded = normalize_exclude_paths(root, exclude_paths)
     records = []
     considered = scanned = oversized = unreadable = skipped_symlink = 0
     truncated = False
     for path in sorted(root.rglob("*")):
         try:
             relative = path.relative_to(root)
+            if any(relative == item or item in relative.parents for item in excluded):
+                continue
             if any(part.casefold() in SKIP_DIRS for part in relative.parts):
                 continue
             if len(relative.parts) == 1 and path.name.casefold() in SKIP_ROOT_FILES:
@@ -153,8 +179,8 @@ def audit_risks(records,opportunities):
         findings.append({"code":"ACCESS_MODEL_COLLISION","path":"<opportunity-catalogue>","line":1,"severity":"review","evidence":"Both private-server and Robux paid-access ideas match project evidence.","message":"Roblox documents these as mutually exclusive experience-level configurations. Choose one after verifying current platform settings."})
     return findings
 
-def discover_opportunities(root,max_files=MAX_FILES,max_file_bytes=MAX_FILE_BYTES):
-    root,records,scan=collect_project_files(root,max_files,max_file_bytes)
+def discover_opportunities(root, max_files=MAX_FILES, max_file_bytes=MAX_FILE_BYTES, exclude_paths=None):
+    root, records, scan = collect_project_files(root, max_files, max_file_bytes, exclude_paths=exclude_paths)
     catalog=load_catalog(); opportunities=[]
     for item in catalog:
         matched=set(); evidence=[]

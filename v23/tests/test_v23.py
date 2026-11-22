@@ -114,4 +114,20 @@ class OpportunityDiscoveryTests(unittest.TestCase):
                 V23.load_catalog(path)
 
 
+    def test_callers_can_exclude_output_directories_compatibly(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "src").mkdir()
+            (root / "generated" / "reports").mkdir(parents=True)
+            (root / "src" / "Game.server.lua").write_text("print('game')\\n", encoding="utf-8")
+            (root / "generated" / "reports" / "old.lua").write_text(
+                "PromptProductPurchase random loot box\\n", encoding="utf-8"
+            )
+            report = V23.discover_opportunities(root, exclude_paths={Path("generated/reports")})
+            self.assertEqual(report["summary"]["files_scanned"], 1)
+            report = V23.discover_opportunities(root, exclude_paths={root / "generated"})
+            self.assertEqual(report["summary"]["files_scanned"], 1)
+            with self.assertRaises(ValueError):
+                V23.discover_opportunities(root, exclude_paths={"../outside"})
+
 if __name__=="__main__": unittest.main()
