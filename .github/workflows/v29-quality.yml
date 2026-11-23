@@ -78,7 +78,7 @@ jobs:
             mkdir -p "$(dirname "$file")"
             cp "$RUNNER_TEMP/pre-overlay/$file" "$file"
           done
-          for file in README.md INDEX.md INDEX_V25.md INDEX_V26.md INDEX_V27.md INDEX_V28.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md RELEASE_NOTES_V26.md RELEASE_NOTES_V27.md RELEASE_NOTES_V28.md; do cp "$RUNNER_TEMP/$file" "$file"; done
+          for file in README.md INDEX.md INDEX_V25.md INDEX_V26.md INDEX_V27.md INDEX_V28.md INDEX_V29.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md RELEASE_NOTES_V26.md RELEASE_NOTES_V27.md RELEASE_NOTES_V28.md RELEASE_NOTES_V29.md; do cp "$RUNNER_TEMP/$file" "$file"; done
       - name: Install validation dependencies
         run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
       - name: Validate overlays and regression suites
@@ -99,7 +99,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/v17"
           tar -xJf "$baseline" -C "$RUNNER_TEMP/v17"
           mv "$RUNNER_TEMP/v17/roblox-codex-game-studio-kit-v17" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v29"
-          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v28" >> "$GITHUB_ENV"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v29" >> "$GITHUB_ENV"
       - name: Install cumulative package dependencies
         run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt --requirement "$PACKAGE_ROOT/requirements-ci.txt"
       - name: Integrate and verify V18-V22
