@@ -9,7 +9,7 @@
 
 ## What's included
 
-Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210; V27 — 213; V28 — 216; V29 — 220; V30 — 224; V31 — 228; V32 — 232 native Codex skills; V33 — 236 native Codex skills.
+Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills.
 
 - **236 native Codex skills** for Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio tools, testing, performance, release engineering, analytics, LiveOps, safety, moderation, and sustainable monetization.
 - **V33** adds four QA skills, Studio test orchestration guidance, multiplayer/device/input regression plans, bounded test-plan and run-report validators, regression comparison, and cumulative QA/package audits.
