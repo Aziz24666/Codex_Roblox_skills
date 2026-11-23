@@ -105,7 +105,7 @@ jobs:
           mv "$RUNNER_TEMP/v17/roblox-codex-game-studio-kit-v17" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v30"
           echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v29" >> "$GITHUB_ENV"
       - name: Install cumulative package dependencies
-        run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt --requirement "$PACKAGE_ROOT/requirements-ci.txt"
+        run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
       - name: Integrate and verify V18-V22
         shell: bash
         run: |
