@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V29 device performance budgets",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "budgets"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "description": {
+      "type": "string"
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "low_end_mobile",
+        "high_end_mobile",
+        "desktop"
+      ],
+      "properties": {
+        "low_end_mobile": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "frame_time_ms_p50": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "frame_time_ms_p95": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "memory_mb": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "load_time_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "script_cpu_ms": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "replication_kbps": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "high_end_mobile": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "frame_time_ms_p50": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "frame_time_ms_p95": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "memory_mb": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "load_time_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "script_cpu_ms": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "replication_kbps": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "desktop": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "properties": {
+            "frame_time_ms_p50": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "frame_time_ms_p95": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "memory_mb": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "load_time_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "script_cpu_ms": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "replication_kbps": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}
