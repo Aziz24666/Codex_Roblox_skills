@@ -17,6 +17,7 @@ EXPECTED_SKILLS_V29 = 220
 EXPECTED_SKILLS_V30 = 224
 EXPECTED_SKILLS_V31 = 228
 EXPECTED_SKILLS_V32 = 232
+EXPECTED_SKILLS_V33 = 236
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -105,6 +106,10 @@ def audit(root: Path) -> list[str]:
                     # Earlier cumulative overlays may carry the current README/INDEX
                     # before the V29 overlay is installed. Defer only V29-local links
                     # until its VERSION marker exists; the final V29 audit checks them.
+                    if not (root / "v33" / "VERSION").is_file() and (
+                        target_path == "INDEX_V33.md" or target_path.startswith("v33/")
+                    ):
+                        continue
                     if not (root / "v32" / "VERSION").is_file() and (
                         target_path == "INDEX_V32.md" or target_path.startswith("v32/")
                     ):
@@ -134,9 +139,12 @@ def audit(root: Path) -> list[str]:
     is_v30 = (root / "v30" / "VERSION").is_file()
     is_v31 = (root / "v31" / "VERSION").is_file()
     is_v32 = (root / "v32" / "VERSION").is_file()
+    is_v33 = (root / "v33" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    if is_v32:
+    if is_v33:
+        expected_skills = EXPECTED_SKILLS_V33
+    elif is_v32:
         expected_skills = EXPECTED_SKILLS_V32
     elif is_v31:
         expected_skills = EXPECTED_SKILLS_V31
@@ -237,6 +245,17 @@ def audit(root: Path) -> list[str]:
             "v32/schemas/moderation-register.schema.json",
             "v32/examples/moderation-policy.example.json", "v32/examples/moderation-case.example.json",
             "v32/examples/moderation-register.example.json",
+        )
+    if is_v33:
+        required += (
+            "INDEX_V33.md", "v33/VERSION", "v33/INDEX_V33.md", "v33/tools/v33.py",
+            "v33/tools/patch_cumulative_package.py", "v33/tools/audit_cumulative_package.py",
+            "v33/tests/test_v33.py", "v33/docs/STUDIO_AUTOMATION.md",
+            "v33/docs/MULTIPLAYER_AND_NETWORK_TESTING.md", "v33/docs/DEVICE_AND_INPUT_TESTING.md",
+            "v33/docs/TEST_EVIDENCE_AND_REGRESSION.md",
+            "v33/schemas/test-plan.schema.json", "v33/schemas/test-report.schema.json",
+            "v33/examples/test-plan.example.json", "v33/examples/test-report.example.json",
+            "v33/examples/test-report.local-static.example.json",
         )
     for item in required:
         if not (root / item).is_file():
