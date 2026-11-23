@@ -94,7 +94,7 @@ jobs:
             mkdir -p "$(dirname "$file")"
             cp "$RUNNER_TEMP/pre-overlay/$file" "$file"
           done
-          for file in README.md INDEX.md INDEX_V25.md INDEX_V26.md INDEX_V27.md INDEX_V28.md INDEX_V29.md INDEX_V30.md INDEX_V31.md INDEX_V32.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md RELEASE_NOTES_V26.md RELEASE_NOTES_V27.md RELEASE_NOTES_V28.md RELEASE_NOTES_V29.md RELEASE_NOTES_V30.md RELEASE_NOTES_V31.md RELEASE_NOTES_V32.md RELEASE_NOTES_V33.md; do cp "$RUNNER_TEMP/$file" "$file"; done
+          for file in README.md INDEX.md INDEX_V25.md INDEX_V26.md INDEX_V27.md INDEX_V28.md INDEX_V29.md INDEX_V30.md INDEX_V31.md INDEX_V32.md INDEX_V33.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md RELEASE_NOTES_V26.md RELEASE_NOTES_V27.md RELEASE_NOTES_V28.md RELEASE_NOTES_V29.md RELEASE_NOTES_V30.md RELEASE_NOTES_V31.md RELEASE_NOTES_V32.md RELEASE_NOTES_V33.md; do cp "$RUNNER_TEMP/$file" "$file"; done
       - name: Install validation dependencies
         run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
       - name: Validate overlays and regression suites
