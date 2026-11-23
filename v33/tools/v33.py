@@ -214,13 +214,13 @@ def validate_plan(data: Any) -> list[str]:
             errors.append(f"Duplicate test ID: {test_id}.")
         else:
             seen.add(test_id)
-        if case.get("scenario") not in SCENARIOS:
+        if not isinstance(case.get("scenario"), str) or case.get("scenario") not in SCENARIOS:
             errors.append(f"{prefix}.scenario is not a supported scenario code.")
-        if case.get("category") not in CATEGORIES:
+        if not isinstance(case.get("category"), str) or case.get("category") not in CATEGORIES:
             errors.append(f"{prefix}.category is not a supported category code.")
-        if case.get("priority") not in PRIORITIES:
+        if not isinstance(case.get("priority"), str) or case.get("priority") not in PRIORITIES:
             errors.append(f"{prefix}.priority must be P0, P1, P2, or P3.")
-        if case.get("execution") not in EXECUTIONS:
+        if not isinstance(case.get("execution"), str) or case.get("execution") not in EXECUTIONS:
             errors.append(f"{prefix}.execution is not a supported execution mode.")
         clients = case.get("clients")
         if not isinstance(clients, int) or isinstance(clients, bool) or not 1 <= clients <= 8:
@@ -232,7 +232,7 @@ def validate_plan(data: Any) -> list[str]:
             errors.append(f"{prefix}.platforms must contain unique supported platform codes.")
         elif not set(case_platforms).issubset(plan_platforms):
             errors.append(f"{prefix}.platforms must be a subset of plan platforms.")
-        if case.get("expected") not in EXPECTED:
+        if not isinstance(case.get("expected"), str) or case.get("expected") not in EXPECTED:
             errors.append(f"{prefix}.expected is not a supported expected-result code.")
     return errors
 
@@ -265,7 +265,7 @@ def validate_report(data: Any, plan: Any) -> list[str]:
     if set(environment) != ENVIRONMENT_FIELDS:
         errors.append("environment must contain exactly the documented fields.")
     runner = environment.get("runner")
-    if runner not in RUNNERS:
+    if not isinstance(runner, str) or runner not in RUNNERS:
         errors.append("environment.runner is not supported.")
     studio_version = environment.get("studio_version")
     if not isinstance(studio_version, str) or not studio_version.strip() or len(studio_version) > 80:
@@ -275,10 +275,10 @@ def validate_report(data: Any, plan: Any) -> list[str]:
     elif runner == "local_static" and studio_version != "not_applicable":
         errors.append("local_static reports must set studio_version to not_applicable.")
     platform = environment.get("platform")
-    if platform not in PLATFORMS or platform not in plan.get("platforms", []):
+    if not isinstance(platform, str) or platform not in PLATFORMS or platform not in plan.get("platforms", []):
         errors.append("environment.platform must be a platform included in the plan.")
     network_profile = environment.get("network_profile")
-    if network_profile not in NETWORK_PROFILES or network_profile not in plan.get("network_profiles", []):
+    if not isinstance(network_profile, str) or network_profile not in NETWORK_PROFILES or network_profile not in plan.get("network_profiles", []):
         errors.append("environment.network_profile must be a profile included in the plan.")
     simulated_clients = environment.get("simulated_clients")
     if not isinstance(simulated_clients, int) or isinstance(simulated_clients, bool) or not 1 <= simulated_clients <= 8:
@@ -311,9 +311,9 @@ def validate_report(data: Any, plan: Any) -> list[str]:
         outcome = result.get("outcome_code")
         executed_at = result.get("executed_at")
         evidence_ref = result.get("evidence_ref")
-        if status not in STATUSES:
+        if not isinstance(status, str) or status not in STATUSES:
             errors.append(f"{prefix}.status is not supported.")
-        if outcome not in OUTCOMES:
+        if not isinstance(outcome, str) or outcome not in OUTCOMES:
             errors.append(f"{prefix}.outcome_code is not supported.")
         if evidence_ref is not None and (not isinstance(evidence_ref, str) or not EVIDENCE_REF.fullmatch(evidence_ref)):
             errors.append(f"{prefix}.evidence_ref must be an opaque ev- reference.")
@@ -325,14 +325,14 @@ def validate_report(data: Any, plan: Any) -> list[str]:
             errors.append(f"{prefix}: blocked status requires a blocker outcome code.")
         elif status == "not_run" and outcome != "not_executed":
             errors.append(f"{prefix}: not_run status requires outcome_code not_executed.")
-        if status in {"pass", "fail"} and parse_timestamp(executed_at) is None:
+        if isinstance(status, str) and status in {"pass", "fail"} and parse_timestamp(executed_at) is None:
             errors.append(f"{prefix}.executed_at must be timezone-aware for an executed test.")
         elif status == "not_run" and executed_at is not None:
             errors.append(f"{prefix}.executed_at must be null for a not_run test.")
         elif status == "blocked" and executed_at is not None and parse_timestamp(executed_at) is None:
             errors.append(f"{prefix}.executed_at must be null or timezone-aware.")
         case = test_map[test_id]
-        if runner == "local_static" and case["execution"] != "static_local" and status in {"pass", "fail"}:
+        if runner == "local_static" and case["execution"] != "static_local" and isinstance(status, str) and status in {"pass", "fail"}:
             errors.append(f"{prefix}: local_static cannot pass or fail a Studio test.")
     missing = set(test_map) - seen
     if missing:
