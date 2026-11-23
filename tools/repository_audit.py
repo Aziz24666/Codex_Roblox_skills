@@ -136,11 +136,22 @@ def audit(root: Path) -> list[str]:
     is_v32 = (root / "v32" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    expected_skills = EXPECTED_SKILLS_V32 if is_v32 else (EXPECTED_SKILLS_V31 if is_v31 else (EXPECTED_SKILLS_V30 if is_v30 else (EXPECTED_SKILLS_V29 if is_v29 else (EXPECTED_SKILLS_V28 if is_v28 else (
-        EXPECTED_SKILLS_V27 if is_v27 else (
-            EXPECTED_SKILLS_V26 if is_v26 else EXPECTED_SKILLS_V25
-        )
-    ))))
+    if is_v32:
+        expected_skills = EXPECTED_SKILLS_V32
+    elif is_v31:
+        expected_skills = EXPECTED_SKILLS_V31
+    elif is_v30:
+        expected_skills = EXPECTED_SKILLS_V30
+    elif is_v29:
+        expected_skills = EXPECTED_SKILLS_V29
+    elif is_v28:
+        expected_skills = EXPECTED_SKILLS_V28
+    elif is_v27:
+        expected_skills = EXPECTED_SKILLS_V27
+    elif is_v26:
+        expected_skills = EXPECTED_SKILLS_V26
+    else:
+        expected_skills = EXPECTED_SKILLS_V25
     if len(skills) != expected_skills:
         problems.append(f"Expected {expected_skills} native skills, found {len(skills)}.")
     names: dict[str, str] = {}
