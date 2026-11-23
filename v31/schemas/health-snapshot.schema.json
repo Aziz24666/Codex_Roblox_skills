@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v31/schemas/health-snapshot.schema.json",
+  "title": "V31 aggregate game-health snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "environment", "captured_at", "source", "sample_size", "metrics"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "environment": { "enum": ["development", "staging", "production"] },
+    "captured_at": { "type": "string", "format": "date-time" },
+    "source": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "sample_size": { "type": "integer", "minimum": 1 },
+    "metrics": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": { "type": "number", "minimum": 0 }
+    }
+  }
+}

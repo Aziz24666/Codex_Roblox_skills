@@ -15,6 +15,7 @@ EXPECTED_SKILLS_V27 = 213
 EXPECTED_SKILLS_V28 = 216
 EXPECTED_SKILLS_V29 = 220
 EXPECTED_SKILLS_V30 = 224
+EXPECTED_SKILLS_V31 = 228
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -103,6 +104,10 @@ def audit(root: Path) -> list[str]:
                     # Earlier cumulative overlays may carry the current README/INDEX
                     # before the V29 overlay is installed. Defer only V29-local links
                     # until its VERSION marker exists; the final V29 audit checks them.
+                    if not (root / "v31" / "VERSION").is_file() and (
+                        target_path == "INDEX_V31.md" or target_path.startswith("v31/")
+                    ):
+                        continue
                     if not (root / "v29" / "VERSION").is_file() and (
                         target_path == "INDEX_V29.md" or target_path.startswith("v29/")
                     ):
@@ -122,13 +127,14 @@ def audit(root: Path) -> list[str]:
     is_v28 = (root / "v28" / "VERSION").is_file()
     is_v29 = (root / "v29" / "VERSION").is_file()
     is_v30 = (root / "v30" / "VERSION").is_file()
+    is_v31 = (root / "v31" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    expected_skills = EXPECTED_SKILLS_V30 if is_v30 else (EXPECTED_SKILLS_V29 if is_v29 else (EXPECTED_SKILLS_V28 if is_v28 else (
+    expected_skills = EXPECTED_SKILLS_V31 if is_v31 else (EXPECTED_SKILLS_V30 if is_v30 else (EXPECTED_SKILLS_V29 if is_v29 else (EXPECTED_SKILLS_V28 if is_v28 else (
         EXPECTED_SKILLS_V27 if is_v27 else (
             EXPECTED_SKILLS_V26 if is_v26 else EXPECTED_SKILLS_V25
         )
-    )))
+    ))))
     if len(skills) != expected_skills:
         problems.append(f"Expected {expected_skills} native skills, found {len(skills)}.")
     names: dict[str, str] = {}
@@ -192,6 +198,17 @@ def audit(root: Path) -> list[str]:
             "v30/docs/RELEASE_EVIDENCE_AND_ROLLBACK.md",
             "v30/schemas/release-plan.schema.json", "v30/schemas/release-report.schema.json",
             "v30/examples/release-plan.staging.example.json",
+        )
+    if is_v31:
+        required += (
+            "INDEX_V31.md", "v31/VERSION", "v31/INDEX_V31.md", "v31/tools/v31.py",
+            "v31/tools/patch_cumulative_package.py", "v31/tools/audit_cumulative_package.py",
+            "v31/tests/test_v31.py", "v31/docs/ANALYTICS_EVENT_GOVERNANCE.md",
+            "v31/docs/AGGREGATE_GAME_HEALTH_AND_LIVEOPS.md",
+            "v31/schemas/event-catalog.schema.json", "v31/schemas/health-policy.schema.json",
+            "v31/schemas/health-snapshot.schema.json",
+            "v31/examples/event-catalog.example.json", "v31/examples/health-policy.example.json",
+            "v31/examples/health-snapshot.example.json",
         )
     for item in required:
         if not (root / item).is_file():

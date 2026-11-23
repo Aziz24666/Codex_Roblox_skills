@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "environment": "staging",
+  "captured_at": "2026-11-23T12:00:00Z",
+  "source": "Example aggregate report; replace with your real source and timestamp.",
+  "sample_size": 500,
+  "metrics": {
+    "server_error_rate_pct": 0.7,
+    "purchase_failure_rate_pct": 2.5,
+    "onboarding_completion_pct": 42.0
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v31/schemas/health-policy.schema.json",
+  "title": "V31 aggregate game-health guardrail policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "minimum_sample_size", "maximum_age_hours", "metrics"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "minimum_sample_size": { "type": "integer", "minimum": 1 },
+    "maximum_age_hours": { "type": "number", "exclusiveMinimum": 0, "maximum": 8760 },
+    "metrics": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 100,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["direction", "threshold", "warning_threshold"],
+        "properties": {
+          "direction": { "enum": ["min", "max"] },
+          "threshold": { "type": "number", "minimum": 0 },
+          "warning_threshold": { "type": "number", "minimum": 0 },
+          "description": { "type": "string", "maxLength": 200 }
+        }
+      }
+    }
+  }
+}
