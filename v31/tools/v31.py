@@ -27,7 +27,8 @@ SKIP_DIRS = {
 }
 CUSTOM_EVENT_LIMIT = 100
 CUSTOM_FIELD_LIMIT = 3
-CUSTOM_FIELD_VALUE_LIMIT = 8_000
+CUSTOM_FIELD_COMBINATION_LIMIT = 8_000
+ANALYTICS_CUSTOM_FIELD_SLOTS = {"CustomField01", "CustomField02", "CustomField03"}
 CUSTOM_FIELD_VALUES_PER_FIELD_LIMIT = 256
 CUSTOM_EVENT_NAME = re.compile(r"^[A-Za-z][A-Za-z0-9_]{0,63}$")
 FIELD_NAME = re.compile(r"^[a-z][a-z0-9_]{0,31}$")
@@ -46,7 +47,7 @@ DEPRECATED_METHODS = {
     "FireLogEvent", "FirePlayerProgressionEvent",
 }
 SUPPORTED_METHODS = {
-    "LogCustomEvent", "LogEconomyEvent", "LogFunnelStepEvent",
+    "LogCustomEvent", "LogEconomyEvent", "LogFunnelStepEvent", "LogJourneyEvent",
     "LogOnboardingFunnelStepEvent", "LogProgressionEvent",
     "LogProgressionCompleteEvent", "LogProgressionFailEvent",
     "LogProgressionStartEvent",
@@ -185,7 +186,7 @@ def validate_catalog(data: Any) -> list[str]:
         errors.append(f"Custom event catalog exceeds Roblox's {CUSTOM_EVENT_LIMIT}-event experience limit.")
 
     names: set[str] = set()
-    declared_field_values: set[str] = set()
+    declared_combination_upper_bound = 0
     for index, event in enumerate(events):
         label = f"events[{index}]"
         if not isinstance(event, dict):
@@ -217,6 +218,8 @@ def validate_catalog(data: Any) -> list[str]:
         if len(fields) > CUSTOM_FIELD_LIMIT:
             errors.append(f"{label} exceeds Roblox's {CUSTOM_FIELD_LIMIT}-custom-field limit.")
         field_names: set[str] = set()
+        field_slots: set[str] = set()
+        field_value_counts: list[int] = []
         for field_index, field in enumerate(fields):
             field_label = f"{label}.fields[{field_index}]"
             if not isinstance(field, dict):
@@ -224,35 +227,59 @@ def validate_catalog(data: Any) -> list[str]:
                 continue
             field_name = field.get("name")
             if not isinstance(field_name, str) or not FIELD_NAME.fullmatch(field_name):
-                errors.append(f"{field_label}.name must be a lower_snake_case field key.")
+                errors.append(f"{field_label}.name must be a lower_snake_case semantic field name.")
             elif field_name in field_names:
                 errors.append(f"{label} has duplicate custom field name {field_name}.")
             else:
                 field_names.add(field_name)
                 if field_name in FORBIDDEN_FIELD_NAMES:
                     errors.append(f"{field_label}.name is not allowed: identifiers and personal data are prohibited.")
-            if set(field) - {"name", "allowed_values"}:
+
+            slot = field.get("slot")
+            slot_is_unique = isinstance(slot, str) and slot in ANALYTICS_CUSTOM_FIELD_SLOTS and slot not in field_slots
+            if not isinstance(slot, str) or slot not in ANALYTICS_CUSTOM_FIELD_SLOTS:
+                errors.append(
+                    f"{field_label}.slot must be CustomField01, CustomField02, or CustomField03 "
+                    "and maps to Enum.AnalyticsCustomFieldKeys.<slot>.Name."
+                )
+            elif slot in field_slots:
+                errors.append(f"{label} maps more than one semantic field to {slot}; each AnalyticsService slot may be used once per event.")
+            else:
+                field_slots.add(slot)
+
+            if set(field) - {"name", "slot", "allowed_values"}:
                 errors.append(f"{field_label} contains unsupported fields.")
             values = field.get("allowed_values")
             if not isinstance(values, list) or not values:
                 errors.append(f"{field_label}.allowed_values must be a non-empty finite list.")
                 continue
+            values_are_valid = True
             if len(values) > CUSTOM_FIELD_VALUES_PER_FIELD_LIMIT:
                 errors.append(f"{field_label}.allowed_values exceeds the {CUSTOM_FIELD_VALUES_PER_FIELD_LIMIT}-value local review limit.")
+                values_are_valid = False
             seen_values: set[str] = set()
             for value in values:
                 if not isinstance(value, str) or not value.strip() or _sensitive_value(value):
                     errors.append(f"{field_label}.allowed_values must contain short, non-identifying strings only.")
+                    values_are_valid = False
                     continue
                 if value in seen_values:
                     errors.append(f"{field_label}.allowed_values contains a duplicate value.")
+                    values_are_valid = False
                 seen_values.add(value)
-            declared_field_values.update(seen_values)
+            if slot_is_unique and values_are_valid and seen_values:
+                field_value_counts.append(len(seen_values))
 
-    if len(declared_field_values) > CUSTOM_FIELD_VALUE_LIMIT:
+        # Each event's Cartesian product is a conservative upper bound for its
+        # possible field tuples. Sum the event bounds so duplicate tuples across
+        # events cannot make this local preflight less strict than Roblox's cap.
+        if fields and len(field_value_counts) == len(fields):
+            declared_combination_upper_bound += math.prod(field_value_counts)
+
+    if declared_combination_upper_bound > CUSTOM_FIELD_COMBINATION_LIMIT:
         errors.append(
-            f"Catalog declares {len(declared_field_values)} custom-field values; "
-            f"the Roblox experience limit is {CUSTOM_FIELD_VALUE_LIMIT:,} combined unique values."
+            f"Catalog permits an upper bound of {declared_combination_upper_bound:,} custom-field combinations "
+            f"(sum of per-event Cartesian products), exceeding Roblox's {CUSTOM_FIELD_COMBINATION_LIMIT:,}-combination limit."
         )
     telemetry_budget = data.get("telemetry_budget")
     if telemetry_budget is not None:

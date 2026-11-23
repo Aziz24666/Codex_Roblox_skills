@@ -25,9 +25,10 @@
             "items": {
               "type": "object",
               "additionalProperties": false,
-              "required": ["name", "allowed_values"],
+              "required": ["name", "slot", "allowed_values"],
               "properties": {
                 "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,31}$" },
+                "slot": { "enum": ["CustomField01", "CustomField02", "CustomField03"] },
                 "allowed_values": {
                   "type": "array",
                   "minItems": 1,

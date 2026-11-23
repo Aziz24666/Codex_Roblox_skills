@@ -11,7 +11,7 @@ V31 extends the cumulative V1-V30 Roblox Codex Game Studio Kit with privacy-revi
   - `roblox-experiment-design-and-guardrails-v31`
 - `v31/tools/v31.py` commands:
   - `doctor`: inspect local Luau inventory and optional tools.
-  - `validate-catalog`: validate a finite custom event catalog, privacy review declaration, field count/value limits, and optional telemetry request budget.
+  - `validate-catalog`: validate a finite custom event catalog, privacy review declaration, Roblox custom-field slot mappings, conservative combination-space limits, and optional telemetry request budget.
   - `audit`: detect AnalyticsService call sites, deprecated methods, likely client-context custom-event use, uncatalogued literal events, and suspicious identifying/free-text fields around custom-event calls.
   - `evaluate-health`: evaluate operator-supplied aggregate numeric metrics with predeclared thresholds, minimum sample size, and freshness limits.
 - Three schemas, three examples, documentation, regression tests, cumulative package patcher/auditor, and a V1-V31 quality workflow.
@@ -19,7 +19,7 @@ V31 extends the cumulative V1-V30 Roblox Codex Game Studio Kit with privacy-revi
 
 ## Evidence and privacy boundaries
 
-- Roblox AnalyticsService limits are encoded as review guardrails, not a promise that a request will succeed at runtime. Check the current Creator Hub documentation before instrumentation.
+- Roblox AnalyticsService limits are encoded as review guardrails, not a promise that a request will succeed at runtime. The catalog maps semantic field labels to the accepted `CustomField01`/`02`/`03` enum keys and conservatively estimates the 8,000 unique-combination ceiling. Check the current Creator Hub documentation before instrumentation.
 - The source audit is static, bounded, and advisory. It does not execute Luau, prove server/client execution context, send analytics, inspect player data, or contact Roblox.
 - Aggregate health evaluation accepts only numeric metrics plus limited snapshot metadata. It rejects extra snapshot fields, holds stale/undersized/incomplete samples, and never fills missing values.
 - The toolkit does not collect player-level telemetry, construct individual-spender profiles, or prescribe retention/revenue targets.

@@ -38,8 +38,8 @@ class Fixture(unittest.TestCase):
                     "purpose": "Count completed missions by finite mission category.",
                     "privacy_reviewed": True,
                     "fields": [
-                        {"name": "mission_type", "allowed_values": ["story", "daily", "side"]},
-                        {"name": "difficulty", "allowed_values": ["easy", "normal", "hard"]},
+                        {"name": "mission_type", "slot": "CustomField01", "allowed_values": ["story", "daily", "side"]},
+                        {"name": "difficulty", "slot": "CustomField02", "allowed_values": ["easy", "normal", "hard"]},
                     ],
                 }
             ],
@@ -96,7 +96,7 @@ class CatalogTests(Fixture):
     def test_too_many_custom_fields_fail(self):
         data = self.catalog()
         data["events"][0]["fields"] = [
-            {"name": f"field_{index}", "allowed_values": ["a", "b", "c"]}
+            {"name": f"field_{index}", "slot": f"CustomField0{index + 1}", "allowed_values": ["a", "b", "c"]}
             for index in range(4)
         ]
         self.assertTrue(any("3-custom-field" in item for item in v31.validate_catalog(data)))
@@ -104,9 +104,17 @@ class CatalogTests(Fixture):
     def test_identifiers_and_personal_data_fields_fail(self):
         data = self.catalog()
         data["events"][0]["fields"].append(
-            {"name": "user_id", "allowed_values": ["one", "two"]}
+            {"name": "user_id", "slot": "CustomField03", "allowed_values": ["one", "two"]}
         )
         self.assertTrue(any("identifiers and personal data" in item for item in v31.validate_catalog(data)))
+
+    def test_custom_field_slots_must_match_roblox_enum_and_be_unique(self):
+        data = self.catalog()
+        data["events"][0]["fields"][0]["slot"] = "mission_type"
+        self.assertTrue(any(".slot must be CustomField01" in item for item in v31.validate_catalog(data)))
+        data = self.catalog()
+        data["events"][0]["fields"][1]["slot"] = "CustomField01"
+        self.assertTrue(any("maps more than one semantic field" in item for item in v31.validate_catalog(data)))
 
     def test_email_guid_and_long_numeric_values_fail(self):
         data = self.catalog()
@@ -115,20 +123,14 @@ class CatalogTests(Fixture):
         ]
         self.assertTrue(any("non-identifying strings" in item for item in v31.validate_catalog(data)))
 
-    def test_combined_custom_field_value_limit_is_checked(self):
+    def test_custom_field_cartesian_combination_limit_is_checked(self):
         data = self.catalog()
-        data["events"] = [
-            {
-                "name": f"Event{index}", "method": "LogCustomEvent",
-                "purpose": "Finite category sample.", "privacy_reviewed": True,
-                "fields": [{
-                    "name": "category",
-                    "allowed_values": [f"value_{index}_{slot}" for slot in range(81)],
-                }],
-            }
-            for index in range(100)
+        data["events"][0]["fields"] = [
+            {"name": "mission_type", "slot": "CustomField01", "allowed_values": [f"mission_{i}" for i in range(90)]},
+            {"name": "difficulty", "slot": "CustomField02", "allowed_values": [f"difficulty_{i}" for i in range(90)]},
         ]
-        self.assertTrue(any("8,000 combined unique values" in item for item in v31.validate_catalog(data)))
+        self.assertTrue(any("8,000-combination limit" in item for item in v31.validate_catalog(data)))
+
 
     def test_privacy_review_is_required(self):
         data = self.catalog()
@@ -172,6 +174,14 @@ class SourceAuditTests(Fixture):
         )
         report = v31.audit_project(self.root)
         self.assertTrue(any(item["code"] == "deprecated_analytics_api" for item in report["findings"]))
+
+    def test_journey_event_is_included_in_current_api_inventory(self):
+        self.put(
+            "ServerScriptService/Analytics.server.lua",
+            'AnalyticsService:LogJourneyEvent(player, "Onboarding", "Started", "session")\\n',
+        )
+        report = v31.audit_project(self.root)
+        self.assertEqual(report["inventory"]["analytics_method_calls"]["LogJourneyEvent"], 1)
 
     def test_dynamic_custom_event_name_needs_review(self):
         self.put(
@@ -252,6 +262,13 @@ class HealthPolicyTests(Fixture):
         self.assertEqual(report["status"], "hold")
         self.assertTrue(any("older than" in item for item in report["hold_reasons"]))
         self.assertEqual(report["metrics"], [])
+
+    def test_future_dated_snapshot_is_held(self):
+        snapshot = self.snapshot()
+        snapshot["captured_at"] = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+        report = v31.evaluate_health(self.policy(), snapshot)
+        self.assertEqual(report["status"], "hold")
+        self.assertTrue(any("future" in item.lower() for item in report["hold_reasons"]))
 
     def test_small_sample_is_held(self):
         snapshot = self.snapshot()

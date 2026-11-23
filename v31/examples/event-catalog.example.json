@@ -7,8 +7,8 @@
       "purpose": "Measure aggregate mission completion by authored mission category.",
       "privacy_reviewed": true,
       "fields": [
-        { "name": "mission_type", "allowed_values": ["story", "daily", "side"] },
-        { "name": "difficulty", "allowed_values": ["easy", "normal", "hard"] }
+        { "name": "mission_type", "slot": "CustomField01", "allowed_values": ["story", "daily", "side"] },
+        { "name": "difficulty", "slot": "CustomField02", "allowed_values": ["easy", "normal", "hard"] }
       ]
     },
     {
@@ -17,8 +17,8 @@
       "purpose": "Understand which authored ability categories are used in the core game loop.",
       "privacy_reviewed": true,
       "fields": [
-        { "name": "ability_class", "allowed_values": ["movement", "support", "defense", "utility"] },
-        { "name": "map_region", "allowed_values": ["forest", "desert", "city"] }
+        { "name": "ability_class", "slot": "CustomField01", "allowed_values": ["movement", "support", "defense", "utility"] },
+        { "name": "map_region", "slot": "CustomField02", "allowed_values": ["forest", "desert", "city"] }
       ]
     }
   ],
