@@ -1,6 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/roblox-codex/v33/test-report.schema.json",
   "title": "V33 Roblox QA Run Report",
   "type": "object",
   "additionalProperties": false,
