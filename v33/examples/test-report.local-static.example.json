@@ -11,7 +11,8 @@
     "simulated_clients": 1
   },
   "results": [
-    {"test_id": "TC-SMOKE-001", "status": "pass", "outcome_code": "passed", "executed_at": "2026-11-23T12:10:00Z", "evidence_ref": "ev-111122223333"},
+    {"test_id": "TC-STATIC-000", "status": "pass", "outcome_code": "passed", "executed_at": "2026-11-23T12:10:00Z", "evidence_ref": "ev-111122223333"},
+    {"test_id": "TC-SMOKE-001", "status": "not_run", "outcome_code": "not_executed", "executed_at": null},
     {"test_id": "TC-JOIN-002", "status": "not_run", "outcome_code": "not_executed", "executed_at": null},
     {"test_id": "TC-UI-003", "status": "not_run", "outcome_code": "not_executed", "executed_at": null},
     {"test_id": "TC-REMOTE-004", "status": "not_run", "outcome_code": "not_executed", "executed_at": null}
