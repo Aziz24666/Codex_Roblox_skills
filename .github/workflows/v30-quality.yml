@@ -1,0 +1,262 @@
+name: V30 production release readiness quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v30-quality-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Validate and build cumulative V1-V30 package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Restore and verify V24 source overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          archive="$RUNNER_TEMP/v24-source-overlay.zip"
+          cp .github/workflows/v24-quality.yml "$RUNNER_TEMP/v24-quality.yml"
+          cp .github/workflows/v25-quality.yml "$RUNNER_TEMP/v25-quality.yml"
+          cp .github/workflows/v26-quality.yml "$RUNNER_TEMP/v26-quality.yml"
+          cp .github/workflows/v27-quality.yml "$RUNNER_TEMP/v27-quality.yml"
+          cp .github/workflows/v28-quality.yml "$RUNNER_TEMP/v28-quality.yml"
+          cp .github/workflows/v29-quality.yml "$RUNNER_TEMP/v29-quality.yml"
+          cp .github/workflows/v30-quality.yml "$RUNNER_TEMP/v30-quality.yml"
+          cp tools/repository_audit.py "$RUNNER_TEMP/repository_audit.py"
+          for file in README.md INDEX.md INDEX_V25.md INDEX_V26.md INDEX_V27.md INDEX_V28.md INDEX_V29.md INDEX_V30.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md RELEASE_NOTES_V26.md RELEASE_NOTES_V27.md RELEASE_NOTES_V28.md RELEASE_NOTES_V29.md RELEASE_NOTES_V30.md; do cp "$file" "$RUNNER_TEMP/$file"; done
+          cp -a v26 "$RUNNER_TEMP/v26-source"
+          cp -a v27 "$RUNNER_TEMP/v27-source"
+          cp -a v28 "$RUNNER_TEMP/v28-source"
+          cp -a v29 "$RUNNER_TEMP/v29-source"
+          cp -a v30 "$RUNNER_TEMP/v30-source"
+          mkdir -p "$RUNNER_TEMP/pre-overlay"
+          preserve_files=(
+            v18/docs/RESEARCH_SNAPSHOT.md
+            v20/docs/PRODUCTION_RELIABILITY.md
+            v23/tools/v23.py
+            v23/tests/test_v23.py
+            v23/schemas/opportunity-discovery-report.schema.json
+            v23/README.md
+            v23/INDEX_V23.md
+            v23/docs/ENGAGEMENT_AND_STORE_OPTIMIZATION.md
+            v23/docs/ROBLOX_REVENUE_OPPORTUNITY_PLAYBOOK.md
+          )
+          for file in "${preserve_files[@]}"; do
+            mkdir -p "$RUNNER_TEMP/pre-overlay/$(dirname "$file")"
+            cp "$file" "$RUNNER_TEMP/pre-overlay/$file"
+          done
+          cat dist/v24-source-overlay-b64parts/part-*.b64 | base64 --decode > "$archive"
+          echo "fe9b3539fc33a11c0d5da3b6362e78a1ab16ebde76c9db768a3fe75a14561a93  $archive" | sha256sum --check
+          unzip -t "$archive"
+          unzip -oq "$archive" -d .
+          cp "$RUNNER_TEMP/v24-quality.yml" .github/workflows/v24-quality.yml
+          cp "$RUNNER_TEMP/v25-quality.yml" .github/workflows/v25-quality.yml
+          cp "$RUNNER_TEMP/v26-quality.yml" .github/workflows/v26-quality.yml
+          cp "$RUNNER_TEMP/v27-quality.yml" .github/workflows/v27-quality.yml
+          cp "$RUNNER_TEMP/v28-quality.yml" .github/workflows/v28-quality.yml
+          cp "$RUNNER_TEMP/v29-quality.yml" .github/workflows/v29-quality.yml
+          cp "$RUNNER_TEMP/v30-quality.yml" .github/workflows/v30-quality.yml
+          cp "$RUNNER_TEMP/repository_audit.py" tools/repository_audit.py
+          rm -rf v26 v27 v28 v29 v30
+          cp -a "$RUNNER_TEMP/v26-source" v26
+          cp -a "$RUNNER_TEMP/v27-source" v27
+          cp -a "$RUNNER_TEMP/v28-source" v28
+          cp -a "$RUNNER_TEMP/v29-source" v29
+          cp -a "$RUNNER_TEMP/v30-source" v30
+          for file in "${preserve_files[@]}"; do
+            mkdir -p "$(dirname "$file")"
+            cp "$RUNNER_TEMP/pre-overlay/$file" "$file"
+          done
+          for file in README.md INDEX.md INDEX_V25.md INDEX_V26.md INDEX_V27.md INDEX_V28.md INDEX_V29.md INDEX_V30.md RELEASE_NOTES_V25.md RELEASE_NOTES_V25_0_1.md RELEASE_NOTES_V26.md RELEASE_NOTES_V27.md RELEASE_NOTES_V28.md RELEASE_NOTES_V29.md RELEASE_NOTES_V30.md; do cp "$RUNNER_TEMP/$file" "$file"; done
+      - name: Install validation dependencies
+        run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
+      - name: Validate overlays and regression suites
+        run: |
+          set -euo pipefail
+          python v23/tools/validate_v23_overlay.py
+          python v24/tools/validate_v24_overlay.py
+          python -m unittest discover -s v22/tests -v
+          python -m unittest discover -s v23/tests -v
+          python -m unittest discover -s v24/tests -v
+      - name: Reconstruct pinned V17 baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline="$RUNNER_TEMP/roblox-codex-game-studio-kit-v17.tar.xz"
+          cat dist/v17-baseline-b64parts/part-*.b64 | base64 --decode > "$baseline"
+          echo "6679380cdfd962611645bd6b9427690ef7d036784ba033825480847026cf8c61  $baseline" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/v17"
+          tar -xJf "$baseline" -C "$RUNNER_TEMP/v17"
+          mv "$RUNNER_TEMP/v17/roblox-codex-game-studio-kit-v17" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v30"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v30" >> "$GITHUB_ENV"
+      - name: Install cumulative package dependencies
+        run: python -m pip install --disable-pip-version-check --requirement v18/requirements-ci.txt
+      - name: Integrate and verify V18-V22
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v18/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          mkdir -p "$PACKAGE_ROOT/.github/workflows"
+          cp .github/workflows/v18-quality.yml "$PACKAGE_ROOT/.github/workflows/v18-quality.yml"
+          python "$PACKAGE_ROOT/v18/tools/v18.py" verify --root "$PACKAGE_ROOT"
+          python v19/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v19/tests" -v
+          python "$PACKAGE_ROOT/v19/tools/v19.py" verify --root "$PACKAGE_ROOT"
+          python v20/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v20/tests" -v
+          python "$PACKAGE_ROOT/v20/tools/v20.py" verify --root "$PACKAGE_ROOT"
+          python v21/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v21/tests" -v
+          python "$PACKAGE_ROOT/v21/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "191"
+          python v22/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v22/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "196"
+      - name: Integrate and verify V23
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v23/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v23/tests" -v
+          python "$PACKAGE_ROOT/v23/tools/v23.py" verify --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v23/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "201"
+      - name: Integrate and verify V24
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v24/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v24/tests" -v
+          python "$PACKAGE_ROOT/v24/tools/v24.py" verify --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v24/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "205"
+      - name: Integrate and audit V25 session continuity
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v25/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m py_compile v25/tools/v25.py v25/tools/patch_cumulative_package.py v25/tools/audit_cumulative_package.py v26/tools/v26.py v26/tools/patch_cumulative_package.py v26/tools/audit_cumulative_package.py v27/tools/v27.py v27/tools/patch_cumulative_package.py v27/tools/audit_cumulative_package.py v28/tools/v28.py v28/tools/patch_cumulative_package.py v28/tools/audit_cumulative_package.py v28/tests/test_v28.py v29/tools/v29.py v29/tools/patch_cumulative_package.py v29/tools/audit_cumulative_package.py v29/tests/test_v29.py v30/tools/v30.py v30/tools/patch_cumulative_package.py v30/tools/audit_cumulative_package.py v30/tests/test_v30.py v23/tools/v23.py tools/repository_audit.py
+          python -m unittest discover -s "$PACKAGE_ROOT/v25/tests" -v
+          python "$PACKAGE_ROOT/v25/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "207"
+      - name: Integrate and audit V26 Studio MCP workflows
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v26/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v26/tests" -v
+          python "$PACKAGE_ROOT/v26/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python tools/repository_audit.py --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "210"
+      - name: Integrate and audit V27 Luau intelligence and architecture
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v27/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v27/tests" -v
+          python "$PACKAGE_ROOT/v27/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python tools/repository_audit.py --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "213"
+      - name: Integrate and audit V28 security and reliability
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v28/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v28/tests" -v
+          python "$PACKAGE_ROOT/v28/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python tools/repository_audit.py --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "216"
+      - name: Integrate and audit V29 performance engineering
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v29/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v29/tests" -v
+          python "$PACKAGE_ROOT/v29/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python tools/repository_audit.py --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "220"
+
+      - name: Integrate and audit V30 production release readiness
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v30/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT"
+          python -m unittest discover -s "$PACKAGE_ROOT/v30/tests" -v
+          python "$PACKAGE_ROOT/v30/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python tools/repository_audit.py --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "224"
+
+      - name: Build and compare V30 release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          tar -cJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v30.tar.xz" "$name"
+          zip -qr "$RUNNER_TEMP/roblox-codex-game-studio-kit-v30.zip" "$name"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v30.zip"
+          xz -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v30.tar.xz"
+          mkdir -p "$RUNNER_TEMP/check-zip" "$RUNNER_TEMP/check-tar"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v30.zip" -d "$RUNNER_TEMP/check-zip"
+          tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v30.tar.xz" -C "$RUNNER_TEMP/check-tar"
+          diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
+          cd "$RUNNER_TEMP"
+          sha256sum roblox-codex-game-studio-kit-v30.zip roblox-codex-game-studio-kit-v30.tar.xz > SHA256SUMS-RELEASE.txt
+          sha256sum --check SHA256SUMS-RELEASE.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v30
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v30.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v30.tar.xz
+            ${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish V30 GitHub Release
+    if: github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v30:')
+    runs-on: ubuntu-24.04
+    needs: build
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: roblox-codex-game-studio-kit-v30
+          path: ${{ runner.temp }}/v30-release-assets
+      - name: Publish versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v30:(v30[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          [[ "$tag" =~ ^v30[.][0-9]+[.][0-9]+$ ]]
+          test "$(tr -d '\r\n' < v30/VERSION)" = "${tag#v}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
+          gh release create "$tag" \
+            "$RUNNER_TEMP/v30-release-assets/roblox-codex-game-studio-kit-v30.zip" \
+            "$RUNNER_TEMP/v30-release-assets/roblox-codex-game-studio-kit-v30.tar.xz" \
+            "$RUNNER_TEMP/v30-release-assets/SHA256SUMS-RELEASE.txt" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V30.md

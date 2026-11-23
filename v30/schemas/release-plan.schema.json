@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v30/schemas/release-plan.schema.json",
+  "title": "Roblox V30 release plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "release", "controls", "gates", "approvals"],
+  "properties": {
+    "schema_version": { "const": 1 },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "environment", "source_revision", "created_at", "change_summary"],
+      "properties": {
+        "version": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(-[0-9A-Za-z.-]+)?$" },
+        "environment": { "enum": ["development", "staging", "production"] },
+        "source_revision": { "type": "string", "pattern": "^[A-Fa-f0-9]{7,64}$" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "change_summary": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publishing_mode", "human_approval_required", "staged_rollout", "data_store_migration", "rollback_plan", "backup_reference"],
+      "properties": {
+        "publishing_mode": { "const": "manual" },
+        "human_approval_required": { "const": true },
+        "staged_rollout": { "type": "boolean" },
+        "data_store_migration": { "type": "boolean" },
+        "rollback_plan": { "type": "string" },
+        "backup_reference": { "type": "string" }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "status", "evidence", "sha256", "notes"],
+        "properties": {
+          "id": { "type": "string" },
+          "status": { "enum": ["passed", "failed", "blocked", "not_run", "not_applicable"] },
+          "evidence": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^([A-Fa-f0-9]{64})?$" },
+          "notes": { "type": "string", "maxLength": 1000 }
+        }
+      }
+    },
+    "approvals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "name", "approved", "approved_at", "evidence"],
+        "properties": {
+          "role": { "type": "string", "minLength": 1 },
+          "name": { "type": "string", "minLength": 1 },
+          "approved": { "type": "boolean" },
+          "approved_at": { "type": "string", "format": "date-time" },
+          "evidence": { "type": "string" },
+          "sha256": { "type": "string", "pattern": "^([A-Fa-f0-9]{64})?$" }
+        }
+      }
+    },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  }
+}
