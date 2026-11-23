@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v32/schemas/moderation-policy.schema.json",
+  "title": "V32 human-reviewed moderation policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "review_sla_hours",
+    "evidence_retention_days",
+    "appeal_window_days",
+    "require_second_review_for",
+    "automated_enforcement"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "review_sla_hours": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "low",
+        "standard",
+        "high",
+        "critical"
+      ],
+      "properties": {
+        "low": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 720
+        },
+        "standard": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 720
+        },
+        "high": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 720
+        },
+        "critical": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 720
+        }
+      }
+    },
+    "evidence_retention_days": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 365
+    },
+    "appeal_window_days": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 365
+    },
+    "require_second_review_for": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "high",
+          "critical"
+        ]
+      },
+      "maxItems": 2
+    },
+    "automated_enforcement": {
+      "const": false
+    }
+  }
+}

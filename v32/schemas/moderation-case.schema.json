@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v32/schemas/moderation-case.schema.json",
+  "title": "V32 privacy-minimal moderation case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "case_ref",
+    "created_at",
+    "source",
+    "category",
+    "channel",
+    "severity",
+    "status",
+    "summary_code",
+    "evidence_refs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "case_ref": {
+      "type": "string",
+      "pattern": "^case-[a-z0-9]{12}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source": {
+      "enum": [
+        "platform_report",
+        "in_experience_report",
+        "moderator_observation",
+        "safety_dashboard"
+      ]
+    },
+    "category": {
+      "enum": [
+        "harassment",
+        "privacy",
+        "scam_or_deception",
+        "spam",
+        "inappropriate_content",
+        "exploit_abuse",
+        "other"
+      ]
+    },
+    "channel": {
+      "enum": [
+        "text",
+        "voice",
+        "avatar_or_asset",
+        "audio",
+        "experience",
+        "gameplay",
+        "other"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "low",
+        "standard",
+        "high",
+        "critical"
+      ]
+    },
+    "status": {
+      "enum": [
+        "open",
+        "in_review",
+        "escalated",
+        "resolved",
+        "closed",
+        "appeal_pending",
+        "appeal_resolved"
+      ]
+    },
+    "summary_code": {
+      "enum": [
+        "user_report_submitted",
+        "trusted_moderator_observation",
+        "safety_dashboard_signal",
+        "content_review_request",
+        "other"
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^ev-[a-z0-9]{12}$"
+      }
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "reviewer_role": {
+      "enum": [
+        "moderator",
+        "senior_moderator",
+        "safety_lead"
+      ]
+    },
+    "decision_code": {
+      "enum": [
+        "no_action",
+        "policy_reminder",
+        "temporary_feature_restriction",
+        "temporary_ban",
+        "permanent_ban",
+        "refer_to_platform",
+        "insufficient_evidence"
+      ]
+    },
+    "appeal_ref": {
+      "type": "string",
+      "pattern": "^appeal-[a-z0-9]{12}$"
+    },
+    "appeal_outcome": {
+      "enum": [
+        "pending",
+        "upheld",
+        "modified",
+        "overturned"
+      ]
+    },
+    "second_reviewer_role": {
+      "enum": [
+        "senior_moderator",
+        "safety_lead"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "resolved",
+              "closed",
+              "appeal_pending",
+              "appeal_resolved"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "reviewed_at",
+          "reviewer_role",
+          "decision_code"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "appeal_pending"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "appeal_ref",
+          "appeal_outcome"
+        ],
+        "properties": {
+          "appeal_outcome": {
+            "const": "pending"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "appeal_resolved"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "appeal_ref",
+          "appeal_outcome"
+        ],
+        "properties": {
+          "appeal_outcome": {
+            "enum": [
+              "upheld",
+              "modified",
+              "overturned"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

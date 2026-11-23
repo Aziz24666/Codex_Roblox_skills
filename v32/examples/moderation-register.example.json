@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "schema_version": 1,
+      "case_ref": "case-2f4b8c1d9e0a",
+      "created_at": "2026-11-20T11:00:00Z",
+      "source": "platform_report",
+      "category": "harassment",
+      "channel": "text",
+      "severity": "standard",
+      "status": "resolved",
+      "summary_code": "user_report_submitted",
+      "evidence_refs": [
+        "ev-2f4b8c1d9e0a"
+      ],
+      "reviewed_at": "2026-11-20T12:00:00Z",
+      "reviewer_role": "moderator",
+      "decision_code": "policy_reminder"
+    }
+  ]
+}

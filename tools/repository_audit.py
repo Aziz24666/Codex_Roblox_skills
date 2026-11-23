@@ -16,6 +16,7 @@ EXPECTED_SKILLS_V28 = 216
 EXPECTED_SKILLS_V29 = 220
 EXPECTED_SKILLS_V30 = 224
 EXPECTED_SKILLS_V31 = 228
+EXPECTED_SKILLS_V32 = 232
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -104,6 +105,10 @@ def audit(root: Path) -> list[str]:
                     # Earlier cumulative overlays may carry the current README/INDEX
                     # before the V29 overlay is installed. Defer only V29-local links
                     # until its VERSION marker exists; the final V29 audit checks them.
+                    if not (root / "v32" / "VERSION").is_file() and (
+                        target_path == "INDEX_V32.md" or target_path.startswith("v32/")
+                    ):
+                        continue
                     if not (root / "v31" / "VERSION").is_file() and (
                         target_path == "INDEX_V31.md" or target_path.startswith("v31/")
                     ):
@@ -128,13 +133,25 @@ def audit(root: Path) -> list[str]:
     is_v29 = (root / "v29" / "VERSION").is_file()
     is_v30 = (root / "v30" / "VERSION").is_file()
     is_v31 = (root / "v31" / "VERSION").is_file()
+    is_v32 = (root / "v32" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    expected_skills = EXPECTED_SKILLS_V31 if is_v31 else (EXPECTED_SKILLS_V30 if is_v30 else (EXPECTED_SKILLS_V29 if is_v29 else (EXPECTED_SKILLS_V28 if is_v28 else (
-        EXPECTED_SKILLS_V27 if is_v27 else (
-            EXPECTED_SKILLS_V26 if is_v26 else EXPECTED_SKILLS_V25
-        )
-    ))))
+    if is_v32:
+        expected_skills = EXPECTED_SKILLS_V32
+    elif is_v31:
+        expected_skills = EXPECTED_SKILLS_V31
+    elif is_v30:
+        expected_skills = EXPECTED_SKILLS_V30
+    elif is_v29:
+        expected_skills = EXPECTED_SKILLS_V29
+    elif is_v28:
+        expected_skills = EXPECTED_SKILLS_V28
+    elif is_v27:
+        expected_skills = EXPECTED_SKILLS_V27
+    elif is_v26:
+        expected_skills = EXPECTED_SKILLS_V26
+    else:
+        expected_skills = EXPECTED_SKILLS_V25
     if len(skills) != expected_skills:
         problems.append(f"Expected {expected_skills} native skills, found {len(skills)}.")
     names: dict[str, str] = {}
@@ -209,6 +226,17 @@ def audit(root: Path) -> list[str]:
             "v31/schemas/health-snapshot.schema.json",
             "v31/examples/event-catalog.example.json", "v31/examples/health-policy.example.json",
             "v31/examples/health-snapshot.example.json",
+        )
+    if is_v32:
+        required += (
+            "INDEX_V32.md", "v32/VERSION", "v32/INDEX_V32.md", "v32/tools/v32.py",
+            "v32/tools/patch_cumulative_package.py", "v32/tools/audit_cumulative_package.py",
+            "v32/tests/test_v32.py", "v32/docs/TEXT_FILTERING_AND_UGC.md",
+            "v32/docs/MODERATION_AND_APPEALS.md", "v32/docs/PLAYER_SAFETY_BY_DESIGN.md",
+            "v32/schemas/moderation-policy.schema.json", "v32/schemas/moderation-case.schema.json",
+            "v32/schemas/moderation-register.schema.json",
+            "v32/examples/moderation-policy.example.json", "v32/examples/moderation-case.example.json",
+            "v32/examples/moderation-register.example.json",
         )
     for item in required:
         if not (root / item).is_file():
