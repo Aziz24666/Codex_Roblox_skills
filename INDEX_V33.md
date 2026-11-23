@@ -11,7 +11,7 @@ V33.0.0 is the complete cumulative V1-V33 package with **236 native Codex skills
   - validate-plan: validate unique test IDs, scenarios, categories, client limits, platforms, and execution modes.
   - validate-report: validate the report against its plan, require one result per planned test, and reject unsafe free-form/identity fields.
   - compare: compare baseline/current reports to identify regressions, newly blocked tests, coverage gaps, and improvements.
-- Two JSON schemas, two examples, four testing guides, 32 regression tests, cumulative package patcher/auditor, and a V1-V33 quality workflow.
+- Two JSON schemas, two examples, four testing guides, 33 regression tests, cumulative package patcher/auditor, and a V1-V33 quality workflow.
 - Cumulative package target: **236 native skills**.
 
 ## Quick start
