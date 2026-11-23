@@ -120,6 +120,11 @@ class PlanTests(Fixture):
         plan["tests"][0]["execution"] = []
         self.assertTrue(v33.validate_plan(plan))
 
+    def test_unhashable_plan_platform_values_do_not_crash(self) -> None:
+        plan = valid_plan()
+        plan["platforms"] = [{"unexpected": "value"}]
+        self.assertTrue(v33.validate_plan(plan))
+
     def test_boolean_is_not_accepted_as_client_integer(self) -> None:
         plan = valid_plan()
         plan["max_simulated_clients"] = True
