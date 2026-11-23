@@ -45,5 +45,16 @@
       "platforms": ["desktop"],
       "expected": "invalid_request_rejected"
     }
+    ,
+    {
+      "id": "TC-STATIC-000",
+      "scenario": "remote_validation",
+      "category": "security",
+      "priority": "P1",
+      "execution": "static_local",
+      "clients": 1,
+      "platforms": ["desktop"],
+      "expected": "invalid_request_rejected"
+    }
   ]
 }
