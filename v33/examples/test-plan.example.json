@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "suite_id": "suite-a13b9c7d2e4f",
+  "max_simulated_clients": 4,
+  "platforms": ["desktop", "mobile"],
+  "network_profiles": ["baseline", "high_latency"],
+  "tests": [
+    {
+      "id": "TC-SMOKE-001",
+      "scenario": "baseline_smoke",
+      "category": "smoke",
+      "priority": "P0",
+      "execution": "studio_manual",
+      "clients": 1,
+      "platforms": ["desktop"],
+      "expected": "no_unhandled_errors"
+    },
+    {
+      "id": "TC-JOIN-002",
+      "scenario": "mid_session_join",
+      "category": "multiplayer",
+      "priority": "P1",
+      "execution": "studio_scripted",
+      "clients": 4,
+      "platforms": ["desktop"],
+      "expected": "players_replicated"
+    },
+    {
+      "id": "TC-UI-003",
+      "scenario": "touch_navigation",
+      "category": "ui",
+      "priority": "P1",
+      "execution": "studio_manual",
+      "clients": 1,
+      "platforms": ["mobile"],
+      "expected": "ui_action_received"
+    },
+    {
+      "id": "TC-REMOTE-004",
+      "scenario": "remote_validation",
+      "category": "security",
+      "priority": "P0",
+      "execution": "studio_scripted",
+      "clients": 2,
+      "platforms": ["desktop"],
+      "expected": "invalid_request_rejected"
+    },
+    {
+      "id": "TC-STATIC-000",
+      "scenario": "remote_validation",
+      "category": "security",
+      "priority": "P1",
+      "execution": "static_local",
+      "clients": 1,
+      "platforms": ["desktop"],
+      "expected": "invalid_request_rejected"
+    }
+  ]
+}
