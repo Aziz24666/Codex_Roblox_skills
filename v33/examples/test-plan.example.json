@@ -44,8 +44,7 @@
       "clients": 2,
       "platforms": ["desktop"],
       "expected": "invalid_request_rejected"
-    }
-    ,
+    },
     {
       "id": "TC-STATIC-000",
       "scenario": "remote_validation",
