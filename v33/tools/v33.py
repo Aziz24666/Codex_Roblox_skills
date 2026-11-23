@@ -179,7 +179,7 @@ def validate_plan(data: Any) -> list[str]:
             errors.append("Test plan is missing required fields: " + ", ".join(sorted(missing)) + ".")
         if extra:
             errors.append("Test plan contains unsupported fields.")
-    if data.get("schema_version") != 1:
+    if type(data.get("schema_version")) is not int or data.get("schema_version") != 1:
         errors.append("schema_version must equal 1.")
     suite_id = data.get("suite_id")
     if not isinstance(suite_id, str) or not SUITE_REF.fullmatch(suite_id):
@@ -319,9 +319,9 @@ def validate_report(data: Any, plan: Any) -> list[str]:
             errors.append(f"{prefix}.evidence_ref must be an opaque ev- reference.")
         if status == "pass" and outcome != "passed":
             errors.append(f"{prefix}: pass status requires outcome_code passed.")
-        elif status == "fail" and outcome not in FAIL_OUTCOMES:
+        elif status == "fail" and (not isinstance(outcome, str) or outcome not in FAIL_OUTCOMES):
             errors.append(f"{prefix}: fail status requires a failure outcome code.")
-        elif status == "blocked" and outcome not in BLOCKED_OUTCOMES:
+        elif status == "blocked" and (not isinstance(outcome, str) or outcome not in BLOCKED_OUTCOMES):
             errors.append(f"{prefix}: blocked status requires a blocker outcome code.")
         elif status == "not_run" and outcome != "not_executed":
             errors.append(f"{prefix}: not_run status requires outcome_code not_executed.")
