@@ -203,6 +203,12 @@ class ReportTests(Fixture):
         report["results"][0]["outcome_code"] = {"code": "passed"}
         self.assertTrue(v33.validate_report(report, valid_plan()))
 
+    def test_fail_status_with_unhashable_outcome_does_not_crash(self) -> None:
+        report = valid_report()
+        report["results"][0]["status"] = "fail"
+        report["results"][0]["outcome_code"] = {"code": "assertion_failed"}
+        self.assertTrue(v33.validate_report(report, valid_plan()))
+
     def test_report_timestamp_requires_timezone(self) -> None:
         report = valid_report()
         report["created_at"] = "2026-11-23T13:00:00"
