@@ -249,7 +249,7 @@ def validate_report(data: Any, plan: Any) -> list[str]:
             errors.append("Test report is missing required fields.")
         if set(data) - REPORT_FIELDS:
             errors.append("Test report contains unsupported fields; do not add raw logs, player identifiers, or free text.")
-    if data.get("schema_version") != 1:
+    if type(data.get("schema_version")) is not int or data.get("schema_version") != 1:
         errors.append("Report schema_version must equal 1.")
     if data.get("suite_id") != plan.get("suite_id"):
         errors.append("Report suite_id must match the supplied plan.")
@@ -559,10 +559,13 @@ def command_compare(args: argparse.Namespace) -> int:
     _, baseline = load_json(root, args.baseline)
     _, current = load_json(root, args.current)
     errors = validate_report(baseline, plan) + validate_report(current, plan)
-    if baseline.get("suite_id") != current.get("suite_id"):
-        errors.append("Baseline and current reports must use the same suite_id.")
-    if baseline.get("run_ref") == current.get("run_ref"):
-        errors.append("Baseline and current reports must have different run_ref values.")
+    if not isinstance(baseline, dict) or not isinstance(current, dict):
+        errors.append("Baseline and current reports must be JSON objects.")
+    else:
+        if baseline.get("suite_id") != current.get("suite_id"):
+            errors.append("Baseline and current reports must use the same suite_id.")
+        if baseline.get("run_ref") == current.get("run_ref"):
+            errors.append("Baseline and current reports must have different run_ref values.")
     if errors:
         for error in errors:
             print(f"FAIL: {error}")
