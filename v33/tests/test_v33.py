@@ -294,7 +294,7 @@ class PatcherAndPackageTests(Fixture):
         for name in ("README.md", "INDEX.md", "INDEX_V32.md", "INDEX_V33.md",
                      "RELEASE_NOTES_V32.md", "RELEASE_NOTES_V33.md"):
             (repo / name).write_text("V33 236 native Codex skills\n", encoding="utf-8")
-        (repo / "tools").mkdir()
+        (repo / "tools").mkdir(exist_ok=True)
         (repo / "tools" / "repository_audit.py").write_text("# audit\n", encoding="utf-8")
         workflow = repo / ".github" / "workflows"
         workflow.mkdir(parents=True)
