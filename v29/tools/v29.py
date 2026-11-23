@@ -245,7 +245,7 @@ def validate_budgets(data: Any) -> list[str]:
             continue
         unknown = set(limits) - METRICS
         if unknown:
-            errors.append(f"budgets.{profile} has unknown metrics: " + ", ".join(sorted(unknown)) + ".")
+            errors.append(f"Unknown metrics in budgets.{profile}: " + ", ".join(sorted(unknown)) + ".")
         for metric, value in limits.items():
             if metric in METRICS and not positive_number(value):
                 errors.append(f"budgets.{profile}.{metric} must be a finite positive number.")
