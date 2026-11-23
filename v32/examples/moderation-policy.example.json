@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "review_sla_hours": {
+    "low": 168,
+    "standard": 72,
+    "high": 24,
+    "critical": 2
+  },
+  "evidence_retention_days": 30,
+  "appeal_window_days": 30,
+  "require_second_review_for": [
+    "high",
+    "critical"
+  ],
+  "automated_enforcement": false
+}

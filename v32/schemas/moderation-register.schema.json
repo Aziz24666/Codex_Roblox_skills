@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v32/schemas/moderation-register.schema.json",
+  "title": "V32 moderation case register",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "cases"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "cases": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "moderation-case.schema.json"
+      }
+    }
+  }
+}
