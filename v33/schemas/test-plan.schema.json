@@ -1,6 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/roblox-codex/v33/test-plan.schema.json",
   "title": "V33 Roblox QA Test Plan",
   "type": "object",
   "additionalProperties": false,
