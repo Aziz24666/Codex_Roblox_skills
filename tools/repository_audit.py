@@ -14,6 +14,7 @@ EXPECTED_SKILLS_V26 = 210
 EXPECTED_SKILLS_V27 = 213
 EXPECTED_SKILLS_V28 = 216
 EXPECTED_SKILLS_V29 = 220
+EXPECTED_SKILLS_V30 = 224
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -120,13 +121,14 @@ def audit(root: Path) -> list[str]:
     skills = sorted(skills_root.glob("*/SKILL.md")) if skills_root.is_dir() else []
     is_v28 = (root / "v28" / "VERSION").is_file()
     is_v29 = (root / "v29" / "VERSION").is_file()
+    is_v30 = (root / "v30" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    expected_skills = EXPECTED_SKILLS_V29 if is_v29 else (EXPECTED_SKILLS_V28 if is_v28 else (
+    expected_skills = EXPECTED_SKILLS_V30 if is_v30 else (EXPECTED_SKILLS_V29 if is_v29 else (EXPECTED_SKILLS_V28 if is_v28 else (
         EXPECTED_SKILLS_V27 if is_v27 else (
             EXPECTED_SKILLS_V26 if is_v26 else EXPECTED_SKILLS_V25
         )
-    ))
+    )))
     if len(skills) != expected_skills:
         problems.append(f"Expected {expected_skills} native skills, found {len(skills)}.")
     names: dict[str, str] = {}
@@ -181,6 +183,15 @@ def audit(root: Path) -> list[str]:
             "INDEX_V29.md", "v29/VERSION", "v29/INDEX_V29.md", "v29/tools/v29.py", "v29/tests/test_v29.py",
             "v29/tools/audit_cumulative_package.py", "v29/docs/PERFORMANCE_ENGINEERING.md",
             "v29/docs/DEVICE_PERFORMANCE_BUDGETS.md", "v29/docs/PROFILING_AND_REGRESSION_EVIDENCE.md",
+        )
+    if is_v30:
+        required += (
+            "INDEX_V30.md", "v30/VERSION", "v30/INDEX_V30.md", "v30/tools/v30.py",
+            "v30/tools/patch_cumulative_package.py", "v30/tools/audit_cumulative_package.py",
+            "v30/tests/test_v30.py", "v30/docs/PRODUCTION_RELEASE_READINESS.md",
+            "v30/docs/RELEASE_EVIDENCE_AND_ROLLBACK.md",
+            "v30/schemas/release-plan.schema.json", "v30/schemas/release-report.schema.json",
+            "v30/examples/release-plan.staging.example.json",
         )
     for item in required:
         if not (root / item).is_file():

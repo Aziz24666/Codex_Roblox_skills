@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Roblox V30 release validation report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["report_type", "schema_version", "plan", "environment", "valid", "errors", "limitations"],
+  "properties": {
+    "report_type": { "const": "v30_release_plan_validation" },
+    "schema_version": { "const": 1 },
+    "plan": { "type": "string" },
+    "environment": { "type": ["string", "null"] },
+    "valid": { "type": "boolean" },
+    "errors": { "type": "array", "items": { "type": "string" } },
+    "limitations": { "type": "array", "items": { "type": "string" } }
+  }
+}
