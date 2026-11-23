@@ -99,6 +99,13 @@ def audit(root: Path) -> list[str]:
                     target_path = target.split("#", 1)[0].split("?", 1)[0]
                     if not target_path:
                         continue
+                    # Earlier cumulative overlays may carry the current README/INDEX
+                    # before the V29 overlay is installed. Defer only V29-local links
+                    # until its VERSION marker exists; the final V29 audit checks them.
+                    if not (root / "v29" / "VERSION").is_file() and (
+                        target_path == "INDEX_V29.md" or target_path.startswith("v29/")
+                    ):
+                        continue
                     candidate = root / target_path.lstrip("/") if target_path.startswith("/") else path.parent / target_path
                     try:
                         resolved = candidate.resolve()
