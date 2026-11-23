@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "events": [
+    {
+      "name": "MissionCompleted",
+      "method": "LogCustomEvent",
+      "purpose": "Measure aggregate mission completion by authored mission category.",
+      "privacy_reviewed": true,
+      "fields": [
+        { "name": "mission_type", "slot": "CustomField01", "allowed_values": ["story", "daily", "side"] },
+        { "name": "difficulty", "slot": "CustomField02", "allowed_values": ["easy", "normal", "hard"] }
+      ]
+    },
+    {
+      "name": "AbilityUsed",
+      "method": "LogCustomEvent",
+      "purpose": "Understand which authored ability categories are used in the core game loop.",
+      "privacy_reviewed": true,
+      "fields": [
+        { "name": "ability_class", "slot": "CustomField01", "allowed_values": ["movement", "support", "defense", "utility"] },
+        { "name": "map_region", "slot": "CustomField02", "allowed_values": ["forest", "desert", "city"] }
+      ]
+    }
+  ],
+  "telemetry_budget": {
+    "expected_calls_per_minute": 500,
+    "maximum_concurrent_users": 25
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "minimum_sample_size": 100,
+  "maximum_age_hours": 48,
+  "metrics": {
+    "server_error_rate_pct": {
+      "direction": "max",
+      "threshold": 2.0,
+      "warning_threshold": 1.0,
+      "description": "Aggregate server-session error rate."
+    },
+    "purchase_failure_rate_pct": {
+      "direction": "max",
+      "threshold": 5.0,
+      "warning_threshold": 3.0,
+      "description": "Aggregate purchase flow failure rate; not a player-level spender profile."
+    },
+    "onboarding_completion_pct": {
+      "direction": "min",
+      "threshold": 25.0,
+      "warning_threshold": 35.0,
+      "description": "Aggregate onboarding completion; interpret alongside accessibility and player feedback."
+    }
+  }
+}
