@@ -196,7 +196,8 @@ def validate_plan(data: Any) -> list[str]:
         errors.append(f"tests must be an array with 1-{MAX_TESTS} entries.")
         return errors
     seen: set[str] = set()
-    plan_platforms = set(data.get("platforms", [])) if isinstance(data.get("platforms"), list) else set()
+    raw_plan_platforms = data.get("platforms")
+    plan_platforms = {item for item in raw_plan_platforms if isinstance(item, str)} if isinstance(raw_plan_platforms, list) else set()
     for index, case in enumerate(tests):
         prefix = f"tests[{index}]"
         if not isinstance(case, dict):
