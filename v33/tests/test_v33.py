@@ -254,7 +254,7 @@ class PathAndAuditTests(Fixture):
             v33.safe_project_path(self.root, str(self.root / "outside.json"))
 
     def test_symlink_path_is_rejected(self) -> None:
-        outside = self.root.parent / "outside-v33-test.txt"
+        outside = self.root.parent / f"{self.root.name}-outside-v33-test.txt"
         outside.write_text("x", encoding="utf-8")
         link = self.root / "linked.txt"
         try:
@@ -263,6 +263,8 @@ class PathAndAuditTests(Fixture):
             self.skipTest("Symlinks are unavailable in this environment.")
         with self.assertRaises(ValueError):
             v33.safe_project_path(self.root, "linked.txt", must_exist=True)
+        link.unlink(missing_ok=True)
+        outside.unlink(missing_ok=True)
 
     def test_audit_is_static_and_inventory_only(self) -> None:
         self.put("ServerScriptService/Main.server.lua",
