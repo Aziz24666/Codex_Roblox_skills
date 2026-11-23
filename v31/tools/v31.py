@@ -252,7 +252,7 @@ def validate_catalog(data: Any) -> list[str]:
     if len(declared_field_values) > CUSTOM_FIELD_VALUE_LIMIT:
         errors.append(
             f"Catalog declares {len(declared_field_values)} custom-field values; "
-            f"the Roblox experience limit is {CUSTOM_FIELD_VALUE_LIMIT} combined unique values."
+            f"the Roblox experience limit is {CUSTOM_FIELD_VALUE_LIMIT:,} combined unique values."
         )
     telemetry_budget = data.get("telemetry_budget")
     if telemetry_budget is not None:
@@ -343,7 +343,7 @@ def audit_project(root: Path, catalog: Any = None, max_files: int = MAX_FILES) -
         r"AnalyticsService\s*:\s*(" + "|".join(sorted(SUPPORTED_METHODS)) + r")\b"
     )
     call_pattern = re.compile(
-        r"AnalyticsService\s*:\s*LogCustomEvent\s*\(\s*[^,]+,\s*([^,\r\n]+)",
+        r"AnalyticsService\s*:\s*LogCustomEvent\s*\(\s*[^,]+,\s*([^,\r\n)]+)",
         re.S,
     )
     literal_pattern = re.compile(r"""^\s*(['"])([^'"]+)\1\s*$""")
