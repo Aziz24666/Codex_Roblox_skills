@@ -15,7 +15,7 @@ V33 extends the cumulative V1-V32 Roblox Codex Game Studio Kit with repeatable t
   - validate-plan: validate a structured QA test plan and the maximum of eight simulated clients.
   - validate-report: validate all results against the plan, status/outcome rules, timezones, and opaque evidence references.
   - compare: identify pass-to-fail regressions, newly blocked tests, coverage gaps, and improvements.
-- Two JSON schemas, two sample plans/reports (including a local-static report), four guides, a cumulative package patcher/auditor, and 33 regression tests.
+- Two JSON schemas, two sample plans/reports (including a local-static report), four guides, a cumulative package patcher/auditor, and 34 regression tests.
 - Cumulative target: **236 native Codex skills**.
 
 ## Studio testing guidance
