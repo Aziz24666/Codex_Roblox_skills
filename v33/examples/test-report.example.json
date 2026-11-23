@@ -15,5 +15,7 @@
     {"test_id": "TC-JOIN-002", "status": "pass", "outcome_code": "passed", "executed_at": "2026-11-23T12:20:00Z", "evidence_ref": "ev-222233334444"},
     {"test_id": "TC-UI-003", "status": "blocked", "outcome_code": "device_profile_unavailable", "executed_at": null},
     {"test_id": "TC-REMOTE-004", "status": "pass", "outcome_code": "passed", "executed_at": "2026-11-23T12:40:00Z", "evidence_ref": "ev-333344445555"}
+    {"test_id": "TC-REMOTE-004", "status": "pass", "outcome_code": "passed", "executed_at": "2026-11-23T12:40:00Z", "evidence_ref": "ev-333344445555"},
+    {"test_id": "TC-STATIC-000", "status": "pass", "outcome_code": "passed", "executed_at": "2026-11-23T12:45:00Z", "evidence_ref": "ev-444455556666"}
   ]
 }
