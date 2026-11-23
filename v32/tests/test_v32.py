@@ -103,7 +103,7 @@ class AuditTests(Fixtures):
         self.put("ServerScriptService/Text.server.lua",'local TextService=game:GetService("TextService")\nlocal TextChatService=game:GetService("TextChatService")\nTextService:FilterStringAsync(rawText,player.UserId)\nTextLabel.Text=inputText\n')
         r=v32.audit_project(self.root)
         self.assertEqual(r["inventory"]["text_service_filter_calls"],1)
-        self.assertEqual(r["inventory"]["text_chat_service_references"],1)
+        self.assertEqual(r["inventory"]["text_chat_service_get_service_calls"],1)
         self.assertEqual(r["inventory"]["possible_raw_text_sinks"],1)
         self.assertTrue(any(x["code"]=="possible_unfiltered_text_display" for x in r["findings"]))
     def test_legacy_chat_filter_flagged(self):
