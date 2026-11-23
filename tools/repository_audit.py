@@ -13,6 +13,7 @@ EXPECTED_SKILLS_V25 = 207
 EXPECTED_SKILLS_V26 = 210
 EXPECTED_SKILLS_V27 = 213
 EXPECTED_SKILLS_V28 = 216
+EXPECTED_SKILLS_V29 = 220
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -98,6 +99,13 @@ def audit(root: Path) -> list[str]:
                     target_path = target.split("#", 1)[0].split("?", 1)[0]
                     if not target_path:
                         continue
+                    # Earlier cumulative overlays may carry the current README/INDEX
+                    # before the V29 overlay is installed. Defer only V29-local links
+                    # until its VERSION marker exists; the final V29 audit checks them.
+                    if not (root / "v29" / "VERSION").is_file() and (
+                        target_path == "INDEX_V29.md" or target_path.startswith("v29/")
+                    ):
+                        continue
                     candidate = root / target_path.lstrip("/") if target_path.startswith("/") else path.parent / target_path
                     try:
                         resolved = candidate.resolve()
@@ -111,13 +119,14 @@ def audit(root: Path) -> list[str]:
     skills_root = root / ".agents" / "skills"
     skills = sorted(skills_root.glob("*/SKILL.md")) if skills_root.is_dir() else []
     is_v28 = (root / "v28" / "VERSION").is_file()
+    is_v29 = (root / "v29" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    expected_skills = EXPECTED_SKILLS_V28 if is_v28 else (
+    expected_skills = EXPECTED_SKILLS_V29 if is_v29 else (EXPECTED_SKILLS_V28 if is_v28 else (
         EXPECTED_SKILLS_V27 if is_v27 else (
             EXPECTED_SKILLS_V26 if is_v26 else EXPECTED_SKILLS_V25
         )
-    )
+    ))
     if len(skills) != expected_skills:
         problems.append(f"Expected {expected_skills} native skills, found {len(skills)}.")
     names: dict[str, str] = {}
@@ -166,6 +175,12 @@ def audit(root: Path) -> list[str]:
             "v28/docs/SERVER_AUTHORITY_AND_REMOTE_SECURITY.md",
             "v28/docs/DATASTORE_MIGRATION_SAFETY.md",
             "v28/docs/MULTIPLAYER_RELIABILITY_VALIDATION.md",
+        )
+    if is_v29:
+        required += (
+            "INDEX_V29.md", "v29/VERSION", "v29/INDEX_V29.md", "v29/tools/v29.py", "v29/tests/test_v29.py",
+            "v29/tools/audit_cumulative_package.py", "v29/docs/PERFORMANCE_ENGINEERING.md",
+            "v29/docs/DEVICE_PERFORMANCE_BUDGETS.md", "v29/docs/PROFILING_AND_REGRESSION_EVIDENCE.md",
         )
     for item in required:
         if not (root / item).is_file():

@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "description": "Illustrative starting ceilings only. Tune using repeatable captures on actual target devices.",
+  "budgets": {
+    "low_end_mobile": {
+      "frame_time_ms_p95": 33.3,
+      "memory_mb": 450,
+      "load_time_s": 20,
+      "script_cpu_ms": 8,
+      "replication_kbps": 100
+    },
+    "high_end_mobile": {
+      "frame_time_ms_p95": 25,
+      "memory_mb": 600,
+      "load_time_s": 15,
+      "script_cpu_ms": 6,
+      "replication_kbps": 150
+    },
+    "desktop": {
+      "frame_time_ms_p95": 16.7,
+      "memory_mb": 1000,
+      "load_time_s": 12,
+      "script_cpu_ms": 5,
+      "replication_kbps": 250
+    }
+  }
+}

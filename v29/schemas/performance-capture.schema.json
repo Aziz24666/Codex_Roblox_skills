@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V29 Roblox performance capture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "build",
+    "device_profile",
+    "measurement_source",
+    "metrics"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "build": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "device_profile": {
+      "enum": [
+        "low_end_mobile",
+        "high_end_mobile",
+        "desktop"
+      ]
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "measurement_source": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scene": {
+      "type": "string"
+    },
+    "player_count": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "metrics": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "frame_time_ms_p50": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "frame_time_ms_p95": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "memory_mb": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "load_time_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "script_cpu_ms": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "replication_kbps": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    }
+  }
+}

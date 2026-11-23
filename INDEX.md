@@ -1,3 +1,3 @@
 # Current toolkit index
 
-The current cumulative release is **V28.0.0**. See INDEX_V28.md for server-authority review, DataStore migration safety, multiplayer reliability scenarios, and the full V1-V28 scope.
+The current cumulative release is **V29.0.0** with 220 native Codex skills. See [INDEX_V29.md](INDEX_V29.md) for the full V1-V29 scope and performance engineering additions.

@@ -1,56 +1,52 @@
 # Roblox Codex Game Studio Kit
 
-[![V28 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v28-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v28-quality.yml)
+[![V29 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v29-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v29-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V28.0.0 — Server Authority, DataStore Safety, and Multiplayer Reliability.** This is the complete cumulative V1-V28 toolkit. Only the current release is required.
+**Current release: V29.0.0 — Performance Engineering and Optimization.** This is the complete cumulative V1-V29 toolkit. Only the current release is required.
 
-[Open the V28 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v28.0.0).
+[Open the V29 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v29.0.0).
 
 ## What's included
 
-- **216 native Codex skills** for Roblox engineering, Luau, gameplay, characters, UI, networking, persistence, economy, procedural content, NPCs, Studio tools, testing, performance, release engineering, and sustainable monetization.
-- V23-V24 sustainable monetization discovery, opportunity ranking, backlog creation, and growth-roadmap automation.
-- V25 durable checkpoints, recoverable handoff prompts, backup recovery, validated journal integrity, project-root binding, and bounded-stage task execution (**207 native Codex skills at V25**).
-- V26 Studio MCP workflow skills for safe inspection/editing, multiplayer/device/network testing, and evidence-based change review (**210 native Codex skills at V26**).
-- V27 Luau static-analysis and architecture tools for dependency cycles, type-mode inventory, remote contract review, and Rojo project validation (**213 native Codex skills at V27**).
-- V28 adds server-authority and remote-contract review, rate-limit/idempotency signals, DataStore API and schema-migration review, and a synthetic/staging-only migration-manifest validator.
-- Read-only architecture and security reports, official luau-analyze integration, optional temporary Rojo builds, and safe migration-plan validation.
+- **220 native Codex skills** across Roblox engineering, Luau, gameplay, characters, UI, networking, persistence, economy, procedural content, NPCs, Studio tools, testing, performance, release engineering, and sustainable monetization.
+- V29 adds performance profiling, Luau hot-path review, memory and asset optimization, device-specific budgets, and measurement regression comparison.
+- V28 adds server-authority and remote-contract review, rate-limit/idempotency signals, DataStore schema-migration review, and a synthetic/staging-only migration-manifest validator (**216 native Codex skills at V28**).
+- V27 adds Luau static-analysis and architecture tools for dependency cycles, type-mode inventory, remote contract review, and Rojo project validation (**213 native Codex skills at V27**).
+- V26 adds Studio MCP workflow skills for safe inspection/editing, multiplayer/device/network test planning, and evidence-based change review (**210 native Codex skills at V26**).
+- V25 adds durable checkpoints, recoverable handoff prompts, backup recovery, validated journal integrity, project-root binding, and bounded-stage task execution (**207 native Codex skills at V25**).
+- V23-V24 add sustainable monetization discovery, opportunity ranking, backlog creation, and growth-roadmap automation.
 - Cumulative regression suites, package audits, archive integrity checks, and release checks.
 
 ## Start a Roblox development session
 
-1. Download and extract the V28 release, then open the cumulative package root in Codex.
-2. Read AGENTS.md and INDEX_V28.md.
-3. Initialize session continuity in the **actual game project folder**:
+1. Download and extract the V29 release, then open the cumulative package root in Codex.
+2. Read AGENTS.md and INDEX_V29.md.
+3. Initialize session continuity in the actual game project folder:
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v28\v25\tools\v25.py" start --root "C:\Path\To\YourGame" --goal "Build and ship my Roblox game"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v29\v25\tools\v25.py" start --root "C:\Path\To\YourGame" --goal "Build and ship my Roblox game"
 
-4. Run the V28 local project check:
+4. Run local V29 diagnostics:
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v28\v28\tools\v28.py" doctor --root "C:\Path\To\YourGame"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v29\v29\tools\v29.py" doctor --root "C:\Path\To\YourGame"
 
-5. Generate the read-only security and persistence review:
+5. Generate a read-only performance review:
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v28\v28\tools\v28.py" audit --root "C:\Path\To\YourGame"
+       python "C:\Path\To\roblox-codex-game-studio-kit-v29\v29\tools\v29.py" audit --root "C:\Path\To\YourGame"
 
-6. Validate a human-authored migration manifest (see v28/tools/manifest-example.json):
+6. Validate device budgets and compare captures after recording actual measurements. See the V29 profiling guide.
 
-       python "C:\Path\To\roblox-codex-game-studio-kit-v28\v28\tools\v28.py" validate-migration --root "C:\Path\To\YourGame" --manifest ".codex\migration-plan.json"
+V25 commands: start, checkpoint, handoff, resume, status, verify, and recover. V26 commands: doctor, plan, and verify-plan. V27 commands: doctor, audit, typecheck, and rojo-check. V28 commands: doctor, audit, and validate-migration. V29 commands: doctor, audit, budget, compare, and report.
 
-V25 commands: start, checkpoint, handoff, resume, status, verify, and recover. V26 commands: doctor, plan, and verify-plan. V27 commands: doctor, audit, typecheck, and rojo-check. V28 commands: doctor, audit, and validate-migration.
+## V29 performance evidence boundaries
 
-## V28 analysis boundaries
+V29's static scanner reads bounded local Luau text and flags patterns that deserve investigation. It is not a Luau parser or profiler and cannot measure FPS, frame time, memory, script CPU, replication, or load time. Confirm bottlenecks with Roblox Studio MicroProfiler, Script Profiler, Developer Console, and representative hardware.
 
-The V28 scanner reads local Luau text only. It inventories statically named remote calls and server handler patterns, searches a bounded area near handlers for validation, ownership, rate-limit, and idempotency signals, and records DataStore API calls and nearby migration/retry/backup indicators. It is a conservative heuristic, not a Luau parser, control-flow analyzer, DataModel emulator, security proof, or penetration test. Verify every finding against the full scripts and actual Studio hierarchy.
+The comparison tool reads developer-supplied JSON captures. It compares stated values; it does not verify capture authenticity, start Studio, connect to Roblox, or collect telemetry. GitHub Actions does not run live Studio profiling or device tests.
 
-The migration-manifest command checks that a plan is explicitly synthetic/staging-only, dry-run, non-production-writing, sequential, idempotent, backed up, rollback-planned, and covered by valid/invalid/legacy/repeat cases. It validates structure only: it never executes migrations, connects to Roblox, touches DataStores, or calls Open Cloud.
+## V28 security and persistence boundaries
 
-## Studio MCP and production boundaries
-
-Roblox Studio's MCP server is local to the developer's machine. Connect only trusted clients and confirm the target Studio instance/place. GitHub Actions cannot automatically control the local Studio session.
-
-Saving a modified place, publishing, production DataStore writes, and player-impacting Open Cloud operations require explicit human review and approval. Use least privilege, isolated test places, and synthetic data. A generated test plan or static report must not be represented as an executed Studio test.
+Treat client input as untrusted and keep game-critical state authoritative on the server. Validate ownership, permissions, state, bounds, and request frequency. Keep DataStore migrations staged, backed up, versioned, idempotent, and tested with synthetic data. Publishing, production DataStore writes, and player-impacting Open Cloud operations require explicit human approval.
 
 ## Growth principles
 
@@ -58,14 +54,14 @@ Maximize sustainable player value and discover viable opportunities—not pressu
 
 ## Documentation
 
-- V28 feature index: INDEX_V28.md
-- V28 server authority and remote security: v28/docs/SERVER_AUTHORITY_AND_REMOTE_SECURITY.md
-- V28 DataStore migration safety: v28/docs/DATASTORE_MIGRATION_SAFETY.md
-- V28 multiplayer reliability: v28/docs/MULTIPLAYER_RELIABILITY_VALIDATION.md
-- V28 report reference: v28/docs/SECURITY_REPORT_REFERENCE.md
+- V29 feature index: INDEX_V29.md
+- V29 performance engineering: v29/docs/PERFORMANCE_ENGINEERING.md
+- V29 device budgets: v29/docs/DEVICE_PERFORMANCE_BUDGETS.md
+- V29 profiling and regression evidence: v29/docs/PROFILING_AND_REGRESSION_EVIDENCE.md
+- V28 server authority and security: v28/INDEX_V28.md
 - V27 Luau and architecture: v27/INDEX_V27.md
 - V26 Studio MCP workflow: v26/docs/STUDIO_MCP_WORKFLOW.md
-- V25 session continuity guide: v25/docs/SESSION_CONTINUITY.md
+- V25 session continuity: v25/docs/SESSION_CONTINUITY.md
 - [V18 no-gambling and fair monetization](v18/docs/NO_GAMBLING_AND_FAIR_MONETIZATION.md)
 - MIT License
 
