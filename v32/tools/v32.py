@@ -214,7 +214,7 @@ def audit_project(root:Path,max_files:int=MAX_FILES)->dict[str,Any]:
     findings=[]; warnings=[]; files=iter_luau_files(root,max(1,min(max_files,MAX_FILES)),warnings)
     filt=re.compile(r"\bTextService\s*:\s*FilterStringAsync\s*\(")
     legacy=re.compile(r"\bChat\s*:\s*FilterStringAsync\s*\(")
-    native=re.compile(r"\bgame\s*:\s*GetService\s*\(\s*["']TextChatService["']\s*\)")
+    native=re.compile(r"""\bgame\s*:\s*GetService\s*\(\s*["']TextChatService["']\s*\)""")
     sink=re.compile(r"\b[A-Za-z_][A-Za-z0-9_\.]*\.Text\s*=\s*(?:rawText|unfilteredText|inputText|submittedText|userText|playerText|messageText|petName|signText|customName)\b",re.I)
     filter_calls=legacy_calls=native_refs=raw_sinks=readable=0
     for path in files:
