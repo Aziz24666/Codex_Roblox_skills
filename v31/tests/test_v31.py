@@ -287,7 +287,7 @@ class HealthPolicyTests(Fixture):
 
 class PathAndPackageTests(Fixture):
     def test_path_escape_and_symlink_are_rejected(self):
-        with self.assertRaisesRegex(ValueError, "project-relative"):
+        with self.assertRaisesRegex(ValueError, "inside the selected project root"):
             v31.safe_project_path(self.root, "../outside.json")
         outside = Path(tempfile.mkdtemp())
         try:
