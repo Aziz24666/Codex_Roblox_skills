@@ -40,6 +40,12 @@ def patch(package_root: Path, source_root: Path | None = None) -> int:
         raise ValueError("The 252-skill package does not contain the complete V37 skill set.")
 
     shutil.copytree(source, root / "v37", dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__", "*.pyc", ".pytest_cache"))
+    repository = source.parent
+    compatible_v36_auditor = repository / "v36" / "tools" / "audit_cumulative_package.py"
+    if compatible_v36_auditor.is_file():
+        v36_tools = root / "v36" / "tools"
+        v36_tools.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(compatible_v36_auditor, v36_tools / "audit_cumulative_package.py")
     for skill in skills:
         destination = target / skill.parent.name
         destination.mkdir(parents=True, exist_ok=True)
@@ -52,7 +58,6 @@ def patch(package_root: Path, source_root: Path | None = None) -> int:
     if MARKER not in agent_content:
         agents.write_text(agent_content.rstrip() + "\n\n" + RULES, encoding="utf-8")
 
-    repository = source.parent
     for name in (
         "README.md", "INDEX.md", "INDEX_V36.md", "INDEX_V37.md",
         "RELEASE_NOTES_V36.md", "RELEASE_NOTES_V37.md",
