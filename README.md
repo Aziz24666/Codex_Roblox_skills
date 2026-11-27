@@ -1,17 +1,18 @@
 # Roblox Codex Game Studio Kit
 
-[![V41 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v41-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v41-quality.yml)
+[![V42 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v42-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v42-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V41.0.0 — Matchmaking, Parties and Multiplayer Orchestration.** The cumulative V1–V41 toolkit contains **268 native Codex skills**. Only the current release is required.
+**Current release: V42.0.0 — LiveOps, Events and Configuration Management.** The cumulative V1–V42 toolkit contains **272 native Codex skills**. Only the current release is required.
 
-[Open the V41 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v41.0.0).
+[Open the V42 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v42.0.0).
 
 ## What's included
 
-Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills; V40 — 264 native Codex skills; V41 — 268 native Codex skills.
+Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills; V40 — 264 native Codex skills; V41 — 268 native Codex skills; V42 — 272 native Codex skills.
 
-- **268 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
+- **272 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
+- **V42** adds LiveOps event scheduling, Roblox Experience Configs, staged feature-flag rollouts, config compatibility/rollback, and an offline manifest validator/auditor.
 - **V41** adds skill-based matchmaking queues, party/lobby lifecycle, cross-server coordination, reserved-server teleport/reconnect recovery, and an offline matchmaking validator/auditor plus deterministic synthetic-ticket simulator.
 - **V40** adds player-profile lifecycle/session ownership, bounded save/retry/recovery policies, safe schema migration chains, idempotent reward/receipt commits, and an offline persistence-contract validator/auditor.
 - **V39** adds gameplay currency source/sink modeling, deterministic day-by-day simulations across synthetic activity archetypes, progression milestone rewards, and fairness review with an offline model validator/simulator.
@@ -35,10 +36,10 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 ## Start a Roblox development session
 
 1. Download and extract the V41 release, then open the extracted package root in Codex.
-2. Read `AGENTS.md` and `INDEX_V41.md`.
+2. Read `AGENTS.md` and `INDEX_V42.md`.
 3. Initialize session continuity in the actual game project folder:
 
-       python C:\Path\To\roblox-codex-game-studio-kit-v41\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
+       python C:\Path\To\roblox-codex-game-studio-kit-v42\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
 
 4. For feature work, read `v37/INDEX_V37.md` and follow the V37 reconnaissance → plan → scoped implementation → evidence handoff workflow.
 5. For a production incident, copy `v38/examples/incident.example.json` into `.codex/incidents/incident.json`, replace the example values with verified aggregate-only facts, then run:
@@ -74,7 +75,20 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
    The simulator uses synthetic tickets only. The CLI does not call Roblox services or prove live matchmaking, party coordination, or teleport success.
 
-Commands: V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate. V40 — doctor, validate, audit. V41 — doctor, validate, audit, simulate.
+9. For LiveOps event and config governance, copy `v42/examples/liveops-model.example.json` to `.codex/liveops/liveops-model.json`, then run:
+
+       python .\v42\tools\v42.py doctor --root C:\Path\To\YourGame
+       python .\v42\tools\v42.py validate --root C:\Path\To\YourGame --model .codex\liveops\liveops-model.json
+       python .\v42\tools\v42.py audit --root C:\Path\To\YourGame --model .codex\liveops\liveops-model.json --output .codex\reports\liveops-audit.json
+       python .\v42\tools\v42.py compare --root C:\Path\To\YourGame --baseline .codex\liveops\baseline.json --candidate .codex\liveops\candidate.json --output .codex\reports\config-compatibility.json
+
+   V42 validates manifests only. It does not call Roblox or publish config. Keep API credentials out of project files; stage and test changes, get human approval, publish through the authorized workflow, and read back the published values.
+
+Commands: V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate. V40 — doctor, validate, audit. V41 — doctor, validate, audit, simulate. V42 — doctor, validate, audit, compare.
+
+## V42 LiveOps and configuration boundaries
+
+V42 validates local config/event manifests only. ConfigService is server-side and read-only; Open Cloud draft, publish, and restore operations require authorized credentials and explicit human approval. Stage and test a draft, use the latest draftHash to guard concurrent updates, publish with a descriptive message, and verify the published values by reading them back. Restoring a revision stages a draft; a separate publish is still required. The V42 CLI does not contact Roblox or execute live operations.
 
 ## V41 matchmaking and teleport boundaries
 
@@ -104,6 +118,11 @@ Keep analytics aggregate and purpose-bound; do not build individual-spender prof
 
 ## Documentation
 
+- V42 feature index: `INDEX_V42.md`
+- LiveOps event lifecycle: `v42/docs/LIVEOPS_EVENT_LIFECYCLE.md`
+- Experience Configs and feature flags: `v42/docs/EXPERIENCE_CONFIGS_AND_FEATURE_FLAGS.md`
+- Safe config deployment and rollback: `v42/docs/SAFE_CONFIG_DEPLOYMENT_AND_ROLLBACK.md`
+- V42 CLI reference: `v42/docs/V42_CLI.md`
 - V41 feature index: `INDEX_V41.md`
 - Matchmaking architecture: `v41/docs/MATCHMAKING_ARCHITECTURE.md`
 - Party and lobby lifecycle: `v41/docs/PARTIES_AND_LOBBY_LIFECYCLE.md`

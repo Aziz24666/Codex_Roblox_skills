@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "model_id": "seasonal-liveops-release",
+  "config_contract": {
+    "repository": "InExperienceConfig",
+    "key_limit": 100,
+    "active_config_limit": 1000,
+    "server_only": true,
+    "runtime_write_access": false,
+    "staged_before_publish": true,
+    "draft_hash_guard": true,
+    "publish_message_required": true,
+    "snapshot_refresh_policy": "next_safe_boundary",
+    "refresh_signal_handling": "UpdateAvailable_then_Refresh",
+    "fallback_on_initial_failure": "static_defaults"
+  },
+  "configs": [
+    {
+      "key": "feature.new_lobby",
+      "value_type": "boolean",
+      "default_value": false,
+      "category": "feature_flag",
+      "runtime_change_policy": "next_safe_boundary",
+      "fallback_policy": "static_default",
+      "targeting_mode": "global",
+      "condition_count": 0,
+      "condition_order_reviewed": true,
+      "owner": "gameplay",
+      "server_only": true,
+      "contains_secret": false
+    },
+    {
+      "key": "event.winter_festival.enabled",
+      "value_type": "boolean",
+      "default_value": false,
+      "category": "event_control",
+      "runtime_change_policy": "next_safe_boundary",
+      "fallback_policy": "disable_optional_feature",
+      "targeting_mode": "global",
+      "condition_count": 0,
+      "condition_order_reviewed": true,
+      "owner": "liveops",
+      "server_only": true,
+      "contains_secret": false
+    },
+    {
+      "key": "event.weekend_bonus.enabled",
+      "value_type": "boolean",
+      "default_value": false,
+      "category": "event_control",
+      "runtime_change_policy": "next_safe_boundary",
+      "fallback_policy": "disable_optional_feature",
+      "targeting_mode": "global",
+      "condition_count": 0,
+      "condition_order_reviewed": true,
+      "owner": "liveops",
+      "server_only": true,
+      "contains_secret": false
+    },
+    {
+      "key": "progression.xp_multiplier",
+      "value_type": "number",
+      "default_value": 1.0,
+      "category": "balance_tuning",
+      "runtime_change_policy": "next_round",
+      "fallback_policy": "keep_last_known_good",
+      "targeting_mode": "global",
+      "condition_count": 0,
+      "condition_order_reviewed": true,
+      "owner": "progression",
+      "server_only": true,
+      "contains_secret": false
+    },
+    {
+      "key": "matchmaking.enabled",
+      "value_type": "boolean",
+      "default_value": true,
+      "category": "operations",
+      "runtime_change_policy": "immediate_noncompetitive_only",
+      "fallback_policy": "static_default",
+      "targeting_mode": "global",
+      "condition_count": 0,
+      "condition_order_reviewed": true,
+      "owner": "server",
+      "server_only": true,
+      "contains_secret": false
+    },
+    {
+      "key": "ui.new_hud.enabled",
+      "value_type": "boolean",
+      "default_value": false,
+      "category": "feature_flag",
+      "runtime_change_policy": "next_session",
+      "fallback_policy": "static_default",
+      "targeting_mode": "conditional",
+      "condition_count": 2,
+      "condition_order_reviewed": true,
+      "owner": "ui",
+      "server_only": true,
+      "contains_secret": false
+    }
+  ],
+  "events": [
+    {
+      "event_id": "winter_festival",
+      "title": "Winter Festival",
+      "schedule_group": "seasonal_events",
+      "status": "scheduled",
+      "starts_at": "2027-12-01T00:00:00Z",
+      "ends_at": "2027-12-15T00:00:00Z",
+      "config_keys": ["event.winter_festival.enabled", "progression.xp_multiplier"],
+      "enabled_config_key": "event.winter_festival.enabled",
+      "preflight_required": true,
+      "test_case_ids": ["event_start", "event_end", "server_restart"]
+    },
+    {
+      "event_id": "weekend_bonus",
+      "title": "Weekend Bonus",
+      "schedule_group": "weekend_bonus",
+      "status": "planned",
+      "starts_at": "2027-01-22T00:00:00Z",
+      "ends_at": "2027-01-25T00:00:00Z",
+      "config_keys": ["event.weekend_bonus.enabled", "progression.xp_multiplier"],
+      "enabled_config_key": "event.weekend_bonus.enabled",
+      "preflight_required": true,
+      "test_case_ids": []
+    }
+  ],
+  "deployment": {
+    "strategy": "GradualRollout",
+    "staged_test_required": true,
+    "pre_publish_validation_required": true,
+    "published_readback_required": true,
+    "human_approval_required": true,
+    "publish_message_required": true,
+    "publish_only_after_approval": true,
+    "draft_hash_guard_required": true,
+    "api_key_outside_project": true,
+    "publish_message": "Stage and gradually roll out seasonal LiveOps config."
+  },
+  "rollback": {
+    "revision_history_required": true,
+    "restore_creates_staged_draft": true,
+    "republish_after_restore": true,
+    "published_readback_required": true,
+    "human_approval_required": true,
+    "no_automatic_production_rollback": true,
+    "rollback_test_required": true
+  },
+  "consumers": [
+    {
+      "consumer_id": "lobby_feature_gate",
+      "config_key": "feature.new_lobby",
+      "expected_type": "boolean",
+      "required": true,
+      "fallback_value": false,
+      "apply_boundary": "next_session",
+      "server_only": true
+    },
+    {
+      "consumer_id": "winter_event_controller",
+      "config_key": "event.winter_festival.enabled",
+      "expected_type": "boolean",
+      "required": true,
+      "fallback_value": false,
+      "apply_boundary": "next_event_boundary",
+      "server_only": true
+    },
+    {
+      "consumer_id": "weekend_event_controller",
+      "config_key": "event.weekend_bonus.enabled",
+      "expected_type": "boolean",
+      "required": true,
+      "fallback_value": false,
+      "apply_boundary": "next_event_boundary",
+      "server_only": true
+    },
+    {
+      "consumer_id": "progression_reward_service",
+      "config_key": "progression.xp_multiplier",
+      "expected_type": "number",
+      "required": true,
+      "fallback_value": 1.0,
+      "apply_boundary": "next_round",
+      "server_only": true
+    },
+    {
+      "consumer_id": "matchmaking_service",
+      "config_key": "matchmaking.enabled",
+      "expected_type": "boolean",
+      "required": true,
+      "fallback_value": true,
+      "apply_boundary": "immediate_noncompetitive_only",
+      "server_only": true
+    },
+    {
+      "consumer_id": "hud_controller",
+      "config_key": "ui.new_hud.enabled",
+      "expected_type": "boolean",
+      "required": true,
+      "fallback_value": false,
+      "apply_boundary": "next_session",
+      "server_only": true
+    }
+  ]
+}
