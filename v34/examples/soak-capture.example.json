@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "run_id": "perf-run-a13b9c7d2e4f",
+  "build_id": "v34-demo-baseline",
+  "scenario": "steady_gameplay",
+  "target": "server",
+  "device_profile": "server",
+  "measurement_source": "developer_console",
+  "network_profile": "baseline",
+  "player_count": 4,
+  "started_at": "2026-11-27T10:00:00Z",
+  "warmup_minutes": 5,
+  "duration_minutes": 60,
+  "sample_interval_seconds": 600,
+  "evidence_ref": "ev-111122223333",
+  "samples": [
+    {"elapsed_seconds": 0, "server_age_minutes": 125, "connected_clients": 4, "metrics": {"server_memory_mb": 820, "lua_heap_mb": 160, "instance_count": 12000, "server_cpu_ms_per_frame": 8.2, "server_heartbeat_fps": 60}},
+    {"elapsed_seconds": 600, "server_age_minutes": 135, "connected_clients": 4, "metrics": {"server_memory_mb": 826, "lua_heap_mb": 163, "instance_count": 12010, "server_cpu_ms_per_frame": 8.3, "server_heartbeat_fps": 60}},
+    {"elapsed_seconds": 1200, "server_age_minutes": 145, "connected_clients": 4, "metrics": {"server_memory_mb": 832, "lua_heap_mb": 166, "instance_count": 12020, "server_cpu_ms_per_frame": 8.2, "server_heartbeat_fps": 60}},
+    {"elapsed_seconds": 1800, "server_age_minutes": 155, "connected_clients": 4, "metrics": {"server_memory_mb": 839, "lua_heap_mb": 170, "instance_count": 12030, "server_cpu_ms_per_frame": 8.4, "server_heartbeat_fps": 60}},
+    {"elapsed_seconds": 2400, "server_age_minutes": 165, "connected_clients": 4, "metrics": {"server_memory_mb": 845, "lua_heap_mb": 173, "instance_count": 12040, "server_cpu_ms_per_frame": 8.4, "server_heartbeat_fps": 60}},
+    {"elapsed_seconds": 3000, "server_age_minutes": 175, "connected_clients": 4, "metrics": {"server_memory_mb": 852, "lua_heap_mb": 177, "instance_count": 12050, "server_cpu_ms_per_frame": 8.5, "server_heartbeat_fps": 60}},
+    {"elapsed_seconds": 3600, "server_age_minutes": 185, "connected_clients": 4, "metrics": {"server_memory_mb": 860, "lua_heap_mb": 180, "instance_count": 12060, "server_cpu_ms_per_frame": 8.5, "server_heartbeat_fps": 60}}
+  ]
+}
