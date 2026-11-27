@@ -2,7 +2,8 @@ from __future__ import annotations
 import json, sys, tempfile, unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"tools"))
-import v36\nimport audit_cumulative_package
+import v36
+import audit_cumulative_package
 
 def surface(**changes):
     row={"surface_id":"main-menu","kind":"menu","platforms":["desktop","mobile"],"input_methods":["keyboard_mouse","touch"],"uses_motion":True,"critical_audio":True,
@@ -18,7 +19,10 @@ class V36Tests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory(); self.root=Path(self.tmp.name).resolve()
     def tearDown(self): self.tmp.cleanup()
-    def test_readme_preserves_all_cumulative_skill_count_labels(self):\n        readme=(Path(__file__).resolve().parents[2]/"README.md").read_text(encoding="utf-8")\n        self.assertEqual([x for x in audit_cumulative_package.HISTORICAL_SKILL_LABELS if x not in readme],[])\n    def test_valid_manifest(self): self.assertEqual(v36.validate_manifest(manifest()),[])
+    def test_readme_preserves_all_cumulative_skill_count_labels(self):
+        readme=(Path(__file__).resolve().parents[2]/"README.md").read_text(encoding="utf-8")
+        self.assertEqual([x for x in audit_cumulative_package.HISTORICAL_SKILL_LABELS if x not in readme],[])
+    def test_valid_manifest(self): self.assertEqual(v36.validate_manifest(manifest()),[])
     def test_reject_unknown_root_field(self):
         data=manifest(); data["player_data"]=[]
         self.assertTrue(any("unsupported fields" in x for x in v36.validate_manifest(data)))
