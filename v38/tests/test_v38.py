@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
 import v38
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE = ROOT / "examples" / "incident.example.json"
 
 class IncidentValidationTests(unittest.TestCase):
