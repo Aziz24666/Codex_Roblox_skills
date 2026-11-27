@@ -80,7 +80,7 @@ def validate_manifest(data: Any) -> list[str]:
         if not isinstance(sid,str) or not SURFACE_ID.fullmatch(sid): issues.append(f"{label}.surface_id must be a lowercase stable ID.")
         elif sid in seen: issues.append(f"Duplicate surface_id: {sid}.")
         else: seen.add(sid)
-        if s.get("kind") not in KINDS: issues.append(f"{label}.kind is unsupported.")
+        if not isinstance(s.get("kind"),str) or s.get("kind") not in KINDS: issues.append(f"{label}.kind is unsupported.")
         for field,allowed in (("platforms",PLATFORMS),("input_methods",INPUTS)):
             values=s.get(field)
             if not isinstance(values,list) or not values or any(not isinstance(v,str) or v not in allowed for v in values) or len(set(values))!=len(values): issues.append(f"{label}.{field} must be a non-empty unique list of supported values.")
