@@ -2,7 +2,6 @@ from __future__ import annotations
 import copy
 import importlib.util
 import json
-import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -202,7 +201,10 @@ class InputSafetyTests(unittest.TestCase):
     def test_symlink_path_rejected(self):
         with tempfile.TemporaryDirectory() as temp, tempfile.TemporaryDirectory() as outside_temp:
             root = Path(temp); outside = Path(outside_temp)
-            (root / "linked").symlink_to(outside, target_is_directory=True)
+            try:
+                (root / "linked").symlink_to(outside, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("This runner does not permit directory symlink creation.")
             with self.assertRaises(ValueError): v41.safe_path(root, "linked/model.json")
 
     def test_input_size_limit(self):
