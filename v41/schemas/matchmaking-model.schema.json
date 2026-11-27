@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v41/schemas/matchmaking-model.schema.json",
+  "title": "Roblox matchmaking and session orchestration model",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "model_id", "queue", "matching", "party", "coordination", "teleport", "recovery", "simulation_tickets"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "model_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
+    "queue": {
+      "type": "object", "additionalProperties": false,
+      "required": ["provider", "queue_name", "ordering", "item_ttl_seconds", "invisibility_timeout_seconds", "read_batch_size", "remove_after_assignment", "duplicate_ticket_key", "network_calls_protected", "stores_durable_player_data"],
+      "properties": {
+        "provider": {"const": "MemoryStoreQueue"},
+        "queue_name": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,48}$"},
+        "ordering": {"enum": ["FIFO", "priority"]},
+        "item_ttl_seconds": {"type": "integer", "minimum": 30, "maximum": 3600},
+        "invisibility_timeout_seconds": {"type": "integer", "minimum": 5, "maximum": 120},
+        "read_batch_size": {"type": "integer", "minimum": 1, "maximum": 100},
+        "remove_after_assignment": {"const": true},
+        "duplicate_ticket_key": {"const": "ticket_id"},
+        "network_calls_protected": {"const": true},
+        "stores_durable_player_data": {"const": false}
+      }
+    },
+    "matching": {
+      "type": "object", "additionalProperties": false,
+      "required": ["minimum_players", "preferred_players", "maximum_players", "initial_skill_window", "skill_window_step", "maximum_skill_window", "window_expansion_interval_seconds", "maximum_wait_seconds", "party_atomicity"],
+      "properties": {
+        "minimum_players": {"type": "integer", "minimum": 2, "maximum": 50},
+        "preferred_players": {"type": "integer", "minimum": 2, "maximum": 50},
+        "maximum_players": {"type": "integer", "minimum": 2, "maximum": 50},
+        "initial_skill_window": {"type": "integer", "minimum": 0, "maximum": 5000},
+        "skill_window_step": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "maximum_skill_window": {"type": "integer", "minimum": 0, "maximum": 5000},
+        "window_expansion_interval_seconds": {"type": "integer", "minimum": 5, "maximum": 300},
+        "maximum_wait_seconds": {"type": "integer", "minimum": 30, "maximum": 1800},
+        "party_atomicity": {"const": "all_or_none"}
+      }
+    },
+    "party": {
+      "type": "object", "additionalProperties": false,
+      "required": ["minimum_size", "maximum_size", "leader_policy", "leadership_transfer_policy", "invite_ttl_seconds", "invites_server_validated", "membership_server_validated", "party_ticket_atomic"],
+      "properties": {
+        "minimum_size": {"type": "integer", "minimum": 1, "maximum": 50},
+        "maximum_size": {"type": "integer", "minimum": 1, "maximum": 50},
+        "leader_policy": {"const": "server_authoritative"},
+        "leadership_transfer_policy": {"enum": ["eligible_member_order", "manual_owner_approval"]},
+        "invite_ttl_seconds": {"type": "integer", "minimum": 15, "maximum": 600},
+        "invites_server_validated": {"const": true},
+        "membership_server_validated": {"const": true},
+        "party_ticket_atomic": {"const": true}
+      }
+    },
+    "coordination": {
+      "type": "object", "additionalProperties": false,
+      "required": ["shared_state_store", "active_record_ttl_seconds", "lease_seconds", "lease_refresh_seconds", "fencing_token_required", "versioned_state_required", "server_id_required", "messaging_service_role", "messaging_delivery_assumed", "messaging_as_authority"],
+      "properties": {
+        "shared_state_store": {"const": "MemoryStoreHashMap"},
+        "active_record_ttl_seconds": {"type": "integer", "minimum": 60, "maximum": 86400},
+        "lease_seconds": {"type": "integer", "minimum": 30, "maximum": 300},
+        "lease_refresh_seconds": {"type": "integer", "minimum": 5, "maximum": 150},
+        "fencing_token_required": {"const": true},
+        "versioned_state_required": {"const": true},
+        "server_id_required": {"const": true},
+        "messaging_service_role": {"const": "best_effort_notifications"},
+        "messaging_delivery_assumed": {"const": "best_effort"},
+        "messaging_as_authority": {"const": false}
+      }
+    },
+    "teleport": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "server_context_only", "route_mode", "reserved_server_id_source", "maximum_players_per_call", "teleport_data_classification", "secure_data_in_teleport_payload", "destination_ticket_revalidation", "access_control_reviewed", "teleport_init_failed_handler", "retry_attempts", "retry_same_destination"],
+      "properties": {
+        "method": {"const": "TeleportAsync"},
+        "server_context_only": {"const": true},
+        "route_mode": {"const": "ReservedServerId"},
+        "reserved_server_id_source": {"const": "HttpService:GenerateGUID(false)"},
+        "maximum_players_per_call": {"type": "integer", "minimum": 1, "maximum": 50},
+        "teleport_data_classification": {"const": "opaque_ticket_reference_only"},
+        "secure_data_in_teleport_payload": {"const": false},
+        "destination_ticket_revalidation": {"const": true},
+        "access_control_reviewed": {"const": true},
+        "teleport_init_failed_handler": {"const": true},
+        "retry_attempts": {"type": "integer", "minimum": 1, "maximum": 5},
+        "retry_same_destination": {"const": true}
+      }
+    },
+    "recovery": {
+      "type": "object", "additionalProperties": false,
+      "required": ["ticket_idempotency_required", "queue_reentry_policy", "rejoin_grace_seconds", "orphan_ticket_cleanup_required", "reconcile_failed_members", "client_state_is_authoritative", "on_exhausted_retry", "retry_backoff_seconds"],
+      "properties": {
+        "ticket_idempotency_required": {"const": true},
+        "queue_reentry_policy": {"const": "preserve_party_ticket"},
+        "rejoin_grace_seconds": {"type": "integer", "minimum": 0, "maximum": 600},
+        "orphan_ticket_cleanup_required": {"const": true},
+        "reconcile_failed_members": {"const": true},
+        "client_state_is_authoritative": {"const": false},
+        "on_exhausted_retry": {"const": "return_to_lobby_requeue"},
+        "retry_backoff_seconds": {"type": "integer", "minimum": 1, "maximum": 30}
+      }
+    },
+    "simulation_tickets": {
+      "type": "array", "maxItems": 64,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["ticket_id", "party_size", "skill_rating", "wait_seconds", "order_index"],
+        "properties": {
+          "ticket_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
+          "party_size": {"type": "integer", "minimum": 1, "maximum": 50},
+          "skill_rating": {"type": "integer", "minimum": 0, "maximum": 5000},
+          "wait_seconds": {"type": "integer", "minimum": 0, "maximum": 86400},
+          "order_index": {"type": "integer", "minimum": 0, "maximum": 1000000}
+        }
+      }
+    }
+  }
+}
