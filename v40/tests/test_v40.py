@@ -119,6 +119,10 @@ class PersistenceContractTests(unittest.TestCase):
         data=copy.deepcopy(self.model); data["fields"][0]["default_value"]="100"
         self.assertInvalid(data,"does not match data_type")
 
+    def test_default_value_must_fit_declared_field_budget(self):
+        data=copy.deepcopy(self.model); data["fields"][2]["default_value"]={"payload":"x"*100}; data["fields"][2]["max_encoded_bytes"]=20
+        self.assertInvalid(data,"exceeds max_encoded_bytes")
+
     def test_boolean_is_not_an_integer_default(self):
         data=copy.deepcopy(self.model); data["fields"][0]["default_value"]=True
         self.assertInvalid(data,"does not match data_type integer")
