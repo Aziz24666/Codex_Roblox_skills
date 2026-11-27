@@ -45,6 +45,9 @@ RISKS = {"low","medium","high"}
 ACTION_STATUSES = {"proposed","approved","applied","rejected","reverted"}
 VERIFY = {"not_run","pass","fail"}
 
+def enum(value: Any, choices: set[str]) -> bool:
+    return isinstance(value, str) and value in choices
+
 def is_time(value: Any) -> bool:
     if not isinstance(value,str) or len(value)>40: return False
     try:
@@ -87,8 +90,8 @@ def validate_incident(data: Any) -> list[str]:
     for key in ("opened_at","detected_at"):
         if not is_time(data.get(key)): out.append(f"{key} must be ISO-8601 with timezone.")
     if all(is_time(data.get(k)) for k in ("opened_at","detected_at")) and dt(data["detected_at"])<dt(data["opened_at"]): out.append("detected_at cannot precede opened_at.")
-    if data.get("severity") not in SEVERITIES: out.append("severity is unsupported.")
-    if data.get("status") not in STATUSES: out.append("status is unsupported.")
+    if not enum(data.get("severity"), SEVERITIES): out.append("severity is unsupported.")
+    if not enum(data.get("status"), STATUSES): out.append("status is unsupported.")
     out += text_value(data.get("summary"),"summary",500,10)
 
     impact=data.get("impact")
@@ -98,14 +101,14 @@ def validate_incident(data: Any) -> list[str]:
         services=impact.get("services")
         if not isinstance(services,list) or not 1<=len(services)<=10 or any(x not in SERVICES for x in services if isinstance(x,str)) or any(not isinstance(x,str) for x in services): out.append("impact.services must contain 1-10 supported service categories.")
         elif len(set(services))!=len(services): out.append("impact.services contains duplicates.")
-        if impact.get("audience_scope") not in {"all_players","aggregate_subset","unknown"}: out.append("impact.audience_scope is unsupported.")
+        if not enum(impact.get("audience_scope"), {"all_players","aggregate_subset","unknown"}): out.append("impact.audience_scope is unsupported.")
         out += text_value(impact.get("impact_summary"),"impact.impact_summary",800,10)
         if impact.get("privacy_reviewed") is not True: out.append("impact.privacy_reviewed must be true.")
     detection=data.get("detection")
     if not isinstance(detection,dict): out.append("detection must be an object.")
     else:
         out += fields(detection,FIELDS["detection"],"detection")
-        if detection.get("source") not in {"aggregate_telemetry","aggregated_player_reports","developer_observation","platform_status","other"}: out.append("detection.source is unsupported.")
+        if not enum(detection.get("source"), {"aggregate_telemetry","aggregated_player_reports","developer_observation","platform_status","other"}): out.append("detection.source is unsupported.")
         out += refs(detection.get("signal_refs"),"signal","detection.signal_refs",1,20)
         if detection.get("privacy_safe") is not True: out.append("detection.privacy_safe must be true.")
 
@@ -117,12 +120,12 @@ def validate_incident(data: Any) -> list[str]:
             if not isinstance(item,dict): out.append(f"{label} must be an object."); continue
             out += fields(item,FIELDS["role"],label)
             role=item.get("role")
-            if role not in ROLES: out.append(f"{label}.role is unsupported.")
+            if not enum(role, ROLES): out.append(f"{label}.role is unsupported.")
             elif role in role_set: out.append(f"duplicate role assignment: {role}.")
             else: role_set.add(role)
             if not isinstance(item.get("acknowledged"),bool): out.append(f"{label}.acknowledged must be boolean.")
         if "incident_commander" not in role_set: out.append("roles must include an incident_commander.")
-        if data.get("severity") in {"critical","high"} and "technical_lead" not in role_set: out.append("critical/high incidents require a technical_lead.")
+        if enum(data.get("severity"), {"critical","high"}) and "technical_lead" not in role_set: out.append("critical/high incidents require a technical_lead.")
 
     timeline=data.get("timeline"); event_ids=set(); times=[]; types=[]
     if not isinstance(timeline,list) or not 1<=len(timeline)<=MAX_EVENTS: out.append(f"timeline must contain 1-{MAX_EVENTS} events.")
@@ -140,7 +143,7 @@ def validate_incident(data: Any) -> list[str]:
             else:
                 current=dt(moment); times.append(current)
                 if len(times)>1 and current<times[-2]: out.append("timeline events must be chronological.")
-            if item.get("event_type") not in EVENT_TYPES: out.append(f"{label}.event_type is unsupported.")
+            if not enum(item.get("event_type"), EVENT_TYPES): out.append(f"{label}.event_type is unsupported.")
             else: types.append(item["event_type"])
             out += text_value(item.get("summary"),f"{label}.summary",500,5)
             out += refs(item.get("evidence_refs"),"evidence",f"{label}.evidence_refs",0,10)
@@ -158,14 +161,14 @@ def validate_incident(data: Any) -> list[str]:
             if not isinstance(aid,str) or not re.fullmatch(r"act-[a-z0-9]{8,24}",aid): out.append(f"{label}.action_id is invalid.")
             elif aid in action_ids: out.append(f"duplicate action_id: {aid}.")
             else: action_ids.add(aid)
-            if item.get("category") not in CATEGORIES: out.append(f"{label}.category is unsupported.")
+            if not enum(item.get("category"), CATEGORIES): out.append(f"{label}.category is unsupported.")
             out += text_value(item.get("description"),f"{label}.description",500,5)
             risk=item.get("risk"); status=item.get("status")
-            if risk not in RISKS: out.append(f"{label}.risk is unsupported.")
-            if status not in ACTION_STATUSES: out.append(f"{label}.status is unsupported.")
+            if not enum(risk, RISKS): out.append(f"{label}.risk is unsupported.")
+            if not enum(status, ACTION_STATUSES): out.append(f"{label}.status is unsupported.")
             required=item.get("requires_approval")
             if not isinstance(required,bool): out.append(f"{label}.requires_approval must be boolean.")
-            elif (risk=="high" or item.get("category") in {"rollback","restore"}) and required is not True: out.append(f"{label} high-risk/recovery action requires human approval.")
+            elif (risk=="high" or enum(item.get("category"), {"rollback","restore"})) and required is not True: out.append(f"{label} high-risk/recovery action requires human approval.")
             approval=item.get("approval_ref"); approved_at=item.get("approved_at")
             if required is True and status in {"approved","applied","reverted"}:
                 if not isinstance(approval,str) or not REFS["approval"].fullmatch(approval): out.append(f"{label} requires a valid approval_ref.")
@@ -176,7 +179,7 @@ def validate_incident(data: Any) -> list[str]:
             if not is_time(created): out.append(f"{label}.created_at needs a timezone-aware timestamp.")
             elif is_time(approved_at) and dt(approved_at)<dt(created): out.append(f"{label}.approved_at cannot precede created_at.")
             verification=item.get("verification_status"); vref=item.get("verification_ref")
-            if verification not in VERIFY: out.append(f"{label}.verification_status is unsupported.")
+            if not enum(verification, VERIFY): out.append(f"{label}.verification_status is unsupported.")
             if status in {"applied","reverted"}:
                 if verification!="pass": out.append(f"{label} must pass verification before applied/reverted status.")
                 if not isinstance(vref,str) or not REFS["evidence"].fullmatch(vref): out.append(f"{label} needs a verification_ref.")
@@ -207,7 +210,7 @@ def validate_incident(data: Any) -> list[str]:
             if resolution.get("customer_impact_closed") is not True: out.append("resolved incidents must set customer_impact_closed=true.")
             if "resolved" not in types or (types and types[-1]!="resolved"): out.append("resolved incidents need a final resolved timeline event.")
             if is_time(r_at) and times and dt(r_at)<times[-1]: out.append("resolved_at cannot precede the final timeline event.")
-            if data.get("severity") in {"critical","high"}:
+            if enum(data.get("severity"), {"critical","high"}):
                 if not isinstance(pm,str) or not REFS["postmortem"].fullmatch(pm): out.append("critical/high incidents require a postmortem_ref.")
                 if not isinstance(follow,str) or not REFS["followup"].fullmatch(follow): out.append("critical/high incidents require follow_up_ref.")
             if comm_is_required(comm) and (not isinstance(comm,dict) or comm.get("player_notice_reviewed") is not True): out.append("required player notice must be reviewed before closure.")
