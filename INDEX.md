@@ -1,3 +1,3 @@
 # Current toolkit index
 
-The current cumulative release is **V40.0.0** with **264 native Codex skills**. See the [V40 feature index](https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/INDEX_V40.md) for player-profile lifecycle and session ownership, resilient persistence and recovery, safe schema migrations, and idempotent rewards/receipt processing. All V1–V39 capabilities remain included.
+The current cumulative release is **V41.0.0** with **268 native Codex skills**. See the [V41 feature index](https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/INDEX_V41.md) for skill-based matchmaking queues, party/lobby lifecycle, cross-server coordination, and teleport/reconnect recovery. All V1–V40 capabilities remain included.
