@@ -221,6 +221,10 @@ class PersistenceAuditTests(unittest.TestCase):
         report=v40.audit_model(model)
         self.assertTrue(any("No transaction definitions" in warning for warning in report["warnings"]))
 
+    def test_receipt_history_capacity_warning(self):
+        report=v40.audit_model(self.model)
+        self.assertTrue(any("receipt markers can accumulate" in warning for warning in report["warnings"]))
+
     def test_large_payload_budget_warns(self):
         model=copy.deepcopy(self.model); model["profile_store"]["profile_size_budget_bytes"]=4_000_000
         report=v40.audit_model(model)
