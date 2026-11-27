@@ -133,7 +133,10 @@ def topological_order(tasks: list[dict]) -> tuple[list[str], bool]:
     indegree = {task_id: 0 for task_id in by_id}
     outgoing = {task_id: [] for task_id in by_id}
     for task_id, task in by_id.items():
-        for dependency in task.get("depends_on", []):
+        dependencies = task.get("depends_on", [])
+        if not isinstance(dependencies, list):
+            dependencies = []
+        for dependency in dependencies:
             if isinstance(dependency, str) and dependency in by_id and dependency != task_id:
                 indegree[task_id] += 1
                 outgoing[dependency].append(task_id)
@@ -151,7 +154,8 @@ def topological_order(tasks: list[dict]) -> tuple[list[str], bool]:
 
 
 def dependency_reaches(start: str, target: str, by_id: dict[str, dict]) -> bool:
-    pending = list(by_id.get(start, {}).get("depends_on", []))
+    initial = by_id.get(start, {}).get("depends_on", [])
+    pending = list(initial) if isinstance(initial, list) else []
     visited = set()
     while pending:
         current = pending.pop()
@@ -161,7 +165,9 @@ def dependency_reaches(start: str, target: str, by_id: dict[str, dict]) -> bool:
             return True
         visited.add(current)
         if current in by_id:
-            pending.extend(by_id[current].get("depends_on", []))
+            next_dependencies = by_id[current].get("depends_on", [])
+            if isinstance(next_dependencies, list):
+                pending.extend(next_dependencies)
     return False
 
 
@@ -228,7 +234,7 @@ def validate_plan(data: Any) -> list[str]:
             value = task.get(field)
             if not isinstance(value, str) or not value.strip() or len(value) > limit:
                 issues.append(f"{label}.{field} must be a non-empty string of at most {limit} characters.")
-        if task.get("risk") not in RISK_LEVELS:
+        if not isinstance(task.get("risk"), str) or task.get("risk") not in RISK_LEVELS:
             issues.append(f"{label}.risk must be low, medium, or high.")
         if not isinstance(task.get("human_review_required"), bool):
             issues.append(f"{label}.human_review_required must be boolean.")
@@ -384,7 +390,7 @@ def validate_report(plan: dict, report: Any) -> list[str]:
             continue
         result_by_id[task_id] = result
         status = result.get("status")
-        if status not in TASK_STATUSES:
+        if not isinstance(status, str) or status not in TASK_STATUSES:
             issues.append(f"{label}.status is unsupported.")
         changed_files = result.get("changed_files")
         if not isinstance(changed_files, list) or len(changed_files) > 1000:
@@ -441,7 +447,7 @@ def validate_report(plan: dict, report: Any) -> list[str]:
                 continue
             seen_criteria.add(criterion_id)
             outcome = criterion_result.get("result")
-            if outcome not in CRITERION_RESULTS:
+            if not isinstance(outcome, str) or outcome not in CRITERION_RESULTS:
                 issues.append(f"{criterion_label}.result must be pass, fail, or not_run.")
             elif outcome == "pass" and planned_criteria[criterion_id].get("verification_kind") in {"studio_manual", "runtime_manual"} and not evidence:
                 issues.append(f"{criterion_label} needs an evidence_ref because its verification is manual.")
