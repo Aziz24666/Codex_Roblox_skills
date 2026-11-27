@@ -314,6 +314,8 @@ class SuiteValidationTests(Fixture):
             capture = valid_capture(f"perf-run-base{index:08d}", "build-before")
             if index == 1:
                 capture["player_count"] = 3
+                for sample in capture["samples"]:
+                    sample["connected_clients"] = 3
             self.put_json(path, capture)
         for index, path in enumerate(manifest["candidate_captures"]):
             self.put_json(path, valid_capture(f"perf-run-cand{index:08d}", "build-after"))
@@ -392,6 +394,9 @@ class RepeatedComparisonTests(Fixture):
         manifest = valid_manifest()
         baseline = self.captures("build-before", "base", 0)
         candidate = self.captures("build-after", "cand", 20)
+        for run in baseline:
+            for sample in run["samples"]:
+                sample["metrics"]["server_memory_mb"] = 0
         report = v34.compare_repeated(manifest, baseline, candidate)
         memory = next(item for item in report["metrics"] if item["metric"] == "server_memory_mb")
         self.assertIsNone(memory["delta_pct"])
