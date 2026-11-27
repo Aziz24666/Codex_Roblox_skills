@@ -142,7 +142,7 @@ class PlanValidationTests(V37Fixture):
 
     def test_task_path_overlapping_excluded_scope_is_rejected(self) -> None:
         data = plan(task("feature-a", ["src/legacy"]))
-        self.assertTrue(any("overlaps excluded_paths" in item for item in v37.validate_plan(data)))
+        self.assertTrue(any("is inside excluded_paths" in item for item in v37.validate_plan(data)))
 
     def test_included_path_inside_excluded_scope_is_rejected(self) -> None:
         data = plan()
