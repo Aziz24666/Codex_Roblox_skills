@@ -3,7 +3,7 @@
   "model_id": "player-profile-v1",
   "profile_store": {
     "store_name": "PlayerProfiles",
-    "scope": "production",
+    "scope": "test",
     "schema_version": 3,
     "minimum_supported_version": 1,
     "key_strategy": "user_id_key",
@@ -11,7 +11,7 @@
   },
   "session": {
     "locking_enabled": true,
-    "lock_method": "UpdateAsync_lease",
+    "lock_method": "SessionLockedDataStoreWrapper",
     "lease_seconds": 180,
     "refresh_interval_seconds": 45,
     "wait_on_conflict": true,
