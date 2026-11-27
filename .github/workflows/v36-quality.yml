@@ -53,6 +53,7 @@ jobs:
           python v36/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v36"
           python -m py_compile "$PACKAGE_ROOT/v36/tools/v36.py" "$PACKAGE_ROOT/v36/tools/patch_cumulative_package.py" "$PACKAGE_ROOT/v36/tools/audit_cumulative_package.py"
           python -m unittest discover -s "$PACKAGE_ROOT/v36/tests" -v
+          for version in 26 27 28 29 30 31 32 33 34 35; do python -m unittest discover -s "$PACKAGE_ROOT/v$version/tests" -v; done
           python "$PACKAGE_ROOT/v36/tools/v36.py" doctor --root "$PACKAGE_ROOT"
           python "$PACKAGE_ROOT/v36/tools/v36.py" validate-manifest --root "$PACKAGE_ROOT" --manifest v36/examples/quality-manifest.example.json
           python "$PACKAGE_ROOT/v36/tools/v36.py" audit --root "$PACKAGE_ROOT" --manifest v36/examples/quality-manifest.example.json --output v36/test-output/quality-audit.example.json
