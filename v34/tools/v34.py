@@ -66,7 +66,7 @@ def resolve_root(raw: str) -> Path:
 def safe_project_path(root: Path, raw: str, *, must_exist: bool = False) -> Path:
     if not isinstance(raw, str) or not raw.strip() or "\x00" in raw:
         raise ValueError("Project-relative path must be a non-empty string.")
-    if "\\" in raw or raw.startswith("/") or len(raw) > 240:
+    if "\\" in raw or raw.startswith("/") or len(raw) > 240 or (len(raw) >= 3 and raw[1:3] == ":/"):
         raise ValueError("Path must be project-relative, bounded, and use forward slashes.")
     parts = raw.split("/")
     if any(part in {"", ".", ".."} for part in parts):
