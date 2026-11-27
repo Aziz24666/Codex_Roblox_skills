@@ -265,8 +265,8 @@ def validate_plan(data: Any) -> list[str]:
                     safe_paths.append(path)
                     if included and not path_is_included(path, included):
                         issues.append(f"{label}.allowed_paths entry {path} is outside included_paths.")
-                    if path_is_excluded(path, excluded):
-                        issues.append(f"{label}.allowed_paths entry {path} overlaps excluded_paths.")
+                    if any(within(path, excluded_path) for excluded_path in excluded):
+                        issues.append(f"{label}.allowed_paths entry {path} is inside excluded_paths.")
             allowed_paths = safe_paths
 
         criteria = task.get("acceptance_criteria")
@@ -302,7 +302,10 @@ def validate_plan(data: Any) -> list[str]:
             issues.append(f"{label} has Studio/runtime criteria and must require human review.")
 
     for task in by_id.values():
-        for dependency in task.get("depends_on", []):
+        dependencies = task.get("depends_on", [])
+        if not isinstance(dependencies, list):
+            continue
+        for dependency in dependencies:
             if isinstance(dependency, str) and dependency not in by_id:
                 issues.append(f"Task {task.get('task_id')} references missing dependency {dependency}.")
 
