@@ -8,7 +8,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: v39-quality-\${{ github.ref }}
+  group: v39-quality-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -26,12 +26,10 @@ jobs:
         with:
           python-version: '3.13'
       - name: Download the published V38 cumulative baseline
-        env:
-          GH_TOKEN: \${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
-          gh release download v38.0.0 --repo "$GITHUB_REPOSITORY" --pattern 'roblox-codex-game-studio-kit-v38.zip' --dir "$RUNNER_TEMP"
+          curl --fail --location --silent --show-error "https://github.com/Aziz24666/Codex_Roblox_skills/releases/download/v38.0.0/roblox-codex-game-studio-kit-v38.zip" --output "$RUNNER_TEMP/roblox-codex-game-studio-kit-v38.zip"
           unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v38.zip"
           mkdir -p "$RUNNER_TEMP/v38-extract"
           unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v38.zip" -d "$RUNNER_TEMP/v38-extract"
@@ -88,9 +86,9 @@ jobs:
         with:
           name: roblox-codex-game-studio-kit-v39
           path: |
-            \${{ runner.temp }}/roblox-codex-game-studio-kit-v39.zip
-            \${{ runner.temp }}/roblox-codex-game-studio-kit-v39.tar.xz
-            \${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v39.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v39.tar.xz
+            ${{ runner.temp }}/SHA256SUMS-RELEASE.txt
           if-no-files-found: error
           retention-days: 14
 
@@ -109,16 +107,16 @@ jobs:
       - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
         with:
           name: roblox-codex-game-studio-kit-v39
-          path: \${{ runner.temp }}/v39-release-assets
+          path: ${{ runner.temp }}/v39-release-assets
       - name: Publish versioned release
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -euo pipefail
           tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v39:(v39[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
           [[ "$tag" =~ ^v39[.][0-9]+[.][0-9]+$ ]]
-          test "$(tr -d '\r\n' < v39/VERSION)" = "\${tag#v}"
+          test "$(tr -d '\r\n' < v39/VERSION)" = "${tag#v}"
           if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
           gh release create "$tag" \
             "$RUNNER_TEMP/v39-release-assets/roblox-codex-game-studio-kit-v39.zip" \
