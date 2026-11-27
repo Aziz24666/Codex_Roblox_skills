@@ -311,6 +311,8 @@ def audit_model(data: dict) -> dict:
         warnings.append("Autosave interval is close to the session lease window; verify lease renewal and save scheduling independently.")
     if not transactions:
         warnings.append("No transaction definitions are declared; add them for any reward, exchange, or developer-product flow.")
+    if any(item["transaction_kind"] == "developer_product_receipt" for item in transactions):
+        warnings.append("Developer-product receipt markers can accumulate over time; never evict IDs that may still be redelivered, and review a durable capacity/reconciliation plan before the profile approaches its size budget.")
     if profile["minimum_supported_version"] == profile["schema_version"] and profile["schema_version"] == 1:
         warnings.append("No migration fixtures are declared because the profile schema has one supported version; add migration tests before the first schema change.")
     return {
