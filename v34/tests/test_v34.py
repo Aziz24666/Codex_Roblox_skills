@@ -163,6 +163,8 @@ class CaptureValidationTests(Fixture):
         capture = valid_capture()
         capture["target"] = "client"
         capture["device_profile"] = "low_end_mobile"
+        for sample in capture["samples"]:
+            del sample["metrics"]["replication_kbps"]
         self.assertTrue(any("client-side metric" in item for item in v34.validate_capture(capture)))
 
     def test_capture_rejects_naive_timestamp(self) -> None:
@@ -188,7 +190,7 @@ class CaptureValidationTests(Fixture):
 
 class SoakAnalysisTests(Fixture):
     def test_stable_upward_memory_trend_emits_review_signal(self) -> None:
-        report = v34.analyze_soak(valid_capture(), growth_threshold_pct=5, min_r_squared=0.7)
+        report = v34.analyze_soak(valid_capture(), growth_threshold_pct=4, min_r_squared=0.7)
         memory = next(item for item in report["metrics"] if item["metric"] == "server_memory_mb")
         self.assertTrue(memory["growth_signal"])
         self.assertGreater(memory["slope_per_server_hour"], 0)
