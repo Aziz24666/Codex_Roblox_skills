@@ -11,7 +11,7 @@ V34.0.0 is the complete cumulative V1-V34 package with **240 native Codex skills
   - analyze-soak: calculate memory/instance growth trends and identify workload instability.
   - validate-suite: validate a repeatable benchmark manifest and every referenced capture.
   - compare-repeated: compare at least three baseline and three candidate runs under matched conditions.
-- Two JSON schemas, two examples, three guides, 34+ regression tests, cumulative package patcher/auditor, and the V1-V34 quality workflow.
+- Two JSON schemas, two examples, three guides, 48 regression tests, cumulative package patcher/auditor, and the V1-V34 quality workflow.
 
 ## Quick start
 
