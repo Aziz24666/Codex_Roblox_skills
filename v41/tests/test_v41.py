@@ -200,14 +200,10 @@ class InputSafetyTests(unittest.TestCase):
         with self.assertRaises(ValueError): v41.reject_constant("NaN")
 
     def test_symlink_path_rejected(self):
-        with tempfile.TemporaryDirectory() as temp:
-            root = Path(temp); outside = root.parent / "v41-symlink-test"
-            outside.mkdir(exist_ok=True)
-            try:
-                (root / "linked").symlink_to(outside, target_is_directory=True)
-                with self.assertRaises(ValueError): v41.safe_path(root, "linked/model.json")
-            finally:
-                shutil.rmtree(outside, ignore_errors=True)
+        with tempfile.TemporaryDirectory() as temp, tempfile.TemporaryDirectory() as outside_temp:
+            root = Path(temp); outside = Path(outside_temp)
+            (root / "linked").symlink_to(outside, target_is_directory=True)
+            with self.assertRaises(ValueError): v41.safe_path(root, "linked/model.json")
 
     def test_input_size_limit(self):
         with tempfile.TemporaryDirectory() as temp:
