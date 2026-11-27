@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "plan_id": "impl-plan-a13b9c7d2e4f",
+  "generated_at": "2026-11-27T13:00:00Z",
+  "task_results": [
+    {
+      "task_id": "server-contract",
+      "status": "completed",
+      "changed_files": [
+        "src/server/FeatureService.lua"
+      ],
+      "evidence_refs": [],
+      "criteria_results": [
+        {
+          "criterion_id": "server-authority",
+          "result": "pass"
+        },
+        {
+          "criterion_id": "server-tests",
+          "result": "pass"
+        }
+      ]
+    },
+    {
+      "task_id": "client-ui",
+      "status": "completed",
+      "changed_files": [
+        "src/client/FeaturePanel.client.lua"
+      ],
+      "evidence_refs": [
+        "ev-111122223333"
+      ],
+      "criteria_results": [
+        {
+          "criterion_id": "ui-contract",
+          "result": "pass"
+        },
+        {
+          "criterion_id": "studio-smoke",
+          "result": "pass"
+        }
+      ]
+    },
+    {
+      "task_id": "regression-checks",
+      "status": "completed",
+      "changed_files": [
+        "tests/FeatureService.spec.lua"
+      ],
+      "evidence_refs": [],
+      "criteria_results": [
+        {
+          "criterion_id": "regression-suite",
+          "result": "pass"
+        }
+      ]
+    }
+  ]
+}
