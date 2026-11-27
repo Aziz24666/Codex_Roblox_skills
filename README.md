@@ -1,17 +1,18 @@
 # Roblox Codex Game Studio Kit
 
-[![V36 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v36-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v36-quality.yml)
+[![V37 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v37-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v37-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V36.0.0 — Accessibility, Responsive UI, and Localization Readiness.** The complete cumulative V1-V36 toolkit contains **248 native Codex skills**. Only the current release is required.
+**Current release: V37.0.0 — Project-Aware Implementation Orchestration.** The complete cumulative V1-V37 toolkit contains **252 native Codex skills**. Only the current release is required.
 
-[Open the V36 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v36.0.0).
+[Open the V37 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v37.0.0).
 
 ## What's included
 
-Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills.
+Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills.
 
-- **248 native Codex skills** for Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio tools, testing, performance, release engineering, analytics, LiveOps, safety, moderation, sustainable monetization, asset production, accessibility, and localization.
+- **252 native Codex skills** covering Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio tools, testing, performance, release engineering, analytics, LiveOps, safety, moderation, sustainable monetization, asset production, accessibility, localization, and feature implementation workflows.
+- **V37** adds project reconnaissance and architecture mapping, feature decomposition/dependency planning, scoped implementation/change-impact review, implementation evidence and handoff, plus an offline plan/report validator.
 - **V36** adds accessibility and inclusive interaction reviews, responsive UI/readability, localization/RTL readiness, sensory alternatives and reduced-motion guidance, plus an offline quality manifest validator/auditor.
 - **V35** adds an asset catalog, provenance/review tracking, dependency-graph validation, per-device content budgets, and catalog migration comparison.
 - **V34** adds long-session performance soak analysis, profiler evidence triage, repeated benchmark comparisons, and rollout monitoring.
@@ -29,27 +30,33 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
 ## Start a Roblox development session
 
-1. Download and extract the V36 release, then open the extracted package root in Codex.
-2. Read AGENTS.md and INDEX_V36.md.
+1. Download and extract the V37 release, then open the extracted package root in Codex.
+2. Read AGENTS.md and INDEX_V37.md.
 3. Initialize session continuity in the actual game project folder:
 
-       python C:\Path\To\roblox-codex-game-studio-kit-v36\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
+       python C:\Path\To\roblox-codex-game-studio-kit-v37\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
 
-4. Run V36 quality checks:
+4. Start each substantial feature with read-only reconnaissance. Then create a project-specific copy of `v37/examples/implementation-plan.example.json` and replace its sample data.
+5. Validate and audit the feature plan:
 
-       python .\v36\tools\v36.py doctor --root C:\Path\To\YourGame
-       python .\v36\tools\v36.py validate-manifest --root C:\Path\To\YourGame --manifest .codex\quality\manifest.json
-       python .\v36\tools\v36.py audit --root C:\Path\To\YourGame --manifest .codex\quality\manifest.json --output .codex\reports\v36-quality-audit.json
+       python .\v37\tools\v37.py doctor --root C:\Path\To\YourGame
+       python .\v37\tools\v37.py validate-plan --root C:\Path\To\YourGame --plan .codex\plans\feature-plan.json
+       python .\v37\tools\v37.py audit-plan --root C:\Path\To\YourGame --plan .codex\plans\feature-plan.json --output .codex\reports\feature-plan-audit.json
 
-Copy the example manifest from v36/examples/ and replace its illustrative values with reviewed project data before use.
+6. After implementation, create a report using `v37/examples/implementation-report.example.json` as a template, record actual changed files and evidence references, then validate it:
 
-V25 commands: start, checkpoint, handoff, resume, status, verify, recover. V26: doctor, plan, verify-plan. V27: doctor, audit, typecheck, rojo-check. V28: doctor, audit, validate-migration. V29: doctor, audit, budget, compare, report. V30: doctor, plan, validate, audit. V31: doctor, validate-catalog, audit-catalog, evaluate-health. V32: doctor, audit, validate-policy, validate-case, validate-register. V33: doctor, audit, validate-plan, validate-report, compare. V34: doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35: doctor, validate-catalog, audit-catalog, compare-catalogs. V36: doctor, validate-manifest, audit.
+       python .\v37\tools\v37.py validate-report --root C:\Path\To\YourGame --plan .codex\plans\feature-plan.json --report .codex\reports\implementation-report.json
+       python .\v37\tools\v37.py audit-report --root C:\Path\To\YourGame --plan .codex\plans\feature-plan.json --report .codex\reports\implementation-report.json --output .codex\reports\implementation-handoff.json
 
-## V36 quality review boundaries
+V25 commands: start, checkpoint, handoff, resume, status, verify, recover. V26: doctor, plan, verify-plan. V27: doctor, audit, typecheck, rojo-check. V28: doctor, audit, validate-migration. V29: doctor, audit, budget, compare, report. V30: doctor, plan, validate, audit. V31: doctor, validate-catalog, audit-catalog, evaluate-health. V32: doctor, audit, validate-policy, validate-case, validate-register. V33: doctor, audit, validate-plan, validate-report, compare. V34: doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35: doctor, validate-catalog, audit-catalog, compare-catalogs. V36: doctor, validate-manifest, audit. V37: doctor, validate-plan, audit-plan, validate-report, audit-report.
 
-The V36 CLI validates supplied metadata only. It does not inspect Roblox Studio UI instances, analyze screenshots, execute Luau, test real devices, or certify accessibility. Contrast, navigation, captions, reduced-motion behavior, text scaling, localization, and RTL behavior require human review and actual target-device testing. The manifest uses opaque evidence references and must not contain player health information, personal data, credentials, private URLs, or free-form player profiles.
+## V37 implementation workflow boundaries
+
+V37 validates supplied plan/report metadata, dependency graphs, file-scope declarations, recorded changed paths, acceptance-criterion IDs, and opaque evidence references. It does not inspect the source tree, compute actual version-control diffs, execute code, run Luau, invoke Roblox Studio, contact Roblox services, or authenticate evidence references. Compare reported paths with the actual Git diff during review. A CI pass does not prove Studio, device, runtime, or multiplayer behavior.
 
 ## Earlier verification boundaries and safeguards
+
+V36 quality checks validate supplied metadata only. They do not inspect Roblox Studio UI instances, analyze screenshots, execute Luau, test real devices, or certify accessibility. Contrast, navigation, captions, reduced-motion behavior, text scaling, localization, and RTL behavior require human review and actual target-device testing.
 
 V35 catalog commands validate supplied metadata and project-local source paths only. They do not inspect binary asset content, query Roblox, access Creator Store/private inventories, upload/publish/delete/transfer assets, or determine copyright, license scope, or moderation approval. Rights and moderation states must be verified and maintained by authorized humans. Device budgets are project-specific and must be calibrated with actual Studio/device testing.
 
@@ -63,14 +70,17 @@ Keep analytics aggregate and purpose-bound; do not build individual-spender prof
 
 ## Documentation
 
+- V37 feature index: INDEX_V37.md
+- Project reconnaissance and change impact: v37/docs/PROJECT_RECONNAISSANCE_AND_CHANGE_IMPACT.md
+- Feature planning and dependency graphs: v37/docs/FEATURE_PLANNING_AND_DEPENDENCY_GRAPHS.md
+- Implementation evidence and handoff: v37/docs/IMPLEMENTATION_EVIDENCE_AND_HANDOFF.md
+- Plan and report CLI: v37/docs/PLAN_AND_REPORT_CLI.md
 - V36 feature index: INDEX_V36.md
 - Accessibility and interaction review: v36/docs/ACCESSIBILITY_AND_INTERACTION_REVIEW.md
 - Localization and responsive UI: v36/docs/LOCALIZATION_AND_RESPONSIVE_UI.md
 - Quality manifest and audit: v36/docs/QUALITY_MANIFEST_AND_AUDIT.md
 - V35 feature index: INDEX_V35.md
 - Asset catalog and provenance: v35/docs/ASSET_CATALOG_AND_PROVENANCE.md
-- Content budgets and dependencies: v35/docs/CONTENT_BUDGETS_AND_DEPENDENCIES.md
-- Asset release and migration: v35/docs/ASSET_RELEASE_AND_MIGRATION.md
 - V34 performance soak testing: INDEX_V34.md
 - V33 automated testing and regression: INDEX_V33.md
 - MIT License
