@@ -45,3 +45,8 @@ When relevant, evaluate Roblox's `Player.PartyId` and `SocialService:GetPlayersB
 - Cancel racing with match assignment.
 - Member reconnect during lobby grace period and after expiry.
 - Destination rejects stale party membership version.
+
+## Official Roblox references
+
+- [SocialService API reference](https://create.roblox.com/docs/reference/engine/classes/SocialService).
+- [Player API reference](https://create.roblox.com/docs/reference/engine/classes/Player) — review the current party-related properties and events before integrating platform party metadata.
