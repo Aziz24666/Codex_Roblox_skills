@@ -13,7 +13,7 @@
 The V40 CLI checks the declared migration chain from the minimum supported schema version to the current version. It cannot evaluate migration code or prove the backup exists.
 
 ## Developer-product receipts
-Roblox can deliver unresolved developer-product receipts again, and a specific receipt callback can run on two servers at the same time. Use PurchaseId as the idempotency key. The receipt decision must reflect durable completion.
+Roblox can deliver unresolved developer-product receipts again, and a specific receipt callback can run on two servers at the same time. The current Roblox player-data sample demonstrates checking PurchaseId, applying the reward and marker to the in-memory profile, saving that profile, and acknowledging only after the save succeeds. Its approach depends on session locking to prevent two servers from acting concurrently on stale profile data; review and test the sample rather than assuming it is production-certified. Use PurchaseId as the idempotency key. The receipt decision must reflect durable completion.
 
 Preferred transaction boundary: perform the reward grant and its deduplication marker in the same UpdateAsync update to the same profile key. The transform checks whether PurchaseId is already recorded; if it is, it does not grant again. Otherwise it applies the reward and stores the marker in the same resulting profile value. Acknowledge only after that write is confirmed durable. If the write outcome is uncertain, reload and reconcile by PurchaseId rather than applying the grant blindly.
 
