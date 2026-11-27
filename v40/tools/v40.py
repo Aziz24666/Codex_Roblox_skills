@@ -234,7 +234,7 @@ def validate_model(data: Any) -> list[str]:
         for name in ("idempotent", "backup_required", "dry_run_required", "preserve_unknown_fields"):
             if item.get(name) is not True:
                 errors.append(f"{label}.{name} must be true.")
-        if item.get("rollback_strategy") not in ROLLBACK_STRATEGIES:
+        if not isinstance(item.get("rollback_strategy"), str) or item.get("rollback_strategy") not in ROLLBACK_STRATEGIES:
             errors.append(f"{label}.rollback_strategy must be one of {', '.join(sorted(ROLLBACK_STRATEGIES))}.")
         case_ids = item.get("test_case_ids")
         if not isinstance(case_ids, list) or not 1 <= len(case_ids) <= 20 or not all(is_slug(x) for x in case_ids):
