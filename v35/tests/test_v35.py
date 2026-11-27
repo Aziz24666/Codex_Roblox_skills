@@ -100,7 +100,7 @@ class CatalogComparisonTests(Fixture):
     def test_removed(self): self.assertEqual(v35.compare_catalogs(catalog(asset(),asset("asset-old")),catalog(asset()))["removed"],["asset-old"])
     def test_changed_fields(self): self.assertIn("version",v35.compare_catalogs(catalog(asset()),catalog(asset(version="2.0.0")))["changed"][0]["changed_fields"])
     def test_rights_regression(self): self.assertIn("rights_status_regressed",[x["code"] for x in v35.compare_catalogs(catalog(),catalog(asset(rights_status="unknown")))["regressions"]])
-    def test_moderation_regression(self): self.assertIn("moderation_status_regressed",[x["code"] for x in v35.compare_catalogs(catalog(),catalog(asset(moderation_status="pending")))["regressions"]])
+    def test_moderation_regression(self): self.assertIn("moderation_status_regressed",[x["code"] for x in v35.compare_catalogs(catalog(asset(moderation_status="approved")),catalog(asset(moderation_status="pending")))["regressions"]])
     def test_removed_dependency_still_referenced(self):
         old=catalog(asset(),asset("asset-old")); new=catalog(asset(dependencies=["asset-old"]))
         self.assertIn("removed_asset_still_referenced",[x["code"] for x in v35.compare_catalogs(old,new)["regressions"]])
@@ -156,14 +156,21 @@ class PatcherTests(Fixture):
 
 class PackageAuditTests(Fixture):
     def test_complete_package_passes(self):
+        skill_paths=[relative for relative in audit_cumulative_package.REQUIRED_FILES if relative.startswith(".agents/skills/")]
         for relative in audit_cumulative_package.REQUIRED_FILES:
+            if relative.startswith(".agents/skills/"):
+                continue
             path=self.root/relative; path.parent.mkdir(parents=True,exist_ok=True)
             path.write_text("35.0.0" if relative=="v35/VERSION" else "placeholder")
         (self.root/"AGENTS.md").write_text("<!-- V35_ASSET_PIPELINE_GOVERNANCE -->")
         (self.root/"README.md").write_text("V35 244 native Codex skills")
-        for i in range(244):
+        for i in range(240):
             path=self.root/".agents/skills"/f"skill-{i}"/"SKILL.md"; path.parent.mkdir(parents=True,exist_ok=True)
             path.write_text(f"---\nname: skill-{i}\ndescription: test\n---\n")
+        for relative in skill_paths:
+            path=self.root/relative; path.parent.mkdir(parents=True,exist_ok=True)
+            skill_name=path.parent.name
+            path.write_text(f"---\nname: {skill_name}\ndescription: test\n---\n")
         self.assertEqual(audit_cumulative_package.audit(self.root),[])
 
 if __name__=="__main__": unittest.main()
