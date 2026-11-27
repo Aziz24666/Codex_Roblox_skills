@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "suite_id": "perf-suite-a13b9c7d2e4f",
+  "scenario": "steady_gameplay",
+  "target": "server",
+  "device_profile": "server",
+  "measurement_source": "developer_console",
+  "network_profile": "baseline",
+  "player_count": 4,
+  "duration_minutes": 60,
+  "sample_interval_seconds": 600,
+  "baseline_build": "build-before-change",
+  "candidate_build": "build-after-change",
+  "threshold_pct": 5.0,
+  "baseline_captures": [
+    ".codex/perf/baseline-run-1.json",
+    ".codex/perf/baseline-run-2.json",
+    ".codex/perf/baseline-run-3.json"
+  ],
+  "candidate_captures": [
+    ".codex/perf/candidate-run-1.json",
+    ".codex/perf/candidate-run-2.json",
+    ".codex/perf/candidate-run-3.json"
+  ]
+}

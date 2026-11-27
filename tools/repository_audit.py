@@ -18,6 +18,7 @@ EXPECTED_SKILLS_V30 = 224
 EXPECTED_SKILLS_V31 = 228
 EXPECTED_SKILLS_V32 = 232
 EXPECTED_SKILLS_V33 = 236
+EXPECTED_SKILLS_V34 = 240
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -106,6 +107,10 @@ def audit(root: Path) -> list[str]:
                     # Earlier cumulative overlays may carry the current README/INDEX
                     # before the V29 overlay is installed. Defer only V29-local links
                     # until its VERSION marker exists; the final V29 audit checks them.
+                    if not (root / "v34" / "VERSION").is_file() and (
+                        target_path == "INDEX_V34.md" or target_path.startswith("v34/")
+                    ):
+                        continue
                     if not (root / "v33" / "VERSION").is_file() and (
                         target_path == "INDEX_V33.md" or target_path.startswith("v33/")
                     ):
@@ -140,9 +145,12 @@ def audit(root: Path) -> list[str]:
     is_v31 = (root / "v31" / "VERSION").is_file()
     is_v32 = (root / "v32" / "VERSION").is_file()
     is_v33 = (root / "v33" / "VERSION").is_file()
+    is_v34 = (root / "v34" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    if is_v33:
+    if is_v34:
+        expected_skills = EXPECTED_SKILLS_V34
+    elif is_v33:
         expected_skills = EXPECTED_SKILLS_V33
     elif is_v32:
         expected_skills = EXPECTED_SKILLS_V32
@@ -256,6 +264,16 @@ def audit(root: Path) -> list[str]:
             "v33/schemas/test-plan.schema.json", "v33/schemas/test-report.schema.json",
             "v33/examples/test-plan.example.json", "v33/examples/test-report.example.json",
             "v33/examples/test-report.local-static.example.json",
+        )
+    if is_v34:
+        required += (
+            "INDEX_V34.md", "v34/VERSION", "v34/INDEX_V34.md", "v34/tools/v34.py",
+            "v34/tools/patch_cumulative_package.py", "v34/tools/audit_cumulative_package.py",
+            "v34/tests/test_v34.py", "v34/docs/PERFORMANCE_SOAK_TESTING.md",
+            "v34/docs/MICROPROFILER_AND_DASHBOARD_EVIDENCE.md",
+            "v34/docs/REPEATED_BENCHMARKS_AND_ROLLOUT.md",
+            "v34/schemas/soak-capture.schema.json", "v34/schemas/repeat-suite.schema.json",
+            "v34/examples/soak-capture.example.json", "v34/examples/repeat-suite.example.json",
         )
     for item in required:
         if not (root / item).is_file():

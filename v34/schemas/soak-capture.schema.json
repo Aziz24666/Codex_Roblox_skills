@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V34 Roblox Performance Soak Capture",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "build_id", "scenario", "target", "device_profile", "measurement_source", "network_profile", "player_count", "started_at", "warmup_minutes", "duration_minutes", "sample_interval_seconds", "evidence_ref", "samples"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "run_id": {"type": "string", "pattern": "^perf-run-[a-z0-9]{8,24}$"},
+    "build_id": {"type": "string", "minLength": 1, "maxLength": 120, "pattern": "^[A-Za-z0-9._:+/-]+$"},
+    "scenario": {"enum": ["idle_server_soak", "steady_gameplay", "high_activity", "join_leave_churn", "asset_streaming", "spawn_respawn", "round_transition"]},
+    "target": {"enum": ["server", "client"]},
+    "device_profile": {"enum": ["server", "low_end_mobile", "high_end_mobile", "desktop"]},
+    "measurement_source": {"enum": ["microprofiler", "script_profiler", "developer_console", "performance_dashboard", "custom_harness"]},
+    "network_profile": {"enum": ["baseline", "high_latency", "jitter", "packet_loss"]},
+    "player_count": {"type": "integer", "minimum": 1, "maximum": 100},
+    "started_at": {"type": "string", "format": "date-time"},
+    "warmup_minutes": {"type": "integer", "minimum": 0, "maximum": 60},
+    "duration_minutes": {"type": "integer", "minimum": 30, "maximum": 1440},
+    "sample_interval_seconds": {"type": "integer", "minimum": 30, "maximum": 3600},
+    "evidence_ref": {"type": "string", "pattern": "^ev-[a-z0-9]{12}$"},
+    "samples": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 250,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["elapsed_seconds", "server_age_minutes", "connected_clients", "metrics"],
+        "properties": {
+          "elapsed_seconds": {"type": "number", "minimum": 0},
+          "server_age_minutes": {"type": "number", "minimum": 0},
+          "connected_clients": {"type": "integer", "minimum": 0, "maximum": 100},
+          "metrics": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+              "server_memory_mb": {"type": "number", "minimum": 0},
+              "lua_heap_mb": {"type": "number", "minimum": 0},
+              "instance_count": {"type": "integer", "minimum": 0},
+              "script_cpu_ms_per_frame": {"type": "number", "minimum": 0},
+              "server_cpu_ms_per_frame": {"type": "number", "minimum": 0},
+              "server_heartbeat_fps": {"type": "number", "exclusiveMinimum": 0},
+              "client_frame_time_ms_p95": {"type": "number", "exclusiveMinimum": 0},
+              "client_memory_mb": {"type": "number", "minimum": 0},
+              "join_time_s": {"type": "number", "exclusiveMinimum": 0},
+              "replication_kbps": {"type": "number", "minimum": 0}
+            }
+          }
+        }
+      }
+    }
+  }
+}
