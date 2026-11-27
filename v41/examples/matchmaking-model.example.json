@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "model_id": "ranked-party-matchmaking",
+  "queue": {
+    "provider": "MemoryStoreQueue",
+    "queue_name": "RankedQueueV1",
+    "ordering": "FIFO",
+    "item_ttl_seconds": 180,
+    "invisibility_timeout_seconds": 30,
+    "read_batch_size": 50,
+    "remove_after_assignment": true,
+    "duplicate_ticket_key": "ticket_id",
+    "network_calls_protected": true,
+    "stores_durable_player_data": false
+  },
+  "matching": {
+    "minimum_players": 4,
+    "preferred_players": 8,
+    "maximum_players": 10,
+    "initial_skill_window": 50,
+    "skill_window_step": 25,
+    "maximum_skill_window": 150,
+    "window_expansion_interval_seconds": 30,
+    "maximum_wait_seconds": 120,
+    "party_atomicity": "all_or_none"
+  },
+  "party": {
+    "minimum_size": 1,
+    "maximum_size": 5,
+    "leader_policy": "server_authoritative",
+    "leadership_transfer_policy": "eligible_member_order",
+    "invite_ttl_seconds": 120,
+    "invites_server_validated": true,
+    "membership_server_validated": true,
+    "party_ticket_atomic": true
+  },
+  "coordination": {
+    "shared_state_store": "MemoryStoreHashMap",
+    "active_record_ttl_seconds": 600,
+    "lease_seconds": 90,
+    "lease_refresh_seconds": 30,
+    "fencing_token_required": true,
+    "versioned_state_required": true,
+    "server_id_required": true,
+    "messaging_service_role": "best_effort_notifications",
+    "messaging_delivery_assumed": "best_effort",
+    "messaging_as_authority": false
+  },
+  "teleport": {
+    "method": "TeleportAsync",
+    "server_context_only": true,
+    "route_mode": "ReservedServerId",
+    "reserved_server_id_source": "HttpService:GenerateGUID(false)",
+    "maximum_players_per_call": 10,
+    "teleport_data_classification": "opaque_ticket_reference_only",
+    "secure_data_in_teleport_payload": false,
+    "destination_ticket_revalidation": true,
+    "access_control_reviewed": true,
+    "teleport_init_failed_handler": true,
+    "retry_attempts": 3,
+    "retry_same_destination": true
+  },
+  "recovery": {
+    "ticket_idempotency_required": true,
+    "queue_reentry_policy": "preserve_party_ticket",
+    "rejoin_grace_seconds": 90,
+    "orphan_ticket_cleanup_required": true,
+    "reconcile_failed_members": true,
+    "client_state_is_authoritative": false,
+    "on_exhausted_retry": "return_to_lobby_requeue",
+    "retry_backoff_seconds": 3
+  },
+  "simulation_tickets": [
+    {"ticket_id": "party_alpha", "party_size": 2, "skill_rating": 1025, "wait_seconds": 45, "order_index": 0},
+    {"ticket_id": "party_beta", "party_size": 2, "skill_rating": 1080, "wait_seconds": 35, "order_index": 1},
+    {"ticket_id": "party_gamma", "party_size": 3, "skill_rating": 1150, "wait_seconds": 20, "order_index": 2},
+    {"ticket_id": "solo_delta", "party_size": 1, "skill_rating": 900, "wait_seconds": 80, "order_index": 3}
+  ]
+}
