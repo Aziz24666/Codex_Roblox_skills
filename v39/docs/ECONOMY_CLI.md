@@ -4,8 +4,8 @@ Python 3.10+; standard library only.
 
 ```powershell
 python .\v39\tools\v39.py doctor --root C:\Path\To\YourGame
-python .\v39\tools\v39.py validate --root C:\Path\To\YourGame --model .codex\economy\economy-model.json
-python .\v39\tools\v39.py simulate --root C:\Path\To\YourGame --model .codex\economy\economy-model.json --output .codex\reports\economy-simulation.json
+python .\v39\tools\v39.py validate --root C:\Path\To\YourGame --model .codex/economy/economy-model.json
+python .\v39\tools\v39.py simulate --root C:\Path\To\YourGame --model .codex/economy/economy-model.json --output .codex/reports/economy-simulation.json
 ```
 
 The input is a project-relative JSON path and is limited to 1 MiB. Duplicate object keys, non-standard JSON constants, unknown fields, path traversal, and symlink paths are rejected. Simulation horizon and model dimensions are bounded.
