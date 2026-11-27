@@ -58,8 +58,8 @@ jobs:
           python "$PACKAGE_ROOT/v36/tools/v36.py" validate-manifest --root "$PACKAGE_ROOT" --manifest v36/examples/quality-manifest.example.json
           python "$PACKAGE_ROOT/v36/tools/v36.py" audit --root "$PACKAGE_ROOT" --manifest v36/examples/quality-manifest.example.json --output v36/test-output/quality-audit.example.json
           python "$PACKAGE_ROOT/v36/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
-          grep -Eq "Current release: V3(6|7|8)\\.0\\.0" "$PACKAGE_ROOT/README.md"
-          grep -Eq "248 native Codex skills|252 native Codex skills|256 native Codex skills" "$PACKAGE_ROOT/README.md"
+          grep -Eq "Current release: V3(6|7|8|9)\\.0\\.0" "$PACKAGE_ROOT/README.md"
+          grep -Eq "248 native Codex skills|252 native Codex skills|256 native Codex skills|260 native Codex skills" "$PACKAGE_ROOT/README.md"
           test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "248"
       - name: Build and compare V36 release archives
         shell: bash
