@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "incident_id": "inc-8f31a9d2c4b7",
+  "project_key": "sample-game",
+  "opened_at": "2026-11-27T10:00:00Z",
+  "detected_at": "2026-11-27T10:02:00Z",
+  "severity": "high",
+  "status": "mitigating",
+  "summary": "A regional matchmaking degradation is increasing queue times for a subset of sessions.",
+  "impact": {
+    "services": ["matchmaking", "networking"],
+    "audience_scope": "aggregate_subset",
+    "impact_summary": "Aggregate queue-time indicators are elevated in one region; no player-level records are stored in this incident file.",
+    "privacy_reviewed": true
+  },
+  "detection": {
+    "source": "aggregate_telemetry",
+    "signal_refs": ["sig-queuep95a1"],
+    "privacy_safe": true
+  },
+  "roles": [
+    {"role": "incident_commander", "acknowledged": true},
+    {"role": "technical_lead", "acknowledged": true},
+    {"role": "communications_lead", "acknowledged": false}
+  ],
+  "timeline": [
+    {
+      "event_id": "evt-detected001",
+      "occurred_at": "2026-11-27T10:02:00Z",
+      "event_type": "detected",
+      "summary": "Aggregate queue-time alert crossed the service threshold.",
+      "evidence_refs": ["ev-111122223333"]
+    },
+    {
+      "event_id": "evt-triaged001",
+      "occurred_at": "2026-11-27T10:05:00Z",
+      "event_type": "triaged",
+      "summary": "Impact limited to one regional matchmaking cohort; ownership assigned.",
+      "evidence_refs": []
+    },
+    {
+      "event_id": "evt-investigation01",
+      "occurred_at": "2026-11-27T10:08:00Z",
+      "event_type": "investigation",
+      "summary": "Investigating a recent matchmaking configuration change before selecting mitigation.",
+      "evidence_refs": []
+    }
+  ],
+  "actions": [
+    {
+      "action_id": "act-rollback01",
+      "category": "rollback",
+      "description": "Evaluate reverting the recently changed matchmaking configuration after impact and compatibility review.",
+      "risk": "high",
+      "status": "proposed",
+      "requires_approval": true,
+      "approval_ref": null,
+      "approved_at": null,
+      "created_at": "2026-11-27T10:09:00Z",
+      "verification_status": "not_run",
+      "verification_ref": null
+    }
+  ],
+  "communications": {
+    "player_notice_required": true,
+    "player_notice_reviewed": false,
+    "privacy_safe": true,
+    "player_notice_ref": null
+  },
+  "resolution": {
+    "resolved_at": null,
+    "verification_ref": null,
+    "postmortem_ref": null,
+    "follow_up_ref": null,
+    "customer_impact_closed": false
+  }
+}
