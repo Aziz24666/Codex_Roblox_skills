@@ -147,7 +147,7 @@ class PlanValidationTests(V37Fixture):
     def test_included_path_inside_excluded_scope_is_rejected(self) -> None:
         data = plan()
         data["scope"]["included_paths"] = ["src/legacy"]
-        self.assertTrue(any("overlaps an excluded path" in item for item in v37.validate_plan(data)))
+        self.assertTrue(any("is entirely within an excluded path" in item for item in v37.validate_plan(data)))
 
     def test_high_risk_requires_human_review(self) -> None:
         data = plan(task("feature-a", ["src/a"], risk="high", human=False))
