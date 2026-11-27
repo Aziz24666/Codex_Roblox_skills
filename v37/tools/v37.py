@@ -208,8 +208,8 @@ def validate_plan(data: Any) -> list[str]:
                 else:
                     output.append(value)
     for include in included:
-        if path_is_excluded(include, excluded):
-            issues.append(f"Included path {include} overlaps an excluded path.")
+        if any(within(include, excluded_path) for excluded_path in excluded):
+            issues.append(f"Included path {include} is entirely within an excluded path.")
 
     tasks = data.get("tasks")
     if not isinstance(tasks, list) or not 1 <= len(tasks) <= MAX_TASKS:
@@ -460,9 +460,6 @@ def validate_report(plan: dict, report: Any) -> list[str]:
                 for item in criterion_results
             ):
                 issues.append(f"Completed task {task_id} has a failed or unrun acceptance criterion.")
-            if any(dep not in result_by_id or result_by_id[dep].get("status") != "completed" for dep in task.get("depends_on", [])):
-                # Checked again below after all results have been indexed.
-                pass
         if status == "not_started" and changed_files:
             issues.append(f"Not-started task {task_id} cannot report changed files.")
 
