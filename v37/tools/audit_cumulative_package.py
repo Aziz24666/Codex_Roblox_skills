@@ -5,13 +5,13 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-EXPECTED_SKILLS = 252
+EXPECTED_SKILLS = {252, 256}
 HISTORICAL_SKILL_LABELS = (
     "207 native Codex skills", "210 native Codex skills", "213 native Codex skills",
     "216 native Codex skills", "220 native Codex skills", "224 native Codex skills",
     "228 native Codex skills", "232 native Codex skills", "236 native Codex skills",
     "240 native Codex skills", "244 native Codex skills", "248 native Codex skills",
-    "252 native Codex skills",
+    "252 native Codex skills", "256 native Codex skills",
 )
 REQUIRED_FILES = (
     "AGENTS.md", "README.md", "LICENSE", "INDEX.md", "INDEX_V36.md", "INDEX_V37.md",
@@ -38,8 +38,8 @@ def audit(root: Path) -> list[str]:
     issues = [f"Missing required file: {path}" for path in REQUIRED_FILES if not (root / path).is_file()]
     skills_root = root / ".agents" / "skills"
     skills = sorted(skills_root.glob("*/SKILL.md")) if skills_root.is_dir() else []
-    if len(skills) != EXPECTED_SKILLS:
-        issues.append(f"Expected {EXPECTED_SKILLS} native skills, found {len(skills)}.")
+    if len(skills) not in EXPECTED_SKILLS:
+        issues.append(f"Expected a V37-or-newer cumulative skill count {sorted(EXPECTED_SKILLS)}, found {len(skills)}.")
     version = (root / "v37" / "VERSION").read_text(encoding="utf-8").strip() if (root / "v37" / "VERSION").is_file() else ""
     if version != "37.0.0":
         issues.append(f"Unexpected V37 version: {version!r}.")
@@ -47,8 +47,10 @@ def audit(root: Path) -> list[str]:
     if "<!-- V37_PROJECT_IMPLEMENTATION_ORCHESTRATION -->" not in agents:
         issues.append("AGENTS.md is missing the V37 project implementation orchestration guidance.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    if "Current release: V37.0.0" not in readme or "252 native Codex skills" not in readme:
-        issues.append("README.md does not describe the V37 cumulative package.")
+    current_release = any(label in readme for label in ("Current release: V37.0.0", "Current release: V38.0.0"))
+    current_count = any(label in readme for label in ("252 native Codex skills", "256 native Codex skills"))
+    if not current_release or not current_count:
+        issues.append("README.md does not describe a V37-or-newer cumulative package.")
     missing_labels = [label for label in HISTORICAL_SKILL_LABELS if label not in readme]
     if missing_labels:
         issues.append("README.md is missing historical compatibility labels: " + ", ".join(missing_labels) + ".")
@@ -64,7 +66,7 @@ def main() -> int:
         for item in problems:
             print("FAIL: " + item)
         return 1
-    print(f"PASS: cumulative V1-V37 package audit ({EXPECTED_SKILLS} native skills).")
+    print(f"PASS: V37 compatibility audit ({len(list((args.root.expanduser().resolve() / ".agents" / "skills").glob("*/SKILL.md")))} native skills).")
     return 0
 
 
