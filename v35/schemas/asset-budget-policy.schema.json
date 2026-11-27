@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V35 Asset Budget Policy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_id",
+    "profiles",
+    "release_requires_cleared_rights",
+    "release_requires_approved_moderation",
+    "release_requires_approved_dependencies"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "policy_id": {
+      "type": "string",
+      "pattern": "^asset-policy-[a-z0-9]{8,24}$"
+    },
+    "profiles": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {
+        "enum": [
+          "low_end_mobile",
+          "mobile",
+          "desktop",
+          "console",
+          "vr",
+          "server"
+        ]
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "max_file_size_bytes": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "max_texture_pixels": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "max_mesh_triangles": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "max_audio_duration_seconds": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "max_animation_keyframes": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "release_requires_cleared_rights": {
+      "type": "boolean"
+    },
+    "release_requires_approved_moderation": {
+      "type": "boolean"
+    },
+    "release_requires_approved_dependencies": {
+      "type": "boolean"
+    }
+  }
+}

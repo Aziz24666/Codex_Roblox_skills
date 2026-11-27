@@ -19,6 +19,7 @@ EXPECTED_SKILLS_V31 = 228
 EXPECTED_SKILLS_V32 = 232
 EXPECTED_SKILLS_V33 = 236
 EXPECTED_SKILLS_V34 = 240
+EXPECTED_SKILLS_V35 = 244
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -107,6 +108,10 @@ def audit(root: Path) -> list[str]:
                     # Earlier cumulative overlays may carry the current README/INDEX
                     # before the V29 overlay is installed. Defer only V29-local links
                     # until its VERSION marker exists; the final V29 audit checks them.
+                    if not (root / "v35" / "VERSION").is_file() and (
+                        target_path == "INDEX_V35.md" or target_path.startswith("v35/")
+                    ):
+                        continue
                     if not (root / "v34" / "VERSION").is_file() and (
                         target_path == "INDEX_V34.md" or target_path.startswith("v34/")
                     ):
@@ -146,9 +151,12 @@ def audit(root: Path) -> list[str]:
     is_v32 = (root / "v32" / "VERSION").is_file()
     is_v33 = (root / "v33" / "VERSION").is_file()
     is_v34 = (root / "v34" / "VERSION").is_file()
+    is_v35 = (root / "v35" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    if is_v34:
+    if is_v35:
+        expected_skills = EXPECTED_SKILLS_V35
+    elif is_v34:
         expected_skills = EXPECTED_SKILLS_V34
     elif is_v33:
         expected_skills = EXPECTED_SKILLS_V33
@@ -274,6 +282,15 @@ def audit(root: Path) -> list[str]:
             "v34/docs/REPEATED_BENCHMARKS_AND_ROLLOUT.md",
             "v34/schemas/soak-capture.schema.json", "v34/schemas/repeat-suite.schema.json",
             "v34/examples/soak-capture.example.json", "v34/examples/repeat-suite.example.json",
+        )
+    if is_v35:
+        required += (
+            "INDEX_V35.md", "v35/VERSION", "v35/INDEX_V35.md", "v35/tools/v35.py",
+            "v35/tools/patch_cumulative_package.py", "v35/tools/audit_cumulative_package.py",
+            "v35/tests/test_v35.py", "v35/docs/ASSET_CATALOG_AND_PROVENANCE.md",
+            "v35/docs/CONTENT_BUDGETS_AND_DEPENDENCIES.md", "v35/docs/ASSET_RELEASE_AND_MIGRATION.md",
+            "v35/schemas/asset-catalog.schema.json", "v35/schemas/asset-budget-policy.schema.json",
+            "v35/examples/asset-catalog.example.json", "v35/examples/asset-budget-policy.example.json",
         )
     for item in required:
         if not (root / item).is_file():

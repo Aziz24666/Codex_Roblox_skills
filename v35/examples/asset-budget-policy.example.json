@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "policy_id": "asset-policy-a13b9c7d2e4f",
+  "profiles": {
+    "low_end_mobile": {
+      "max_file_size_bytes": 8000000,
+      "max_texture_pixels": 1048576,
+      "max_mesh_triangles": 30000,
+      "max_audio_duration_seconds": 30,
+      "max_animation_keyframes": 180
+    },
+    "mobile": {
+      "max_file_size_bytes": 16000000,
+      "max_texture_pixels": 4194304,
+      "max_mesh_triangles": 60000,
+      "max_audio_duration_seconds": 60,
+      "max_animation_keyframes": 300
+    },
+    "desktop": {
+      "max_file_size_bytes": 48000000,
+      "max_texture_pixels": 16777216,
+      "max_mesh_triangles": 150000,
+      "max_audio_duration_seconds": 120,
+      "max_animation_keyframes": 900
+    }
+  },
+  "release_requires_cleared_rights": true,
+  "release_requires_approved_moderation": true,
+  "release_requires_approved_dependencies": true
+}
