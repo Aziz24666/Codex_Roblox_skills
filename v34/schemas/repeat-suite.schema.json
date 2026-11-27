@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V34 Repeated Performance Benchmark Suite",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "suite_id", "scenario", "target", "device_profile", "measurement_source", "network_profile", "player_count", "duration_minutes", "sample_interval_seconds", "baseline_build", "candidate_build", "threshold_pct", "baseline_captures", "candidate_captures"],
+  "properties": {
+    "schema_version": {"type": "integer", "const": 1},
+    "suite_id": {"type": "string", "pattern": "^perf-suite-[a-z0-9]{8,24}$"},
+    "scenario": {"enum": ["idle_server_soak", "steady_gameplay", "high_activity", "join_leave_churn", "asset_streaming", "spawn_respawn", "round_transition"]},
+    "target": {"enum": ["server", "client"]},
+    "device_profile": {"enum": ["server", "low_end_mobile", "high_end_mobile", "desktop"]},
+    "measurement_source": {"enum": ["microprofiler", "script_profiler", "developer_console", "performance_dashboard", "custom_harness"]},
+    "network_profile": {"enum": ["baseline", "high_latency", "jitter", "packet_loss"]},
+    "player_count": {"type": "integer", "minimum": 1, "maximum": 100},
+    "duration_minutes": {"type": "integer", "minimum": 30, "maximum": 1440},
+    "sample_interval_seconds": {"type": "integer", "minimum": 30, "maximum": 3600},
+    "baseline_build": {"type": "string", "minLength": 1, "maxLength": 120},
+    "candidate_build": {"type": "string", "minLength": 1, "maxLength": 120},
+    "threshold_pct": {"type": "number", "exclusiveMinimum": 0, "maximum": 100},
+    "baseline_captures": {"type": "array", "minItems": 3, "maxItems": 8, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 200}},
+    "candidate_captures": {"type": "array", "minItems": 3, "maxItems": 8, "uniqueItems": true, "items": {"type": "string", "minLength": 1, "maxLength": 200}}
+  }
+}
