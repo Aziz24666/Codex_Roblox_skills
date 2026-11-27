@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V39 Deterministic Economy Model",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version","model_id","horizon_days","currencies","progression","cohorts"],
+  "properties": {
+    "schema_version": {"const":1},
+    "model_id": {"type":"string","pattern":"^[a-z][a-z0-9_-]{1,39}$"},
+    "horizon_days": {"type":"integer","minimum":1,"maximum":365},
+    "currencies": {
+      "type":"array","minItems":1,"maxItems":8,
+      "items":{
+        "type":"object","additionalProperties":false,
+        "required":["currency_id","kind","starting_balance","healthy_balance_ceiling","sources","sinks"],
+        "properties":{
+          "currency_id":{"type":"string","pattern":"^[a-z][a-z0-9_-]{1,39}$"},
+          "kind":{"enum":["soft","event_token"]},
+          "starting_balance":{"type":"integer","minimum":0,"maximum":1000000000},
+          "healthy_balance_ceiling":{"type":"integer","minimum":1,"maximum":1000000000},
+          "sources":{"type":"array","maxItems":20,"items":{"$ref":"#/$defs/component"}},
+          "sinks":{"type":"array","maxItems":20,"items":{"$ref":"#/$defs/component"}}
+        }
+      }
+    },
+    "progression":{
+      "type":"object","additionalProperties":false,
+      "required":["xp_per_active_day","level_gap_warning","levels"],
+      "properties":{
+        "xp_per_active_day":{"type":"integer","minimum":1,"maximum":1000000},
+        "level_gap_warning":{"type":"integer","minimum":1,"maximum":20},
+        "levels":{"type":"array","maxItems":50,"items":{"type":"object","additionalProperties":false,"required":["level","xp_required","rewards"],"properties":{"level":{"type":"integer","minimum":2,"maximum":51},"xp_required":{"type":"integer","minimum":1,"maximum":100000000},"rewards":{"type":"array","maxItems":8,"items":{"type":"object","additionalProperties":false,"required":["currency_id","amount"],"properties":{"currency_id":{"type":"string","pattern":"^[a-z][a-z0-9_-]{1,39}$"},"amount":{"type":"integer","minimum":0,"maximum":100000000}}}}}}}
+      }
+    },
+    "cohorts":{
+      "type":"array","minItems":2,"maxItems":6,"items":{"type":"object","additionalProperties":false,"required":["cohort_id","active_days_per_week","activity_multiplier_bps"],"properties":{"cohort_id":{"type":"string","pattern":"^[a-z][a-z0-9_-]{1,39}$"},"active_days_per_week":{"type":"integer","minimum":1,"maximum":7},"activity_multiplier_bps":{"type":"integer","minimum":1000,"maximum":20000}}}
+    }
+  },
+  "$defs":{
+    "component":{
+      "type":"object","additionalProperties":false,"required":["component_id","amount_per_active_day"],
+      "properties":{"component_id":{"type":"string","pattern":"^[a-z][a-z0-9_-]{1,39}$"},"amount_per_active_day":{"type":"integer","minimum":0,"maximum":100000000}}
+    }
+  }
+}
