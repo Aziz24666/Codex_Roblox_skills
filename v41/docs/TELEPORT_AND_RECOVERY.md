@@ -41,3 +41,10 @@ Define a grace period and expected state for each stage: lobby, queued, claimed,
 - Exhausted retry returns party to the lobby without duplicating queue tickets.
 
 Studio testing is useful for development, but perform cross-place and multi-server verification in a published test experience before production.
+
+## Official Roblox references
+
+- [Teleport between places](https://create.roblox.com/docs/projects/teleport) — server-side TeleportAsync, join data, and failure handling.
+- [Teleport to private servers](https://create.roblox.com/docs/projects/teleport-private-servers) — reserved-server ID routing.
+- [TeleportService API reference](https://create.roblox.com/docs/reference/engine/classes/TeleportService).
+- [TeleportOptions API reference](https://create.roblox.com/docs/reference/engine/classes/TeleportOptions).
