@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "model_id": "player-profile-v1",
+  "profile_store": {
+    "store_name": "PlayerProfiles",
+    "scope": "production",
+    "schema_version": 3,
+    "minimum_supported_version": 1,
+    "key_strategy": "user_id_key",
+    "profile_size_budget_bytes": 1500000
+  },
+  "session": {
+    "locking_enabled": true,
+    "lock_method": "UpdateAsync_lease",
+    "lease_seconds": 180,
+    "refresh_interval_seconds": 45,
+    "wait_on_conflict": true,
+    "fail_closed_on_uncertain_ownership": true,
+    "owner_token_required": true,
+    "release_on_player_removal": true,
+    "release_on_shutdown": true
+  },
+  "saving": {
+    "write_method": "UpdateAsync",
+    "autosave_interval_seconds": 60,
+    "shutdown_budget_seconds": 25,
+    "retry_attempts": 5,
+    "initial_backoff_ms": 250,
+    "max_backoff_ms": 5000,
+    "exponential_backoff": true,
+    "jitter": true,
+    "serialize_writes_per_key": true,
+    "budget_aware": true,
+    "stagger_autosaves": true,
+    "save_on_leave": true,
+    "flush_on_shutdown": true,
+    "unknown_write_outcome": "reload_and_reconcile"
+  },
+  "fields": [
+    {"field_id":"coins","data_type":"integer","category":"gameplay_currency","default_value":0,"max_encoded_bytes":32,"client_mutable":false,"server_validation_required":true},
+    {"field_id":"level","data_type":"integer","category":"progression","default_value":1,"max_encoded_bytes":16,"client_mutable":false,"server_validation_required":true},
+    {"field_id":"inventory","data_type":"object","category":"inventory","default_value":{},"max_encoded_bytes":65536,"client_mutable":false,"server_validation_required":true},
+    {"field_id":"processed_receipts","data_type":"array","category":"transaction_ledger","default_value":[],"max_encoded_bytes":131072,"client_mutable":false,"server_validation_required":true},
+    {"field_id":"settings","data_type":"object","category":"setting","default_value":{"music":true,"camera_sensitivity":1.0},"max_encoded_bytes":8192,"client_mutable":true,"server_validation_required":true}
+  ],
+  "migrations": [
+    {"migration_id":"profile-v1-to-v2","from_version":1,"to_version":2,"idempotent":true,"backup_required":true,"dry_run_required":true,"preserve_unknown_fields":true,"rollback_strategy":"restore_backup","test_case_ids":["v1-default-profile","v1-partial-inventory"]},
+    {"migration_id":"profile-v2-to-v3","from_version":2,"to_version":3,"idempotent":true,"backup_required":true,"dry_run_required":true,"preserve_unknown_fields":true,"rollback_strategy":"forward_fix","test_case_ids":["v2-normal-profile","v2-missing-settings"]}
+  ],
+  "transactions": [
+    {"operation_id":"developer-product-grant","transaction_kind":"developer_product_receipt","idempotency_key_source":"PurchaseId","dedupe_field_id":"processed_receipts","commit_strategy":"single_profile_key_UpdateAsync","same_update_contains_effect_and_marker":true,"acknowledge_after_commit":true,"concurrent_delivery_policy":"serialized_UpdateAsync_per_key","unknown_outcome_policy":"reload_reconcile_retry_same_key"},
+    {"operation_id":"quest-reward-grant","transaction_kind":"gameplay_reward","idempotency_key_source":"server_operation_id","dedupe_field_id":"processed_receipts","commit_strategy":"single_profile_key_UpdateAsync","same_update_contains_effect_and_marker":true,"acknowledge_after_commit":true,"concurrent_delivery_policy":"serialized_UpdateAsync_per_key","unknown_outcome_policy":"reload_reconcile_retry_same_key"}
+  ]
+}
