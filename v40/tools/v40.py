@@ -13,7 +13,8 @@ from typing import Any
 
 VERSION = "40.0.0"
 MAX_INPUT_BYTES = 1024 * 1024
-MAX_DATASTORE_VALUE_BYTES = 4_194_304
+MAX_PROFILE_BUDGET_BYTES = 4_000_000
+MAX_FIELD_BUDGET_BYTES = 4_000_000
 TOP_FIELDS = {"schema_version", "model_id", "profile_store", "session", "saving", "fields", "migrations", "transactions"}
 PROFILE_FIELDS = {"store_name", "scope", "schema_version", "minimum_supported_version", "key_strategy", "profile_size_budget_bytes"}
 SESSION_FIELDS = {"locking_enabled", "lock_method", "lease_seconds", "refresh_interval_seconds", "wait_on_conflict", "fail_closed_on_uncertain_ownership", "owner_token_required", "release_on_player_removal", "release_on_shutdown"}
@@ -99,8 +100,8 @@ def validate_model(data: Any) -> list[str]:
         if profile.get("key_strategy") != "user_id_key":
             errors.append("profile_store.key_strategy must be user_id_key.")
         profile_budget = profile.get("profile_size_budget_bytes")
-        if not is_int(profile_budget, 65536, MAX_DATASTORE_VALUE_BYTES):
-            errors.append(f"profile_store.profile_size_budget_bytes must be an integer from 65536 to {MAX_DATASTORE_VALUE_BYTES}.")
+        if not is_int(profile_budget, 65536, MAX_PROFILE_BUDGET_BYTES):
+            errors.append(f"profile_store.profile_size_budget_bytes must be an integer from 65536 to {MAX_PROFILE_BUDGET_BYTES}.")
 
     session = data.get("session")
     if not isinstance(session, dict):
@@ -179,10 +180,17 @@ def validate_model(data: Any) -> list[str]:
         category = item.get("category")
         if not isinstance(category, str) or category not in CATEGORIES:
             errors.append(f"{label}.category must be one of {', '.join(sorted(CATEGORIES))}.")
-        if not is_int(item.get("max_encoded_bytes"), 1, MAX_DATASTORE_VALUE_BYTES):
-            errors.append(f"{label}.max_encoded_bytes must be an integer from 1 to {MAX_DATASTORE_VALUE_BYTES}.")
+        if not is_int(item.get("max_encoded_bytes"), 1, MAX_FIELD_BUDGET_BYTES):
+            errors.append(f"{label}.max_encoded_bytes must be an integer from 1 to {MAX_FIELD_BUDGET_BYTES}.")
         else:
             declared_field_budget += item["max_encoded_bytes"]
+            if "default_value" in item:
+                try:
+                    encoded_default_size = len(json.dumps(item["default_value"], ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf-8"))
+                    if encoded_default_size > item["max_encoded_bytes"]:
+                        errors.append(f"{label}.default_value exceeds max_encoded_bytes.")
+                except (TypeError, ValueError, UnicodeError):
+                    errors.append(f"{label}.default_value must be valid JSON data.")
         client_mutable = item.get("client_mutable")
         server_validation = item.get("server_validation_required")
         if not is_bool(client_mutable):
@@ -303,7 +311,7 @@ def audit_model(data: dict) -> dict:
     transactions = data["transactions"]
     declared = sum(x["max_encoded_bytes"] for x in fields)
     budget = profile["profile_size_budget_bytes"]
-    if budget > int(MAX_DATASTORE_VALUE_BYTES * 0.90):
+    if budget > int(MAX_PROFILE_BUDGET_BYTES * 0.90):
         warnings.append("Declared profile size budget is above 90% of the Roblox per-key maximum; lower it to leave serialization and metadata headroom.")
     if declared > int(budget * 0.75):
         warnings.append("Declared field budgets consume more than 75% of the profile size budget; measure actual JSON-encoded payloads.")
