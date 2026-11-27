@@ -1,0 +1,127 @@
+name: V40 advanced data persistence and transaction integrity quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v40-quality-\${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Validate and build cumulative V1-V40 package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 55
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Download the published V39 cumulative baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error "https://github.com/Aziz24666/Codex_Roblox_skills/releases/download/v39.0.0/roblox-codex-game-studio-kit-v39.zip" --output "$RUNNER_TEMP/roblox-codex-game-studio-kit-v39.zip"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v39.zip"
+          mkdir -p "$RUNNER_TEMP/v39-extract"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v39.zip" -d "$RUNNER_TEMP/v39-extract"
+          mv "$RUNNER_TEMP/v39-extract/roblox-codex-game-studio-kit-v39" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v40"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v40" >> "$GITHUB_ENV"
+
+      - name: Validate V40 source, example, schema, and tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile v40/tools/v40.py v40/tools/patch_cumulative_package.py v40/tools/audit_cumulative_package.py v40/tests/test_v40.py
+          python -m unittest discover -s v40/tests -v
+          python v40/tools/v40.py doctor --root .
+          python v40/tools/v40.py validate --root . --model v40/examples/persistence-model.example.json
+          python v40/tools/v40.py audit --root . --model v40/examples/persistence-model.example.json --output v40/test-output/persistence-audit.example.json
+          python -m json.tool v40/schemas/persistence-model.schema.json > /dev/null
+
+      - name: Integrate V40 and run cumulative regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v40/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v40"
+          python -m py_compile "$PACKAGE_ROOT/v40/tools/v40.py" "$PACKAGE_ROOT/v40/tools/patch_cumulative_package.py" "$PACKAGE_ROOT/v40/tools/audit_cumulative_package.py" "$PACKAGE_ROOT/v40/tests/test_v40.py"
+          python -m unittest discover -s "$PACKAGE_ROOT/v40/tests" -v
+          for version in 26 27 28 29 30 31 32 33 34 35 36 37 38 39; do python -m unittest discover -s "$PACKAGE_ROOT/v$version/tests" -v; done
+          python "$PACKAGE_ROOT/v40/tools/v40.py" doctor --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v40/tools/v40.py" validate --root "$PACKAGE_ROOT" --model v40/examples/persistence-model.example.json
+          python "$PACKAGE_ROOT/v40/tools/v40.py" audit --root "$PACKAGE_ROOT" --model v40/examples/persistence-model.example.json --output v40/test-output/persistence-audit.example.json
+          python "$PACKAGE_ROOT/v37/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v38/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v39/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v40/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          grep -q "Current release: V40.0.0" "$PACKAGE_ROOT/README.md"
+          grep -q "264 native Codex skills" "$PACKAGE_ROOT/README.md"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "264"
+
+      - name: Build and compare V40 release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          tar -cJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v40.tar.xz" "$name"
+          zip -qr "$RUNNER_TEMP/roblox-codex-game-studio-kit-v40.zip" "$name"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v40.zip"
+          xz -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v40.tar.xz"
+          mkdir -p "$RUNNER_TEMP/check-zip" "$RUNNER_TEMP/check-tar"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v40.zip" -d "$RUNNER_TEMP/check-zip"
+          tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v40.tar.xz" -C "$RUNNER_TEMP/check-tar"
+          diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
+          cd "$RUNNER_TEMP"
+          sha256sum roblox-codex-game-studio-kit-v40.zip roblox-codex-game-studio-kit-v40.tar.xz > SHA256SUMS-RELEASE.txt
+          sha256sum --check SHA256SUMS-RELEASE.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v40
+          path: |
+            \${{ runner.temp }}/roblox-codex-game-studio-kit-v40.zip
+            \${{ runner.temp }}/roblox-codex-game-studio-kit-v40.tar.xz
+            \${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish V40 GitHub Release
+    if: github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v40:')
+    runs-on: ubuntu-24.04
+    needs: build
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: roblox-codex-game-studio-kit-v40
+          path: \${{ runner.temp }}/v40-release-assets
+      - name: Publish versioned release
+        env:
+          GH_TOKEN: \${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v40:(v40[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          [[ "$tag" =~ ^v40[.][0-9]+[.][0-9]+$ ]]
+          test "$(tr -d '\r\n' < v40/VERSION)" = "\${tag#v}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
+          gh release create "$tag" \
+            "$RUNNER_TEMP/v40-release-assets/roblox-codex-game-studio-kit-v40.zip" \
+            "$RUNNER_TEMP/v40-release-assets/roblox-codex-game-studio-kit-v40.tar.xz" \
+            "$RUNNER_TEMP/v40-release-assets/SHA256SUMS-RELEASE.txt" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V40.md
