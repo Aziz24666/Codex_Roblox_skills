@@ -3,13 +3,14 @@
 V40 models a server-authoritative player-profile contract. Keep the number of stores and keys modest. When related state must change atomically, co-locate it in one profile key while the payload comfortably fits within Roblox's per-key limit. Use a fixed store name/scope and a deterministic user-key strategy; never put raw player data into the model file.
 
 ## Profile lifecycle
-1. On join, acquire an exclusive session lease using an UpdateAsync transform and a unique server-session owner token.
-2. If ownership is held elsewhere, wait or fail closed. Never load a second writable copy after an ambiguous load/lock error.
-3. Keep the active profile in memory. Validate server-side requests and mutate in-memory state through one controlled profile service.
-4. Periodically refresh the lease and autosave with per-player staggering to avoid synchronized write bursts.
-5. Serialize writes for the same key. A delayed retry must not overwrite a newer save.
-6. On player removal, save the latest state and release only the lock owned by that session.
-7. On shutdown, flush bounded saves in parallel within the available shutdown window, then stop cleanly.
+1. Review Roblox's current `DataStoreWrapper` and `SessionLockedDataStoreWrapper` reference implementation in the official player-data sample. It provides per-key queued request ordering/retries and session-lock behavior through UpdateAsync. Roblox explicitly labels the sample as reference material that has not proven itself over a long period in a popular game; review it, adapt it, and test it extensively rather than copying it unchanged. V40 accepts either this wrapper approach or a custom `UpdateAsync_lease` implementation in its declared model.
+2. On join, acquire an exclusive session lease using an UpdateAsync transform and a unique server-session owner token.
+3. If ownership is held elsewhere, wait or fail closed. Never load a second writable copy after an ambiguous load/lock error.
+4. Keep the active profile in memory. Validate server-side requests and mutate in-memory state through one controlled profile service.
+5. Periodically refresh the lease and autosave with per-player staggering to avoid synchronized write bursts.
+6. Serialize writes for the same key. A delayed retry must not overwrite a newer save.
+7. On player removal, save the latest state and release only the lock owned by that session.
+8. On shutdown, flush bounded saves in parallel within the available shutdown window, then stop cleanly.
 
 ## UpdateAsync and retries
 Use UpdateAsync where multiple servers can contend for the same key or where a mutation depends on its current value. Its callback must be pure and non-yielding. Protect network calls with pcall. Retry only transient failures, with bounded exponential backoff and jitter. Avoid retrying validation/permission errors. A failed client response can mean the server does not know whether the backend committed; reload and reconcile before replaying a mutation. Keep retry order per key.
