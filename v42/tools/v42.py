@@ -153,6 +153,8 @@ def validate_model(data: Any) -> list[str]:
     if not isinstance(configs, list) or not 1 <= len(configs) <= 100:
         errors.append("configs must contain 1-100 config declarations (Open Cloud InExperienceConfig repository limit).")
         configs = []
+    if isinstance(configs, list) and is_int(contract.get("key_limit"), 1, 100) and len(configs) > contract["key_limit"]:
+        errors.append(f"configs declares {len(configs)} keys, exceeding config_contract.key_limit ({contract['key_limit']}).")
     condition_total = 0
     for index, item in enumerate(configs):
         label = f"configs[{index}]"

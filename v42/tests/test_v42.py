@@ -47,6 +47,11 @@ class ModelValidationTests(unittest.TestCase):
         data["config_contract"]["key_limit"] = 101
         self.assertInvalid(data, "key_limit must be an integer from 1 to 100")
 
+    def test_declared_config_count_cannot_exceed_contract_limit(self):
+        data = copy.deepcopy(self.model)
+        data["config_contract"]["key_limit"] = 4
+        self.assertInvalid(data, "exceeding config_contract.key_limit")
+
     def test_active_config_limit_capped_at_1000(self):
         data = copy.deepcopy(self.model)
         data["config_contract"]["active_config_limit"] = 1001
@@ -179,7 +184,7 @@ class ModelValidationTests(unittest.TestCase):
     def test_naive_event_timestamp_rejected(self):
         data = copy.deepcopy(self.model)
         data["events"][0]["starts_at"] = "2027-12-01T00:00:00"
-        self.assertInvalid(data, "explicit UTC offset")
+        self.assertInvalid(data, "timezone or UTC offset")
 
     def test_invalid_event_timestamp_rejected(self):
         data = copy.deepcopy(self.model)

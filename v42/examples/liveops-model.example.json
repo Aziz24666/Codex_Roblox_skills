@@ -62,7 +62,7 @@
       "value_type": "number",
       "default_value": 1.0,
       "category": "balance_tuning",
-      "runtime_change_policy": "next_round",
+      "runtime_change_policy": "next_safe_boundary",
       "fallback_policy": "keep_last_known_good",
       "targeting_mode": "global",
       "condition_count": 0,
