@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "catalog_id": "asset-catalog-a13b9c7d2e4f",
+  "project_key": "sample-game",
+  "generated_at": "2026-11-27T12:00:00Z",
+  "assets": [
+    {
+      "asset_key": "base-character-mesh",
+      "kind": "mesh",
+      "source_kind": "studio_created",
+      "provider_asset_id": "rbx-10001",
+      "ownership_scope": "group",
+      "rights_status": "cleared",
+      "moderation_status": "not_applicable",
+      "lifecycle": "released",
+      "version": "1.0.0",
+      "dependencies": [],
+      "targets": [
+        "low_end_mobile",
+        "mobile",
+        "desktop"
+      ],
+      "measurements": {
+        "mesh_triangles": 18000,
+        "file_size_bytes": 340000
+      },
+      "provenance_ref": "ev-111122223333",
+      "review_ref": "ev-222233334444"
+    },
+    {
+      "asset_key": "character-albedo",
+      "kind": "texture",
+      "source_kind": "creator_store",
+      "provider_asset_id": "rbx-10002",
+      "ownership_scope": "third_party",
+      "rights_status": "cleared",
+      "moderation_status": "approved",
+      "lifecycle": "approved",
+      "version": "1.2.0",
+      "dependencies": [],
+      "targets": [
+        "low_end_mobile",
+        "mobile",
+        "desktop"
+      ],
+      "measurements": {
+        "texture_width_px": 1024,
+        "texture_height_px": 1024,
+        "file_size_bytes": 1800000
+      },
+      "provenance_ref": "ev-333344445555",
+      "review_ref": "ev-444455556666"
+    },
+    {
+      "asset_key": "character-rig-model",
+      "kind": "model",
+      "source_kind": "studio_created",
+      "provider_asset_id": "rbx-10003",
+      "ownership_scope": "group",
+      "rights_status": "cleared",
+      "moderation_status": "not_applicable",
+      "lifecycle": "released",
+      "version": "1.0.0",
+      "dependencies": [
+        "base-character-mesh",
+        "character-albedo"
+      ],
+      "targets": [
+        "low_end_mobile",
+        "mobile",
+        "desktop"
+      ],
+      "measurements": {
+        "mesh_triangles": 24000,
+        "file_size_bytes": 2600000
+      },
+      "provenance_ref": "ev-555566667777",
+      "review_ref": "ev-666677778888"
+    },
+    {
+      "asset_key": "footstep-audio",
+      "kind": "audio",
+      "source_kind": "studio_created",
+      "provider_asset_id": "rbx-10004",
+      "ownership_scope": "group",
+      "rights_status": "cleared",
+      "moderation_status": "approved",
+      "lifecycle": "approved",
+      "version": "1.0.0",
+      "dependencies": [],
+      "targets": [
+        "low_end_mobile",
+        "mobile",
+        "desktop"
+      ],
+      "measurements": {
+        "audio_duration_seconds": 1.8,
+        "file_size_bytes": 94000
+      },
+      "provenance_ref": "ev-777788889999",
+      "review_ref": "ev-888899990000"
+    }
+  ]
+}
