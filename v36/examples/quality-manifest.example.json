@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "project_key": "sample-game",
+  "generated_at": "2026-11-27T12:00:00Z",
+  "target_locales": [
+    "en-us",
+    "ar"
+  ],
+  "surfaces": [
+    {
+      "surface_id": "main-menu",
+      "kind": "menu",
+      "platforms": [
+        "desktop",
+        "mobile",
+        "console"
+      ],
+      "input_methods": [
+        "keyboard_mouse",
+        "touch",
+        "gamepad"
+      ],
+      "uses_motion": true,
+      "critical_audio": true,
+      "localization": {
+        "strings_externalized": true,
+        "text_expansion_tested": true,
+        "rtl_reviewed": true
+      },
+      "accessibility": {
+        "focus_navigation": true,
+        "text_scaling": true,
+        "non_color_cues": true,
+        "contrast_reviewed": true,
+        "critical_audio_captions": true,
+        "reduced_motion_option": true
+      },
+      "evidence_refs": [
+        "ev-111122223333"
+      ]
+    }
+  ]
+}

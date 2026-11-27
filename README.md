@@ -1,17 +1,18 @@
 # Roblox Codex Game Studio Kit
 
-[![V35 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v35-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v35-quality.yml)
+[![V36 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v36-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v36-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V35.0.0 — Asset Pipeline Governance and Content Validation.** The complete cumulative V1-V35 toolkit contains **244 native Codex skills**. Only the current release is required.
+**Current release: V36.0.0 — Accessibility, Responsive UI, and Localization Readiness.** The complete cumulative V1-V36 toolkit contains **248 native Codex skills**. Only the current release is required.
 
-[Open the V35 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v35.0.0).
+[Open the V36 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v36.0.0).
 
 ## What's included
 
-Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills.
+Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills.
 
-- **244 native Codex skills** for Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio tools, testing, performance, release engineering, analytics, LiveOps, safety, moderation, sustainable monetization, and asset production.
+- **248 native Codex skills** for Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio tools, testing, performance, release engineering, analytics, LiveOps, safety, moderation, sustainable monetization, asset production, accessibility, and localization.
+- **V36** adds accessibility and inclusive interaction reviews, responsive UI/readability, localization/RTL readiness, sensory alternatives and reduced-motion guidance, plus an offline quality manifest validator/auditor.
 - **V35** adds an asset catalog, provenance/review tracking, dependency-graph validation, per-device content budgets, and catalog migration comparison.
 - **V34** adds long-session performance soak analysis, profiler evidence triage, repeated benchmark comparisons, and rollout monitoring.
 - **V33** adds automated QA plans/reports, Studio test orchestration guidance, device/input/multiplayer regression, and regression comparison.
@@ -28,26 +29,29 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
 ## Start a Roblox development session
 
-1. Download and extract the V35 release, then open the extracted package root in Codex.
-2. Read AGENTS.md and INDEX_V35.md.
+1. Download and extract the V36 release, then open the extracted package root in Codex.
+2. Read AGENTS.md and INDEX_V36.md.
 3. Initialize session continuity in the actual game project folder:
 
-       python C:\Path\To\roblox-codex-game-studio-kit-v35\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
+       python C:\Path\To\roblox-codex-game-studio-kit-v36\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
 
-4. Run V35 asset checks:
+4. Run V36 quality checks:
 
-       python C:\Path\To\roblox-codex-game-studio-kit-v35\v35\tools\v35.py doctor --root C:\Path\To\YourGame
-       python C:\Path\To\roblox-codex-game-studio-kit-v35\v35\tools\v35.py validate-catalog --root C:\Path\To\YourGame --catalog .codex\assets\catalog.json
-       python C:\Path\To\roblox-codex-game-studio-kit-v35\v35\tools\v35.py audit-catalog --root C:\Path\To\YourGame --catalog .codex\assets\catalog.json --policy .codex\assets\budget-policy.json --output .codex\reports\v35-asset-audit.json
-       python C:\Path\To\roblox-codex-game-studio-kit-v35\v35\tools\v35.py compare-catalogs --root C:\Path\To\YourGame --baseline .codex\assets\catalog-v1.json --candidate .codex\assets\catalog-v2.json --output .codex\reports\v35-asset-diff.json
+       python .\v36\tools\v36.py doctor --root C:\Path\To\YourGame
+       python .\v36\tools\v36.py validate-manifest --root C:\Path\To\YourGame --manifest .codex\quality\manifest.json
+       python .\v36\tools\v36.py audit --root C:\Path\To\YourGame --manifest .codex\quality\manifest.json --output .codex\reports\v36-quality-audit.json
 
-V25 commands: start, checkpoint, handoff, resume, status, verify, recover. V26: doctor, plan, verify-plan. V27: doctor, audit, typecheck, rojo-check. V28: doctor, audit, validate-migration. V29: doctor, audit, budget, compare, report. V30: doctor, plan, validate, audit. V31: doctor, validate-catalog, audit, evaluate-health. V32: doctor, audit, validate-policy, validate-case, validate-register. V33: doctor, audit, validate-plan, validate-report, compare. V34: doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35: doctor, validate-catalog, audit-catalog, compare-catalogs.
+Copy the example manifest from v36/examples/ and replace its illustrative values with reviewed project data before use.
 
-## V35 content governance boundaries
+V25 commands: start, checkpoint, handoff, resume, status, verify, recover. V26: doctor, plan, verify-plan. V27: doctor, audit, typecheck, rojo-check. V28: doctor, audit, validate-migration. V29: doctor, audit, budget, compare, report. V30: doctor, plan, validate, audit. V31: doctor, validate-catalog, audit-catalog, evaluate-health. V32: doctor, audit, validate-policy, validate-case, validate-register. V33: doctor, audit, validate-plan, validate-report, compare. V34: doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35: doctor, validate-catalog, audit-catalog, compare-catalogs. V36: doctor, validate-manifest, audit.
 
-The CLI validates supplied metadata and project-local source paths only. It does not inspect binary asset content, query Roblox, access Creator Store/private inventories, upload/publish/delete/transfer assets, or determine copyright, license scope, or moderation approval. Rights and moderation states must be verified and maintained by authorized humans. Device budgets are project-specific values and must be calibrated with actual Studio/device testing.
+## V36 quality review boundaries
+
+The V36 CLI validates supplied metadata only. It does not inspect Roblox Studio UI instances, analyze screenshots, execute Luau, test real devices, or certify accessibility. Contrast, navigation, captions, reduced-motion behavior, text scaling, localization, and RTL behavior require human review and actual target-device testing. The manifest uses opaque evidence references and must not contain player health information, personal data, credentials, private URLs, or free-form player profiles.
 
 ## Earlier verification boundaries and safeguards
+
+V35 catalog commands validate supplied metadata and project-local source paths only. They do not inspect binary asset content, query Roblox, access Creator Store/private inventories, upload/publish/delete/transfer assets, or determine copyright, license scope, or moderation approval. Rights and moderation states must be verified and maintained by authorized humans. Device budgets are project-specific and must be calibrated with actual Studio/device testing.
 
 V34 performance reports process supplied structured evidence only; they do not launch Studio, capture MicroProfiler dumps, execute Luau, access Creator Dashboard, or read live telemetry. A memory-growth signal is not proof of a leak.
 
@@ -59,6 +63,10 @@ Keep analytics aggregate and purpose-bound; do not build individual-spender prof
 
 ## Documentation
 
+- V36 feature index: INDEX_V36.md
+- Accessibility and interaction review: v36/docs/ACCESSIBILITY_AND_INTERACTION_REVIEW.md
+- Localization and responsive UI: v36/docs/LOCALIZATION_AND_RESPONSIVE_UI.md
+- Quality manifest and audit: v36/docs/QUALITY_MANIFEST_AND_AUDIT.md
 - V35 feature index: INDEX_V35.md
 - Asset catalog and provenance: v35/docs/ASSET_CATALOG_AND_PROVENANCE.md
 - Content budgets and dependencies: v35/docs/CONTENT_BUDGETS_AND_DEPENDENCIES.md

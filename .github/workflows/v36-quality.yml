@@ -1,0 +1,122 @@
+name: V36 accessibility, responsive UI, and localization quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v36-quality-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Validate and build cumulative V1-V36 package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Download the published V35 cumulative baseline
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release download v35.0.0 --repo "$GITHUB_REPOSITORY" --pattern 'roblox-codex-game-studio-kit-v35.zip' --dir "$RUNNER_TEMP"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v35.zip"
+          mkdir -p "$RUNNER_TEMP/v35-extract"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v35.zip" -d "$RUNNER_TEMP/v35-extract"
+          mv "$RUNNER_TEMP/v35-extract/roblox-codex-game-studio-kit-v35" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v36"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v36" >> "$GITHUB_ENV"
+      - name: Validate V36 source and regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile v36/tools/v36.py v36/tools/patch_cumulative_package.py v36/tools/audit_cumulative_package.py v36/tests/test_v36.py
+          python -m unittest discover -s v36/tests -v
+          python v36/tools/v36.py doctor --root .
+          python v36/tools/v36.py validate-manifest --root . --manifest v36/examples/quality-manifest.example.json
+          python v36/tools/v36.py audit --root . --manifest v36/examples/quality-manifest.example.json --output v36/test-output/quality-audit.example.json
+      - name: Integrate and audit cumulative V1-V36 package
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v36/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v36"
+          python -m py_compile "$PACKAGE_ROOT/v36/tools/v36.py" "$PACKAGE_ROOT/v36/tools/patch_cumulative_package.py" "$PACKAGE_ROOT/v36/tools/audit_cumulative_package.py"
+          python -m unittest discover -s "$PACKAGE_ROOT/v36/tests" -v
+          for version in 26 27 28 29 30 31 32 33 34 35; do python -m unittest discover -s "$PACKAGE_ROOT/v$version/tests" -v; done
+          python "$PACKAGE_ROOT/v36/tools/v36.py" doctor --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v36/tools/v36.py" validate-manifest --root "$PACKAGE_ROOT" --manifest v36/examples/quality-manifest.example.json
+          python "$PACKAGE_ROOT/v36/tools/v36.py" audit --root "$PACKAGE_ROOT" --manifest v36/examples/quality-manifest.example.json --output v36/test-output/quality-audit.example.json
+          python "$PACKAGE_ROOT/v36/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
+          grep -q "Current release: V36.0.0" "$PACKAGE_ROOT/README.md"
+          grep -q "248 native Codex skills" "$PACKAGE_ROOT/README.md"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "248"
+      - name: Build and compare V36 release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          tar -cJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v36.tar.xz" "$name"
+          zip -qr "$RUNNER_TEMP/roblox-codex-game-studio-kit-v36.zip" "$name"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v36.zip"
+          xz -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v36.tar.xz"
+          mkdir -p "$RUNNER_TEMP/check-zip" "$RUNNER_TEMP/check-tar"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v36.zip" -d "$RUNNER_TEMP/check-zip"
+          tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v36.tar.xz" -C "$RUNNER_TEMP/check-tar"
+          diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
+          cd "$RUNNER_TEMP"
+          sha256sum roblox-codex-game-studio-kit-v36.zip roblox-codex-game-studio-kit-v36.tar.xz > SHA256SUMS-RELEASE.txt
+          sha256sum --check SHA256SUMS-RELEASE.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v36
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v36.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v36.tar.xz
+            ${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish V36 GitHub Release
+    if: github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v36:')
+    runs-on: ubuntu-24.04
+    needs: build
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: roblox-codex-game-studio-kit-v36
+          path: ${{ runner.temp }}/v36-release-assets
+      - name: Publish versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v36:(v36[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          [[ "$tag" =~ ^v36[.][0-9]+[.][0-9]+$ ]]
+          test "$(tr -d '\r\n' < v36/VERSION)" = "${tag#v}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
+          gh release create "$tag" \
+            "$RUNNER_TEMP/v36-release-assets/roblox-codex-game-studio-kit-v36.zip" \
+            "$RUNNER_TEMP/v36-release-assets/roblox-codex-game-studio-kit-v36.tar.xz" \
+            "$RUNNER_TEMP/v36-release-assets/SHA256SUMS-RELEASE.txt" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V36.md
