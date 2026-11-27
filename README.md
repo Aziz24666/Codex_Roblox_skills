@@ -1,17 +1,18 @@
 # Roblox Codex Game Studio Kit
 
-[![V39 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v39-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v39-quality.yml)
+[![V40 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v40-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v40-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V39.0.0 — Deterministic Economy and Progression Simulation.** The cumulative V1–V39 toolkit contains **260 native Codex skills**. Only the current release is required.
+**Current release: V40.0.0 — Advanced Data Persistence and Transaction Integrity.** The cumulative V1–V40 toolkit contains **264 native Codex skills**. Only the current release is required.
 
-[Open the V39 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v39.0.0).
+[Open the V40 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v40.0.0).
 
 ## What's included
 
-Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills.
+Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills; V40 — 264 native Codex skills.
 
-- **260 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
+- **264 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
+- **V40** adds player-profile lifecycle/session ownership, bounded save/retry/recovery policies, safe schema migration chains, idempotent reward/receipt commits, and an offline persistence-contract validator/auditor.
 - **V39** adds gameplay currency source/sink modeling, deterministic day-by-day simulations across synthetic activity archetypes, progression milestone rewards, and fairness review with an offline model validator/simulator.
 - **V38** adds production incident triage/severity, privacy-safe service health and impact, human-approved mitigation/rollback/recovery, and player communications/postmortem readiness, plus an offline incident validator/auditor.
 - **V37** adds project reconnaissance and architecture mapping, feature decomposition/dependency planning, scoped implementation/change-impact review, implementation evidence and handoff, plus an offline plan/report validator.
@@ -32,11 +33,11 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
 ## Start a Roblox development session
 
-1. Download and extract the V39 release, then open the extracted package root in Codex.
-2. Read `AGENTS.md` and `INDEX_V39.md`.
+1. Download and extract the V40 release, then open the extracted package root in Codex.
+2. Read `AGENTS.md` and `INDEX_V40.md`. 
 3. Initialize session continuity in the actual game project folder:
 
-       python C:\Path\To\roblox-codex-game-studio-kit-v39\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
+       python C:\Path\To\roblox-codex-game-studio-kit-v40\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
 
 4. For feature work, read `v37/INDEX_V37.md` and follow the V37 reconnaissance → plan → scoped implementation → evidence handoff workflow.
 5. For a production incident, copy `v38/examples/incident.example.json` into `.codex/incidents/incident.json`, replace the example values with verified aggregate-only facts, then run:
@@ -55,7 +56,15 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
    The model uses synthetic cohorts and is not a prediction of live player behavior. Do not include player-level data or gambling mechanics.
 
-Commands: V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate.
+7. For persistence architecture, copy `v40/examples/persistence-model.example.json` to `.codex/persistence/persistence-model.json`, adapt it to your server-side profile implementation, then run:
+
+       python .\v40\tools\v40.py doctor --root C:\Path\To\YourGame
+       python .\v40\tools\v40.py validate --root C:\Path\To\YourGame --model .codex/persistence/persistence-model.json
+       python .\v40\tools\v40.py audit --root C:\Path\To\YourGame --model .codex/persistence/persistence-model.json --output .codex/reports/persistence-audit.json
+
+   The CLI audits declared metadata; it does not inspect Luau, connect to Roblox, read or write player data, or verify real migrations/receipt handling. Use a separate test experience for DataStore testing and migration rehearsals.
+
+Commands: V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate. V40 — doctor, validate, audit.
 
 ## V38 incident response boundaries
 
@@ -81,6 +90,10 @@ Keep analytics aggregate and purpose-bound; do not build individual-spender prof
 
 ## Documentation
 
+- V40 feature index: `INDEX_V40.md`
+- Persistence architecture: `v40/docs/PERSISTENCE_ARCHITECTURE.md`
+- Profile migrations and receipt handling: `v40/docs/MIGRATIONS_AND_RECEIPTS.md`
+- Persistence CLI reference: `v40/docs/PERSISTENCE_CLI.md`
 - V39 feature index: `INDEX_V39.md`
 - Economy model design: `v39/docs/ECONOMY_MODEL_DESIGN.md`
 - Interpreting simulation results: `v39/docs/INTERPRETING_SIMULATION_RESULTS.md`
