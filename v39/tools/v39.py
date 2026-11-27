@@ -60,7 +60,7 @@ def validate_model(data:Any)->list[str]:
         if not is_slug(cid): errors.append(f"{label}.currency_id must be a valid lowercase slug.")
         elif cid in currency_ids: errors.append(f"Duplicate currency_id: {cid}.")
         else: currency_ids.add(cid)
-        if item.get("kind") not in KINDS: errors.append(f"{label}.kind must be soft or event_token.")
+        if not isinstance(item.get("kind"),str) or item.get("kind") not in KINDS: errors.append(f"{label}.kind must be soft or event_token.")
         if not is_int(item.get("starting_balance"),0,1_000_000_000): errors.append(f"{label}.starting_balance must be an integer from 0 to 1,000,000,000.")
         if not is_int(item.get("healthy_balance_ceiling"),1,1_000_000_000): errors.append(f"{label}.healthy_balance_ceiling must be an integer from 1 to 1,000,000,000.")
         for group in ("sources","sinks"):
