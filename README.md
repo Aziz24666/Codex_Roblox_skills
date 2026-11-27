@@ -34,7 +34,7 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
 ## Start a Roblox development session
 
-1. Download and extract the V40 release, then open the extracted package root in Codex.
+1. Download and extract the V41 release, then open the extracted package root in Codex.
 2. Read `AGENTS.md` and `INDEX_V41.md`.
 3. Initialize session continuity in the actual game project folder:
 
