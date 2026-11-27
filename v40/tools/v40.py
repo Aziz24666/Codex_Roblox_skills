@@ -202,7 +202,7 @@ def validate_model(data: Any) -> list[str]:
         if isinstance(category, str) and category in AUTHORITATIVE_CATEGORIES and client_mutable is True:
             errors.append(f"{label} category {category} cannot be client_mutable.")
 
-    if is_int(profile_budget, 65536, MAX_DATASTORE_VALUE_BYTES) and declared_field_budget > profile_budget:
+    if is_int(profile_budget, 65536, MAX_PROFILE_BUDGET_BYTES) and declared_field_budget > profile_budget:
         errors.append("Sum of declared field budgets exceeds profile_store.profile_size_budget_bytes.")
 
     migrations = data.get("migrations")
