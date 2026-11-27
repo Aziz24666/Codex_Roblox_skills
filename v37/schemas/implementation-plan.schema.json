@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "V37 Implementation Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "project_key",
+    "generated_at",
+    "goal",
+    "scope",
+    "tasks"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "plan_id": {
+      "type": "string",
+      "pattern": "^impl-plan-[a-z0-9]{8,24}$"
+    },
+    "project_key": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{1,62}$"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "goal": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1500
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "included_paths",
+        "excluded_paths"
+      ],
+      "properties": {
+        "included_paths": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/path"
+          }
+        },
+        "excluded_paths": {
+          "type": "array",
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/path"
+          }
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 300,
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    }
+  },
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\\\\\)(?!.*[*?\\[\\]{}]).+$"
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "title",
+        "objective",
+        "depends_on",
+        "allowed_paths",
+        "risk",
+        "human_review_required",
+        "acceptance_criteria"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 800
+        },
+        "depends_on": {
+          "type": "array",
+          "maxItems": 300,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "allowed_paths": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 100,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/path"
+          }
+        },
+        "risk": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "human_review_required": {
+          "type": "boolean"
+        },
+        "acceptance_criteria": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 40,
+          "items": {
+            "$ref": "#/$defs/criterion"
+          }
+        }
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_id",
+        "description",
+        "verification_kind"
+      ],
+      "properties": {
+        "criterion_id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]{1,40}$"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "verification_kind": {
+          "enum": [
+            "static",
+            "automated_test",
+            "studio_manual",
+            "runtime_manual"
+          ]
+        }
+      }
+    }
+  }
+}

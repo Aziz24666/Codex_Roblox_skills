@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "plan_id": "impl-plan-a13b9c7d2e4f",
+  "project_key": "sample-game",
+  "generated_at": "2026-11-27T12:00:00Z",
+  "goal": "Implement a small server-owned feature with a client interface and a focused regression test, following the existing project architecture.",
+  "scope": {
+    "included_paths": [
+      "src",
+      "tests"
+    ],
+    "excluded_paths": [
+      "src/legacy"
+    ]
+  },
+  "tasks": [
+    {
+      "task_id": "server-contract",
+      "title": "Implement the server-owned feature contract",
+      "objective": "Add the server-side state transition and validate every client-provided argument using the existing project conventions.",
+      "depends_on": [],
+      "allowed_paths": [
+        "src/server"
+      ],
+      "risk": "medium",
+      "human_review_required": true,
+      "acceptance_criteria": [
+        {
+          "criterion_id": "server-authority",
+          "description": "The server owns the authoritative state and rejects invalid client input.",
+          "verification_kind": "static"
+        },
+        {
+          "criterion_id": "server-tests",
+          "description": "Configured server-side automated tests pass.",
+          "verification_kind": "automated_test"
+        }
+      ]
+    },
+    {
+      "task_id": "client-ui",
+      "title": "Connect the client interface",
+      "objective": "Add a responsive client interaction that calls the approved server contract and handles success and failure states.",
+      "depends_on": [
+        "server-contract"
+      ],
+      "allowed_paths": [
+        "src/client"
+      ],
+      "risk": "medium",
+      "human_review_required": true,
+      "acceptance_criteria": [
+        {
+          "criterion_id": "ui-contract",
+          "description": "The client uses the documented contract without trusting client-owned state.",
+          "verification_kind": "static"
+        },
+        {
+          "criterion_id": "studio-smoke",
+          "description": "A human verifies the primary interaction and failure state in Roblox Studio.",
+          "verification_kind": "studio_manual"
+        }
+      ]
+    },
+    {
+      "task_id": "regression-checks",
+      "title": "Add focused regression coverage",
+      "objective": "Add or update regression tests for the new contract and its invalid-input cases.",
+      "depends_on": [
+        "client-ui"
+      ],
+      "allowed_paths": [
+        "tests"
+      ],
+      "risk": "low",
+      "human_review_required": false,
+      "acceptance_criteria": [
+        {
+          "criterion_id": "regression-suite",
+          "description": "The repository-configured regression suite passes.",
+          "verification_kind": "automated_test"
+        }
+      ]
+    }
+  ]
+}
