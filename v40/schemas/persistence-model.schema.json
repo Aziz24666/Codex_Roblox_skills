@@ -12,7 +12,7 @@
       "schema_version":{"type":"integer","minimum":1,"maximum":1000},
       "minimum_supported_version":{"type":"integer","minimum":1,"maximum":1000},
       "key_strategy":{"const":"user_id_key"},
-      "profile_size_budget_bytes":{"type":"integer","minimum":65536,"maximum":4194304}
+      "profile_size_budget_bytes":{"type":"integer","minimum":65536,"maximum":4000000}
     }},
     "session":{"type":"object","additionalProperties":false,"required":["locking_enabled","lock_method","lease_seconds","refresh_interval_seconds","wait_on_conflict","fail_closed_on_uncertain_ownership","owner_token_required","release_on_player_removal","release_on_shutdown"],"properties":{
       "locking_enabled":{"const":true},"lock_method":{"enum":["SessionLockedDataStoreWrapper","UpdateAsync_lease"]},
@@ -37,7 +37,7 @@
       "data_type":{"enum":["integer","number","string","boolean","array","object"]},
       "category":{"enum":["gameplay_currency","progression","inventory","cosmetic","setting","transaction_ledger","session_metadata"]},
       "default_value":{},
-      "max_encoded_bytes":{"type":"integer","minimum":1,"maximum":4194304},
+      "max_encoded_bytes":{"type":"integer","minimum":1,"maximum":4000000},
       "client_mutable":{"type":"boolean"},"server_validation_required":{"type":"boolean"}
     }}},
     "migrations":{"type":"array","maxItems":99,"items":{"type":"object","additionalProperties":false,"required":["migration_id","from_version","to_version","idempotent","backup_required","dry_run_required","preserve_unknown_fields","rollback_strategy","test_case_ids"],"properties":{
