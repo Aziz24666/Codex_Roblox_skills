@@ -75,3 +75,10 @@ The example configuration sets the maximum group size to 50, matching the docume
 
 ## Verification boundary
 V41's CLI validates declared JSON contracts and simulates supplied synthetic ticket metadata. It does not call Roblox APIs, access real MemoryStore queues, measure live network latency, launch match servers, or prove fairness/concurrency. Multi-server Studio testing and published-experience validation remain required.
+
+## Official Roblox references
+
+- [Memory stores overview](https://create.roblox.com/docs/cloud-services/memory-stores) — ephemeral cross-server structures and the separation from durable DataStores.
+- [MemoryStoreQueue](https://create.roblox.com/docs/cloud-services/memory-stores/queue) — queue reads, invisibility timeout, and removal/acknowledgment behavior.
+- [Cross-server messaging](https://create.roblox.com/docs/cloud-services/cross-server-messaging) — MessagingService as a best-effort notification mechanism.
+- [MessagingService API reference](https://create.roblox.com/docs/reference/engine/classes/MessagingService).
