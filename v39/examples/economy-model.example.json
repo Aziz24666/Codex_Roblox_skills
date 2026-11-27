@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "model_id": "starter-economy-v1",
+  "horizon_days": 30,
+  "currencies": [
+    {
+      "currency_id": "coins",
+      "kind": "soft",
+      "starting_balance": 500,
+      "healthy_balance_ceiling": 2500,
+      "sources": [
+        {"component_id": "quest_rewards", "amount_per_active_day": 100},
+        {"component_id": "round_rewards", "amount_per_active_day": 60}
+      ],
+      "sinks": [
+        {"component_id": "cosmetic_shop", "amount_per_active_day": 80},
+        {"component_id": "crafting", "amount_per_active_day": 30}
+      ]
+    },
+    {
+      "currency_id": "event_tokens",
+      "kind": "event_token",
+      "starting_balance": 40,
+      "healthy_balance_ceiling": 350,
+      "sources": [
+        {"component_id": "event_participation", "amount_per_active_day": 12}
+      ],
+      "sinks": [
+        {"component_id": "event_cosmetic", "amount_per_active_day": 6}
+      ]
+    }
+  ],
+  "progression": {
+    "xp_per_active_day": 40,
+    "level_gap_warning": 2,
+    "levels": [
+      {"level": 2, "xp_required": 250, "rewards": [{"currency_id": "coins", "amount": 40}]},
+      {"level": 3, "xp_required": 700, "rewards": [{"currency_id": "coins", "amount": 80}]},
+      {"level": 4, "xp_required": 1400, "rewards": [{"currency_id": "coins", "amount": 120}]}
+    ]
+  },
+  "cohorts": [
+    {"cohort_id": "low_activity", "active_days_per_week": 3, "activity_multiplier_bps": 8000},
+    {"cohort_id": "regular_activity", "active_days_per_week": 5, "activity_multiplier_bps": 10000},
+    {"cohort_id": "high_activity", "active_days_per_week": 7, "activity_multiplier_bps": 15000}
+  ]
+}
