@@ -115,13 +115,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="$(git log -1 --format=%B "DOLARGITHUB_SHA" | sed -nE 's/.*\[release-v38:(v38[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v38:(v38[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
           [[ "$tag" =~ ^v38[.][0-9]+[.][0-9]+$ ]]
           test "$(tr -d '\r\n' < v38/VERSION)" = "${tag#v}"
-          if gh release view "$tag" --repo "DOLARGITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
           gh release create "$tag" \
             "$RUNNER_TEMP/v38-release-assets/roblox-codex-game-studio-kit-v38.zip" \
             "$RUNNER_TEMP/v38-release-assets/roblox-codex-game-studio-kit-v38.tar.xz" \
             "$RUNNER_TEMP/v38-release-assets/SHA256SUMS-RELEASE.txt" \
-            --repo "DOLARGITHUB_REPOSITORY" --target "DOLARGITHUB_SHA" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
             --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V38.md
