@@ -53,7 +53,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python v38/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "DOLLANGITHUB_WORKSPACE/v38"
+          python v38/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v38"
           python -m py_compile "$PACKAGE_ROOT/v38/tools/v38.py" "$PACKAGE_ROOT/v38/tools/patch_cumulative_package.py" "$PACKAGE_ROOT/v38/tools/audit_cumulative_package.py" "$PACKAGE_ROOT/v38/tests/test_v38.py"
           python -m unittest discover -s "$PACKAGE_ROOT/v38/tests" -v
           for version in 28 29 30 31 32 33 34 35 36 37; do python -m unittest discover -s "$PACKAGE_ROOT/v$version/tests" -v; done
