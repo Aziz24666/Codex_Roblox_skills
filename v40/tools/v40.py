@@ -110,8 +110,8 @@ def validate_model(data: Any) -> list[str]:
         errors += check_fields(session, SESSION_FIELDS, "session")
         if session.get("locking_enabled") is not True:
             errors.append("session.locking_enabled must be true for writable player profiles.")
-        if session.get("lock_method") != "UpdateAsync_lease":
-            errors.append("session.lock_method must be UpdateAsync_lease.")
+        if session.get("lock_method") not in {"SessionLockedDataStoreWrapper", "UpdateAsync_lease"}:
+            errors.append("session.lock_method must be SessionLockedDataStoreWrapper or UpdateAsync_lease.")
         for name in PROFILE_FLAG_FIELDS - {"locking_enabled"}:
             if session.get(name) is not True:
                 errors.append(f"session.{name} must be true.")
