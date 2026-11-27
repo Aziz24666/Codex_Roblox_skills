@@ -115,6 +115,11 @@ class IncidentValidationTests(unittest.TestCase):
         data["timeline"].append({"event_id":"evt-resolved01","occurred_at":"2026-11-27T10:12:00Z","event_type":"resolved","summary":"Resolved event should not appear on open incident.","evidence_refs":[]})
         self.assertInvalid(data,"cannot include a resolved event")
 
+    def test_unhashable_enum_values_are_reported_not_crashes(self):
+        data=copy.deepcopy(self.data); data["severity"]={}; data["status"]=[]
+        data["roles"][0]["role"]={}; data["timeline"][0]["event_type"]=[]
+        self.assertTrue(v38.validate_incident(data))
+
 class AuditTests(unittest.TestCase):
     def test_audit_flags_unacknowledged_and_pending_action(self):
         data=json.loads(EXAMPLE.read_text(encoding="utf-8")); result=v38.audit_incident(data)
