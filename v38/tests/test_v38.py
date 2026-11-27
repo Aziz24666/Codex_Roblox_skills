@@ -129,7 +129,7 @@ class AuditTests(unittest.TestCase):
 
     def test_audit_does_not_claim_to_execute(self):
         data=json.loads(EXAMPLE.read_text(encoding="utf-8")); result=v38.audit_incident(data)
-        self.assertTrue(any("does not query Roblox" in item for item in result["limitations"]))
+        self.assertTrue(any("Offline metadata audit only" in item for item in result["limitations"]))
 
 class PathSafetyTests(unittest.TestCase):
     def test_parent_traversal_rejected(self):
