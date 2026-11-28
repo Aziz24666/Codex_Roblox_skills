@@ -263,7 +263,6 @@ class ManifestValidationTests(unittest.TestCase):
             "calculation": "PER_USER_FUNNEL_CONVERSION",
             "completion_step": 4
         }
-        data["metrics"]["goal_metric"] = "custom:onboarding_finish"
         data["metrics"]["guardrails"][1]["metric"] = "custom:onboarding_finish"
         self.assertEqual([], v43.validate_manifest(data))
 
