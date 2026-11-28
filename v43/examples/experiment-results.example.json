@@ -21,15 +21,13 @@
           "metric_id": "playtime_per_user",
           "delta_percent": 0.6,
           "confidence_interval_low_percent": -0.3,
-          "confidence_interval_high_percent": 1.5,
-          "harmful_direction": "decrease"
+          "confidence_interval_high_percent": 1.5
         },
         {
           "metric_id": "first_quest_completion",
           "delta_percent": 4.1,
           "confidence_interval_low_percent": 2,
-          "confidence_interval_high_percent": 6.2,
-          "harmful_direction": "decrease"
+          "confidence_interval_high_percent": 6.2
         }
       ]
     }
