@@ -27,7 +27,7 @@ TOP_FIELDS = {
 HYPOTHESIS_FIELDS = {"change", "expected_outcome", "rationale", "success_criteria"}
 CONFIG_FIELDS = {"repository", "key", "value_type", "control_value"}
 VARIANT_FIELDS = {"variant_id", "label", "is_baseline", "weight_percent", "value"}
-METRIC_FIELDS = {"goal_metric", "goal_direction", "learning_metrics", "custom_metrics"}
+METRIC_FIELDS = {"goal_metric", "goal_direction", "learning_metrics", "custom_metrics", "guardrails"}
 CUSTOM_METRIC_FIELDS = {"metric_id", "source", "source_name", "calculation", "completion_step"}
 INSTRUMENTATION_FIELDS = {"events", "max_custom_event_names", "custom_fields_reviewed"}
 EVENT_FIELDS = {
@@ -67,7 +67,7 @@ TREATMENT_RESULT_FIELDS = {
 }
 GUARDRAIL_FIELDS = {
     "metric_id", "delta_percent", "confidence_interval_low_percent",
-    "confidence_interval_high_percent", "harmful_direction",
+    "confidence_interval_high_percent",
 }
 RESULT_STATES = {"DRAFT", "SCHEDULED", "RUNNING", "DECISION_NEEDED", "COMPLETED"}
 
@@ -105,7 +105,7 @@ def value_matches_type(value: Any, value_type: str) -> bool:
     if value_type == "number":
         return is_number(value)
     if value_type == "string":
-        return isinstance(value, str)
+        return isinstance(value, str) and len(value) <= 100_000
     if value_type == "json":
         return isinstance(value, dict)
     return False
@@ -135,8 +135,8 @@ def validate_manifest(data: Any) -> list[str]:
         errors.append("schema_version must be integer 1.")
     if not is_slug(data.get("experiment_id")):
         errors.append("experiment_id must be a lowercase slug (2-40 characters).")
-    if not isinstance(data.get("name"), str) or not 1 <= len(data["name"]) <= 100:
-        errors.append("name must contain 1-100 characters.")
+    if not isinstance(data.get("name"), str) or not 1 <= len(data["name"].strip()) <= 100:
+        errors.append("name must contain 1-100 non-whitespace characters.")
     if data.get("product_type") != "in_game_config":
         errors.append("product_type must be in_game_config; this toolkit models Roblox in-experience config experiments only.")
 
@@ -293,6 +293,37 @@ def validate_manifest(data: Any) -> list[str]:
             errors.append("metrics.learning_metrics must contain at most 7 supported platform or declared custom metrics.")
         elif metrics.get("goal_metric") in learning or len(set(learning)) != len(learning):
             errors.append("metrics.learning_metrics must be unique and must not repeat the goal metric.")
+
+        guardrails = metrics.get("guardrails")
+        if not isinstance(guardrails, list) or not 1 <= len(guardrails) <= 20:
+            errors.append("metrics.guardrails must declare between 1 and 20 guardrail metrics.")
+            guardrails = []
+        guardrail_ids: set[str] = set()
+        guardrail_metrics: set[str] = set()
+        for index, item in enumerate(guardrails):
+            label = f"metrics.guardrails[{index}]"
+            if not isinstance(item, dict):
+                errors.append(f"{label} must be an object.")
+                continue
+            errors += check_fields(item, {"metric_id", "metric", "harmful_direction"}, label)
+            metric_id = item.get("metric_id")
+            if not is_slug(metric_id):
+                errors.append(f"{label}.metric_id must be a lowercase slug.")
+            elif metric_id in guardrail_ids:
+                errors.append(f"Duplicate guardrail metric_id: {metric_id}.")
+            else:
+                guardrail_ids.add(metric_id)
+            metric = item.get("metric")
+            if not metric_ref_is_valid(metric):
+                errors.append(f"{label}.metric must be a supported platform metric or a declared custom:<metric_id>.")
+            elif metric in guardrail_metrics:
+                errors.append(f"{label}.metric must not duplicate another guardrail metric.")
+            else:
+                guardrail_metrics.add(metric)
+            if metric == metrics.get("goal_metric"):
+                errors.append(f"{label}.metric must not repeat the primary goal metric.")
+            if not allowed(item.get("harmful_direction"), {"increase", "decrease"}):
+                errors.append(f"{label}.harmful_direction must be increase or decrease.")
 
     instrumentation = data.get("instrumentation")
     if not isinstance(instrumentation, dict):
@@ -470,12 +501,24 @@ def validate_results(manifest: dict, results: Any) -> list[str]:
                 errors.append(f"{label}.{field} must be a finite number.")
         low = item.get("confidence_interval_low_percent")
         high = item.get("confidence_interval_high_percent")
-        if is_number(low) and is_number(high) and low > high:
-            errors.append(f"{label} confidence interval lower bound must not exceed upper bound.")
+        estimate = item.get("goal_metric_delta_percent")
+        if is_number(low) and is_number(high):
+            if low > high:
+                errors.append(f"{label} confidence interval lower bound must not exceed upper bound.")
+            elif is_number(estimate) and not low <= estimate <= high:
+                errors.append(f"{label}.goal_metric_delta_percent must lie within its confidence interval.")
+
+        planned_guardrails = {
+            guard["metric_id"]: guard
+            for guard in manifest.get("metrics", {}).get("guardrails", [])
+            if isinstance(guard, dict) and isinstance(guard.get("metric_id"), str)
+        }
         guardrails = item.get("guardrails")
-        if not isinstance(guardrails, list) or len(guardrails) > 20:
-            errors.append(f"{label}.guardrails must contain at most 20 entries.")
-            guardrails = []
+        if not isinstance(guardrails, list) or len(guardrails) != len(planned_guardrails):
+            errors.append(
+                f"{label}.guardrails must contain exactly the {len(planned_guardrails)} guardrails declared in the manifest."
+            )
+            guardrails = guardrails if isinstance(guardrails, list) else []
         guardrail_ids: set[str] = set()
         for guard_index, guard in enumerate(guardrails):
             guard_label = f"{label}.guardrails[{guard_index}]"
@@ -490,15 +533,22 @@ def validate_results(manifest: dict, results: Any) -> list[str]:
                 errors.append(f"{guard_label}.metric_id must be unique.")
             else:
                 guardrail_ids.add(metric_id)
+            if isinstance(metric_id, str) and metric_id not in planned_guardrails:
+                errors.append(f"{guard_label}.metric_id is not declared in the experiment manifest.")
             for field in ("delta_percent", "confidence_interval_low_percent", "confidence_interval_high_percent"):
                 if not is_number(guard.get(field)):
                     errors.append(f"{guard_label}.{field} must be a finite number.")
             gl = guard.get("confidence_interval_low_percent")
             gh = guard.get("confidence_interval_high_percent")
-            if is_number(gl) and is_number(gh) and gl > gh:
-                errors.append(f"{guard_label} confidence interval lower bound must not exceed upper bound.")
-            if not allowed(guard.get("harmful_direction"), {"increase", "decrease"}):
-                errors.append(f"{guard_label}.harmful_direction must be increase or decrease.")
+            delta = guard.get("delta_percent")
+            if is_number(gl) and is_number(gh):
+                if gl > gh:
+                    errors.append(f"{guard_label} confidence interval lower bound must not exceed upper bound.")
+                elif is_number(delta) and not gl <= delta <= gh:
+                    errors.append(f"{guard_label}.delta_percent must lie within its confidence interval.")
+        missing_guardrails = set(planned_guardrails) - guardrail_ids
+        if missing_guardrails:
+            errors.append(f"{label}.guardrails is missing declared guardrail(s): {', '.join(sorted(missing_guardrails))}.")
     return sorted(set(errors))
 
 
@@ -520,21 +570,33 @@ def analyze_results(manifest: dict, results: dict) -> dict:
     else:
         desired = manifest["metrics"]["goal_direction"]
         goal_decisions: list[dict] = []
+        planned_guardrails = {
+            guard["metric_id"]: guard["harmful_direction"]
+            for guard in manifest["metrics"]["guardrails"]
+        }
         for treatment in results["treatment_results"]:
             low = treatment["confidence_interval_low_percent"]
             high = treatment["confidence_interval_high_percent"]
             significant = low > 0 or high < 0
             favorable = (low > 0) if desired == "increase" else (high < 0)
             guardrail_harms = []
+            guardrail_reviews = []
             for guard in treatment["guardrails"]:
                 gl, gh = guard["confidence_interval_low_percent"], guard["confidence_interval_high_percent"]
-                harm = (gl > 0) if guard["harmful_direction"] == "increase" else (gh < 0)
+                harmful_direction = planned_guardrails[guard["metric_id"]]
+                harm = (gl > 0) if harmful_direction == "increase" else (gh < 0)
+                guardrail_reviews.append({
+                    "metric_id": guard["metric_id"],
+                    "harmful_direction": harmful_direction,
+                    "significant_harm": harm,
+                })
                 if harm:
                     guardrail_harms.append(guard["metric_id"])
             goal_decisions.append({
                 "variant_id": treatment["variant_id"],
                 "goal_metric_significant": significant,
                 "goal_metric_favorable": favorable and significant,
+                "guardrail_reviews": guardrail_reviews,
                 "guardrail_harms": sorted(guardrail_harms),
             })
         decisions = goal_decisions
