@@ -135,8 +135,8 @@ def validate_manifest(data: Any) -> list[str]:
         errors.append("schema_version must be integer 1.")
     if not is_slug(data.get("experiment_id")):
         errors.append("experiment_id must be a lowercase slug (2-40 characters).")
-    if not isinstance(data.get("name"), str) or not 1 <= len(data["name"].strip()) <= 100:
-        errors.append("name must contain 1-100 non-whitespace characters.")
+    if not isinstance(data.get("name"), str) or not 1 <= len(data["name"]) <= 100 or not data["name"].strip():
+        errors.append("name must contain 1-100 characters and at least one non-whitespace character.")
     if data.get("product_type") != "in_game_config":
         errors.append("product_type must be in_game_config; this toolkit models Roblox in-experience config experiments only.")
 
@@ -148,8 +148,12 @@ def validate_manifest(data: Any) -> list[str]:
         errors += check_fields(hypothesis, HYPOTHESIS_FIELDS, "hypothesis")
         for field in HYPOTHESIS_FIELDS:
             value = hypothesis.get(field)
-            if not isinstance(value, str) or not 12 <= len(value.strip()) <= 500:
-                errors.append(f"hypothesis.{field} must contain 12-500 non-whitespace characters.")
+            if (
+                not isinstance(value, str)
+                or not 12 <= len(value) <= 500
+                or sum(not character.isspace() for character in value) < 12
+            ):
+                errors.append(f"hypothesis.{field} must contain 12-500 characters, including at least 12 non-whitespace characters.")
 
     config = data.get("config")
     if not isinstance(config, dict):
@@ -196,8 +200,8 @@ def validate_manifest(data: Any) -> list[str]:
         else:
             variant_map[variant_id] = item
         variant_label = item.get("label")
-        if not isinstance(variant_label, str) or not 1 <= len(variant_label.strip()) <= 60:
-            errors.append(f"{label}.label must contain 1-60 non-whitespace characters.")
+        if not isinstance(variant_label, str) or not 1 <= len(variant_label) <= 60 or not variant_label.strip():
+            errors.append(f"{label}.label must contain 1-60 characters and at least one non-whitespace character.")
         elif variant_label.casefold() in labels:
             errors.append(f"Duplicate variant label: {variant_label}.")
         else:
@@ -254,8 +258,8 @@ def validate_manifest(data: Any) -> list[str]:
             if not allowed(source, CUSTOM_SOURCES):
                 errors.append(f"{label}.source must be custom, economy, or funnel.")
             source_name = item.get("source_name")
-            if not isinstance(source_name, str) or not 1 <= len(source_name.strip()) <= 100:
-                errors.append(f"{label}.source_name must contain 1-100 non-whitespace characters.")
+            if not isinstance(source_name, str) or not 1 <= len(source_name) <= 100 or not source_name.strip():
+                errors.append(f"{label}.source_name must contain 1-100 characters and at least one non-whitespace character.")
             elif source == "custom":
                 if not EVENT_NAME.fullmatch(source_name):
                     errors.append(f"{label}.source_name must be a valid AnalyticsService event name for custom source.")
