@@ -31,7 +31,7 @@ Prefer one config key per in-game experiment. Keep the control and treatment val
 ## Pre-register the decision
 Before scheduling, document:
 - Primary metric and desired direction.
-- Guardrail metrics and what constitutes harmful movement.
+- At least one guardrail, declared before scheduling, with a stable metric ID, platform/custom metric reference, and harmful direction (increase or decrease).
 - Planned duration and rollout percentage.
 - Sample feasibility and MDE review.
 - Audience targeting and possible interactions with other running experiments.
