@@ -1,11 +1,11 @@
 # Roblox Codex Game Studio Kit
 
-[![V43 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v44-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v44-quality.yml)
+[![V44 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v44-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v44-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Current release: V44.0.0 — Player Feedback and Research Operations.** The cumulative V1–V44 toolkit contains **280 native Codex skills**. Only the current release is required.
 
-[Open the V43 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v44.0.0).
+[Open the V44 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v44.0.0).
 
 ## What's included
 
@@ -37,11 +37,11 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
 ## Start a Roblox development session
 
-1. Download and extract the V43 release, then open the extracted package root in Codex.
-2. Read `AGENTS.md` and `INDEX_V43.md`.
+1. Download and extract the V44 release, then open the extracted package root in Codex.
+2. Read `AGENTS.md` and `INDEX_V44.md`.
 3. Initialize session continuity in the actual game project folder:
 
-       python C:\Path\To\roblox-codex-game-studio-kit-v43\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
+       python C:\Path\To\roblox-codex-game-studio-kit-v44\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
 
 4. For feature work, read `v37/INDEX_V37.md` and follow the V37 reconnaissance → plan → scoped implementation → evidence handoff workflow.
 5. For a production incident, copy `v38/examples/incident.example.json` into `.codex/incidents/incident.json`, replace the example values with verified aggregate-only facts, then run:
