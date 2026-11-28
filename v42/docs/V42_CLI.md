@@ -15,7 +15,7 @@ python .\v42\tools\v42.py compare --root C:\Path\To\YourGame --baseline .codex\l
 
 - validate: validates config key types and values, repository limits, conditional targeting counts, event schedule windows, config references, staging/publish gates, rollback behavior, and consumer contracts.
 - audit: writes a deterministic design report with summary, warnings, and limitations.
-- compare: writes a baseline/candidate report; removed keys and type changes are breaking. Default-value and event changes require review.
+- compare: writes a baseline/candidate report; removed keys and type changes are breaking. Default values, config targeting/fallback policies, event definitions/schedules, runtime consumer contracts, and deployment changes require review.
 - 0: successful command and no blocking compatibility result.
 - 1: model invalid or comparison found breaking config changes.
 - 2: path, input, or runtime error.

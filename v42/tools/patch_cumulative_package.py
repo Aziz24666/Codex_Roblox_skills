@@ -59,7 +59,7 @@ def patch(package_root: Path, source_root: Path) -> int:
         agents.write_text(agent_text.rstrip() + "\n\n" + GUIDANCE, encoding="utf-8")
 
     names_to_copy = (
-        "README.md", "INDEX.md", "INDEX_V37.md", "INDEX_V38.md", "INDEX_V39.md",
+        "README.md", "INDEX.md", "tools/repository_audit.py", "INDEX_V37.md", "INDEX_V38.md",
         "INDEX_V40.md", "INDEX_V41.md", "INDEX_V42.md",
         "RELEASE_NOTES_V37.md", "RELEASE_NOTES_V38.md", "RELEASE_NOTES_V39.md",
         "RELEASE_NOTES_V40.md", "RELEASE_NOTES_V41.md", "RELEASE_NOTES_V42.md",

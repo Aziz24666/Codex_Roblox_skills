@@ -2,7 +2,7 @@
 
 ## Runtime
 
-Roblox Experience Configs are read in game scripts through ConfigService. ConfigService is server-only and read-only at runtime. Use GetConfigAsync() for global configs and GetConfigForPlayerAsync(player) for conditional values. Do not try to call ConfigService from a LocalScript or write to the repository from a game server.
+Roblox Experience Configs are read in game scripts through ConfigService, which is available only to server scripts (not LocalScripts). Production config values are not writable from the running experience. ConfigService also exposes SetTestingValue() and ClearTestingValue() for temporary overrides in the current server instance; use those only in isolated Studio/test sessions, never as a production configuration channel. Use GetConfigAsync() for global configs and GetConfigForPlayerAsync(player) for conditional values. Do not try to call ConfigService from a LocalScript or write to the repository from a game server.
 
 A ConfigSnapshot represents the values at the moment it was requested. Use UpdateAvailable with Refresh(), or refresh deliberately at a safe boundary. A published change does not mean every existing snapshot has already changed. For active matches or encounters, defer non-emergency tuning until a round/event boundary.
 

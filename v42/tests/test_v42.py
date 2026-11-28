@@ -381,6 +381,67 @@ class AuditAndCompareTests(unittest.TestCase):
         self.assertEqual("review_required", result["status"])
         self.assertEqual(["winter_festival"], result["changes"]["removed_events"])
 
+
+    def test_config_targeting_policy_change_requires_review(self):
+        candidate = copy.deepcopy(self.model)
+        config = next(item for item in candidate["configs"] if item["key"] == "ui.new_hud.enabled")
+        config["targeting_mode"] = "global"
+        config["condition_count"] = 0
+        result = v42.compare_models(self.model, candidate)
+        self.assertEqual("review_required", result["status"])
+        self.assertEqual(1, result["summary"]["config_metadata_change_count"])
+
+    def test_event_schedule_change_requires_review(self):
+        candidate = copy.deepcopy(self.model)
+        candidate["events"][0]["starts_at"] = "2027-12-02T00:00:00Z"
+        result = v42.compare_models(self.model, candidate)
+        self.assertEqual("review_required", result["status"])
+        self.assertEqual(1, result["summary"]["event_definition_change_count"])
+
+    def test_consumer_apply_boundary_change_requires_review(self):
+        candidate = copy.deepcopy(self.model)
+        candidate["consumers"][0]["apply_boundary"] = "next_event_boundary"
+        result = v42.compare_models(self.model, candidate)
+        self.assertEqual("review_required", result["status"])
+        self.assertEqual(1, result["summary"]["consumer_contract_change_count"])
+
+    def test_added_config_key_requires_review(self):
+        candidate = copy.deepcopy(self.model)
+        candidate["configs"].append({
+            "key": "feature.new_mode.enabled",
+            "value_type": "boolean",
+            "default_value": False,
+            "category": "feature_flag",
+            "runtime_change_policy": "next_session",
+            "fallback_policy": "static_default",
+            "targeting_mode": "global",
+            "condition_count": 0,
+            "condition_order_reviewed": True,
+            "owner": "gameplay",
+            "server_only": True,
+            "contains_secret": False,
+        })
+        candidate["consumers"].append({
+            "consumer_id": "new_mode_controller",
+            "config_key": "feature.new_mode.enabled",
+            "expected_type": "boolean",
+            "required": True,
+            "fallback_value": False,
+            "apply_boundary": "next_session",
+            "server_only": True,
+        })
+        self.assertEqual([], v42.validate_model(candidate))
+        result = v42.compare_models(self.model, candidate)
+        self.assertEqual("review_required", result["status"])
+        self.assertEqual(["feature.new_mode.enabled"], result["changes"]["added_config_keys"])
+
+    def test_deployment_strategy_change_requires_review(self):
+        candidate = copy.deepcopy(self.model)
+        candidate["deployment"]["strategy"] = "Immediate"
+        result = v42.compare_models(self.model, candidate)
+        self.assertEqual("review_required", result["status"])
+        self.assertEqual(1, result["summary"]["deployment_change_count"])
+
     def test_event_addition_is_reported(self):
         candidate = copy.deepcopy(self.model)
         new_event = copy.deepcopy(candidate["events"][0])

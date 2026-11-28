@@ -64,7 +64,8 @@ def main() -> int:
         for issue in issues:
             print("FAIL: " + issue)
         return 1
-    print(f"PASS: cumulative V1-V41 package audit ({EXPECTED_SKILLS} native skills).")
+    count = len(list((args.root.expanduser().resolve() / ".agents" / "skills").glob("*/SKILL.md")))
+    print(f"PASS: cumulative V1-V41 compatibility audit ({count} native skills).")
     return 0
 
 

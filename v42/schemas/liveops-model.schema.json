@@ -34,7 +34,14 @@
         "properties": {
           "key": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"},
           "value_type": {"enum": ["boolean", "number", "string", "json"]},
-          "default_value": {},
+          "default_value": {
+            "oneOf": [
+              {"type": "boolean"},
+              {"type": "number"},
+              {"type": "string", "maxLength": 100000},
+              {"type": "object"}
+            ]
+          },
           "category": {"enum": ["feature_flag", "balance_tuning", "event_control", "operations"]},
           "runtime_change_policy": {"enum": ["immediate_noncompetitive_only", "next_safe_boundary", "next_session"]},
           "fallback_policy": {"enum": ["static_default", "keep_last_known_good", "disable_optional_feature"]},
@@ -44,7 +51,13 @@
           "owner": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
           "server_only": {"const": true},
           "contains_secret": {"const": false}
-        }
+        },
+        "allOf": [
+          {"if": {"properties": {"value_type": {"const": "boolean"}}, "required": ["value_type"]}, "then": {"properties": {"default_value": {"type": "boolean"}}}},
+          {"if": {"properties": {"value_type": {"const": "number"}}, "required": ["value_type"]}, "then": {"properties": {"default_value": {"type": "number"}}}},
+          {"if": {"properties": {"value_type": {"const": "string"}}, "required": ["value_type"]}, "then": {"properties": {"default_value": {"type": "string", "maxLength": 100000}}}},
+          {"if": {"properties": {"value_type": {"const": "json"}}, "required": ["value_type"]}, "then": {"properties": {"default_value": {"type": "object"}}}}
+        ]
       }
     },
     "events": {
@@ -63,7 +76,10 @@
           "enabled_config_key": {"type": "string"},
           "preflight_required": {"const": true},
           "test_case_ids": {"type": "array", "maxItems": 20, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"}}
-        }
+        },
+        "allOf": [
+          {"if": {"properties": {"status": {"enum": ["staged", "scheduled", "active"]}}, "required": ["status"]}, "then": {"properties": {"test_case_ids": {"minItems": 1}}}}
+        ]
       }
     },
     "deployment": {
@@ -105,10 +121,23 @@
           "config_key": {"type": "string"},
           "expected_type": {"enum": ["boolean", "number", "string", "json"]},
           "required": {"type": "boolean"},
-          "fallback_value": {},
+          "fallback_value": {
+            "oneOf": [
+              {"type": "boolean"},
+              {"type": "number"},
+              {"type": "string", "maxLength": 100000},
+              {"type": "object"}
+            ]
+          },
           "apply_boundary": {"enum": ["immediate_noncompetitive_only", "next_round", "next_event_boundary", "next_session"]},
           "server_only": {"const": true}
-        }
+        },
+        "allOf": [
+          {"if": {"properties": {"expected_type": {"const": "boolean"}}, "required": ["expected_type"]}, "then": {"properties": {"fallback_value": {"type": "boolean"}}}},
+          {"if": {"properties": {"expected_type": {"const": "number"}}, "required": ["expected_type"]}, "then": {"properties": {"fallback_value": {"type": "number"}}}},
+          {"if": {"properties": {"expected_type": {"const": "string"}}, "required": ["expected_type"]}, "then": {"properties": {"fallback_value": {"type": "string", "maxLength": 100000}}}},
+          {"if": {"properties": {"expected_type": {"const": "json"}}, "required": ["expected_type"]}, "then": {"properties": {"fallback_value": {"type": "object"}}}}
+        ]
       }
     }
   }

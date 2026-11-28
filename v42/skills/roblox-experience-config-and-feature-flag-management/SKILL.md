@@ -10,7 +10,7 @@ Replace hard-coded tunables with documented, typed configuration while keeping g
 
 ## Roblox-native config architecture
 - Use the InExperienceConfig repository for in-experience config keys.
-- Read in game scripts through server-side ConfigService. ConfigService is not a client API and is read-only at runtime.
+- Read in game scripts through server-side ConfigService; it is not a client API. Production config values are not writable from the running experience. SetTestingValue() and ClearTestingValue() are test-only overrides for the current server instance, not a production config write path.
 - Use ConfigService:GetConfigAsync() for global config snapshots and ConfigService:GetConfigForPlayerAsync(player) only when conditional config targeting is deliberately required.
 - Treat ConfigSnapshot as a point-in-time snapshot, not a live mutable table.
 - Use ConfigSnapshot.UpdateAvailable and ConfigSnapshot:Refresh() or a deliberate safe-boundary refresh strategy. After refresh, listen to GetValueChangedSignal() for keys whose runtime behavior can be safely updated.

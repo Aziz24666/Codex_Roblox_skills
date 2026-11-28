@@ -21,6 +21,7 @@ REQUIRED = (
     "v39/VERSION", "v39/tools/v39.py", "v39/tools/audit_cumulative_package.py",
     "v40/VERSION", "v40/tools/v40.py", "v40/tools/audit_cumulative_package.py",
     "v41/VERSION", "v41/tools/v41.py", "v41/tools/audit_cumulative_package.py",
+    "tools/repository_audit.py",
     "v42/VERSION", "v42/INDEX_V42.md", "v42/tools/v42.py",
     "v42/tools/patch_cumulative_package.py", "v42/tools/audit_cumulative_package.py",
     "v42/tests/test_v42.py", "v42/schemas/liveops-model.schema.json",

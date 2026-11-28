@@ -3,7 +3,7 @@
 ## Added
 - Four native Codex skills for event lifecycle/scheduling, Roblox Experience Configs and feature flags, safe staged rollouts, and compatibility/rollback.
 - Offline LiveOps config/event manifest validator and auditor.
-- Baseline/candidate compatibility checker for removed config keys, type changes, default changes, and event additions/removals.
+- Baseline/candidate compatibility checker for removed/type-changed keys, default values, config policy/targeting, event schedules/definitions, runtime consumers, and deployment settings.
 - Strict JSON handling, timezone-aware event windows, schedule-overlap checks, server-only config contracts, conditional-config limits, secret-value guardrails, draftHash/publish gates, and staged-restore requirements.
 - JSON Schema, example model, documentation, regression tests, cumulative patcher/auditor, and Windows/Linux CI.
 

@@ -30,7 +30,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile v42/tools/v42.py v42/tools/patch_cumulative_package.py v42/tools/audit_cumulative_package.py v42/tests/test_v42.py
+          python -m py_compile tools/repository_audit.py v42/tools/v42.py v42/tools/patch_cumulative_package.py v42/tools/audit_cumulative_package.py v42/tests/test_v42.py
           python -m unittest discover -s v42/tests -v
           python -m json.tool v42/schemas/liveops-model.schema.json > /dev/null
           python -m json.tool v42/examples/liveops-model.example.json > /dev/null
@@ -82,7 +82,7 @@ jobs:
         run: |
           set -euo pipefail
           python v42/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v42"
-          python -m py_compile "$PACKAGE_ROOT/v42/tools/v42.py" "$PACKAGE_ROOT/v42/tools/patch_cumulative_package.py" "$PACKAGE_ROOT/v42/tools/audit_cumulative_package.py" "$PACKAGE_ROOT/v42/tests/test_v42.py"
+          python -m py_compile "$PACKAGE_ROOT/tools/repository_audit.py" "$PACKAGE_ROOT/v42/tools/v42.py" "$PACKAGE_ROOT/v42/tools/patch_cumulative_package.py" "$PACKAGE_ROOT/v42/tools/audit_cumulative_package.py" "$PACKAGE_ROOT/v42/tests/test_v42.py"
           python -m unittest discover -s "$PACKAGE_ROOT/v42/tests" -v
           for version in 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41; do python -m unittest discover -s "$PACKAGE_ROOT/v$version/tests" -v; done
           python "$PACKAGE_ROOT/v42/tools/v42.py" doctor --root "$PACKAGE_ROOT"
@@ -90,6 +90,7 @@ jobs:
           python "$PACKAGE_ROOT/v42/tools/v42.py" audit --root "$PACKAGE_ROOT" --model v42/examples/liveops-model.example.json --output v42/test-output/liveops-audit.example.json
           python "$PACKAGE_ROOT/v42/tools/v42.py" compare --root "$PACKAGE_ROOT" --baseline v42/examples/liveops-model.example.json --candidate v42/examples/liveops-model.example.json --output v42/test-output/config-compatibility.example.json
           for version in 37 38 39 40 41 42; do python "$PACKAGE_ROOT/v$version/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"; done
+          python "$PACKAGE_ROOT/tools/repository_audit.py" --root "$PACKAGE_ROOT"
           grep -q "Current release: V42.0.0" "$PACKAGE_ROOT/README.md"
           grep -q "272 native Codex skills" "$PACKAGE_ROOT/README.md"
           test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "272"

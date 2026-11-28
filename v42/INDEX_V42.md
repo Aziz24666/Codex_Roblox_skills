@@ -18,7 +18,7 @@ v42/tools/v42.py provides:
 - doctor: confirm the tool and selected project root.
 - validate: validate config contracts, key types and limits, event windows, deployment gates, rollback rules, and runtime consumers.
 - audit: generate an offline design report with unused config and operational warnings.
-- compare: compare baseline/candidate manifests and detect removed config keys, type changes, default-value changes, and event additions/removals.
+- compare: compare baseline/candidate manifests and detect removed/type-changed keys, default and config-policy changes, event schedule/definition changes, runtime-consumer changes, and deployment changes.
 
 See v42/docs/V42_CLI.md for commands and trust boundaries.
 

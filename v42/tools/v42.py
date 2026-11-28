@@ -408,35 +408,106 @@ def audit_model(data: dict) -> dict:
 
 
 def compare_models(baseline: dict, candidate: dict) -> dict:
+    """Compare validated manifests and flag behavioral changes for human review."""
     baseline_configs = {item["key"]: item for item in baseline["configs"]}
     candidate_configs = {item["key"]: item for item in candidate["configs"]}
     removed = sorted(set(baseline_configs) - set(candidate_configs))
     added = sorted(set(candidate_configs) - set(baseline_configs))
     type_changes = []
     default_changes = []
+    metadata_changes = []
+    metadata_fields = sorted(CONFIG_FIELDS - {"key", "value_type", "default_value"})
     for key in sorted(set(baseline_configs) & set(candidate_configs)):
         old = baseline_configs[key]
         new = candidate_configs[key]
         if old["value_type"] != new["value_type"]:
             type_changes.append({"key": key, "before": old["value_type"], "after": new["value_type"]})
-        elif old["default_value"] != new["default_value"]:
+        if old["default_value"] != new["default_value"]:
             default_changes.append({"key": key, "before": old["default_value"], "after": new["default_value"]})
+        changed_fields = [
+            {"field": field, "before": old.get(field), "after": new.get(field)}
+            for field in metadata_fields if old.get(field) != new.get(field)
+        ]
+        if changed_fields:
+            metadata_changes.append({"key": key, "changes": changed_fields})
+
     base_events = {item["event_id"]: item for item in baseline["events"]}
     new_events = {item["event_id"]: item for item in candidate["events"]}
     removed_events = sorted(set(base_events) - set(new_events))
     added_events = sorted(set(new_events) - set(base_events))
+    event_definition_changes = []
+    for event_id in sorted(set(base_events) & set(new_events)):
+        old = base_events[event_id]
+        new = new_events[event_id]
+        fields = sorted((set(old) | set(new)) - {"event_id"})
+        changed_fields = [
+            {"field": field, "before": old.get(field), "after": new.get(field)}
+            for field in fields if old.get(field) != new.get(field)
+        ]
+        if changed_fields:
+            event_definition_changes.append({"event_id": event_id, "changes": changed_fields})
+
+    base_consumers = {item["consumer_id"]: item for item in baseline["consumers"]}
+    new_consumers = {item["consumer_id"]: item for item in candidate["consumers"]}
+    removed_consumers = sorted(set(base_consumers) - set(new_consumers))
+    added_consumers = sorted(set(new_consumers) - set(base_consumers))
+    consumer_contract_changes = []
+    for consumer_id in sorted(set(base_consumers) & set(new_consumers)):
+        old = base_consumers[consumer_id]
+        new = new_consumers[consumer_id]
+        fields = sorted((set(old) | set(new)) - {"consumer_id"})
+        changed_fields = [
+            {"field": field, "before": old.get(field), "after": new.get(field)}
+            for field in fields if old.get(field) != new.get(field)
+        ]
+        if changed_fields:
+            consumer_contract_changes.append({"consumer_id": consumer_id, "changes": changed_fields})
+
+    contract_fields = sorted((set(baseline["config_contract"]) | set(candidate["config_contract"])))
+    config_contract_changes = [
+        {"field": field, "before": baseline["config_contract"].get(field), "after": candidate["config_contract"].get(field)}
+        for field in contract_fields
+        if baseline["config_contract"].get(field) != candidate["config_contract"].get(field)
+    ]
+    deployment_fields = sorted((set(baseline["deployment"]) | set(candidate["deployment"])))
+    deployment_changes = [
+        {"field": field, "before": baseline["deployment"].get(field), "after": candidate["deployment"].get(field)}
+        for field in deployment_fields
+        if baseline["deployment"].get(field) != candidate["deployment"].get(field)
+    ]
+
     breaking = []
+    warnings = []
     for key in removed:
         breaking.append(f"Removed config key {key!r}; existing Luau consumers may still reference it.")
     for item in type_changes:
         breaking.append(f"Changed config key {item['key']!r} type from {item['before']} to {item['after']}.")
-    warnings = []
+    for key in added:
+        warnings.append(f"Added config key {key!r}; verify its default and deploy compatible server consumers before relying on it.")
     for item in default_changes:
         warnings.append(f"Changed default for {item['key']!r}; review live behavior and fallback assumptions.")
+    for item in metadata_changes:
+        changed = ", ".join(change["field"] for change in item["changes"])
+        warnings.append(f"Changed config contract for {item['key']!r} ({changed}); review targeting, refresh, fallback, and ownership behavior.")
     for event_id in removed_events:
-        warnings.append(f"Removed event {event_id!r}; verify its schedule, player messaging, and cleanup plan.")
+        warnings.append(f"Removed event {event_id!r}; verify its schedule, player messaging, reward settlement, and cleanup plan.")
     for event_id in added_events:
-        warnings.append(f"Added event {event_id!r}; verify preflight, schedule, and rollback references.")
+        warnings.append(f"Added event {event_id!r}; verify preflight, schedule, reward idempotency, and rollback references.")
+    for item in event_definition_changes:
+        changed = ", ".join(change["field"] for change in item["changes"])
+        warnings.append(f"Changed event definition {item['event_id']!r} ({changed}); re-review schedule, runtime state transitions, and reward behavior.")
+    for consumer_id in removed_consumers:
+        warnings.append(f"Removed runtime consumer {consumer_id!r}; confirm the Luau consumer is retired or migrated.")
+    for consumer_id in added_consumers:
+        warnings.append(f"Added runtime consumer {consumer_id!r}; verify its server implementation and fallback before publish.")
+    for item in consumer_contract_changes:
+        changed = ", ".join(change["field"] for change in item["changes"])
+        warnings.append(f"Changed runtime consumer {item['consumer_id']!r} ({changed}); verify its expected type, fallback, and apply boundary.")
+    if config_contract_changes:
+        warnings.append("Changed config repository/runtime contract fields; review key limits, snapshot refresh, and initial-load fallback.")
+    if deployment_changes:
+        warnings.append("Changed deployment settings or publish message; re-review rollout strategy and approval evidence.")
+
     status = "breaking_changes" if breaking else ("review_required" if warnings else "compatible")
     return {
         "schema_version": 1,
@@ -448,8 +519,15 @@ def compare_models(baseline: dict, candidate: dict) -> dict:
             "added_config_count": len(added),
             "type_change_count": len(type_changes),
             "default_change_count": len(default_changes),
+            "config_metadata_change_count": len(metadata_changes),
             "removed_event_count": len(removed_events),
             "added_event_count": len(added_events),
+            "event_definition_change_count": len(event_definition_changes),
+            "removed_consumer_count": len(removed_consumers),
+            "added_consumer_count": len(added_consumers),
+            "consumer_contract_change_count": len(consumer_contract_changes),
+            "config_contract_change_count": len(config_contract_changes),
+            "deployment_change_count": len(deployment_changes),
         },
         "breaking_changes": sorted(breaking),
         "warnings": sorted(warnings),
@@ -458,11 +536,18 @@ def compare_models(baseline: dict, candidate: dict) -> dict:
             "added_config_keys": added,
             "config_type_changes": type_changes,
             "config_default_changes": default_changes,
+            "config_metadata_changes": metadata_changes,
             "removed_events": removed_events,
             "added_events": added_events,
+            "event_definition_changes": event_definition_changes,
+            "removed_consumers": removed_consumers,
+            "added_consumers": added_consumers,
+            "consumer_contract_changes": consumer_contract_changes,
+            "config_contract_changes": config_contract_changes,
+            "deployment_changes": deployment_changes,
         },
         "limitations": [
-            "The comparison checks declared manifest contracts only; it does not search Luau source for string-literal config references.",
+            "The comparison checks declared manifest contracts only; it does not search Luau source for string-literal or dynamically constructed config references.",
             "Review actual code references and staged config values before removing or changing any published key.",
         ],
     }
