@@ -127,7 +127,7 @@ jobs:
           retention-days: 14
   publish:
     name: Publish V45 GitHub Release
-    if: ${{ github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v45:') }}
+    if: ${{ github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && (contains(github.event.head_commit.message, '[release-v45:') || contains(github.event.head_commit.message, '[refresh-v45:')) }}
     runs-on: ubuntu-24.04
     needs: cumulative-build
     permissions:
@@ -147,8 +147,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v45:(v45[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[(release-v45|refresh-v45):(v45[.][0-9]+[.][0-9]+)\].*/\2/p' | head -n1)"
           [[ "$tag" =~ ^v45[.][0-9]+[.][0-9]+$ ]]
           test "$(tr -d '\r\n' < v45/VERSION)" = "${tag#v}"
-          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
-          gh release create "$tag" release-assets/roblox-codex-game-studio-kit-v45.zip release-assets/roblox-codex-game-studio-kit-v45.tar.xz release-assets/SHA256SUMS-RELEASE.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V45.md
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            # A refresh replaces the existing versioned assets and retargets the tag to
+            # this verified main commit so the source tree and downloadable archives match.
+            gh release upload "$tag" release-assets/roblox-codex-game-studio-kit-v45.zip release-assets/roblox-codex-game-studio-kit-v45.tar.xz release-assets/SHA256SUMS-RELEASE.txt --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V45.md --latest
+          else
+            gh release create "$tag" release-assets/roblox-codex-game-studio-kit-v45.zip release-assets/roblox-codex-game-studio-kit-v45.tar.xz release-assets/SHA256SUMS-RELEASE.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V45.md
+          fi

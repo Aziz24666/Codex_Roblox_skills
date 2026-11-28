@@ -59,7 +59,7 @@ def audit(root: Path) -> list[str]:
     if version != "44.0.0":
         issues.append(f"Unexpected V44 version: {version!r}.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    if ("Current release: V44.0.0" not in readme and "Current release: V45.0.0 (proposed)" not in readme) or ("280 native Codex skills" not in readme and "284 native Codex skills" not in readme):
+    if ("Current release: V44.0.0" not in readme and "Current release: V45.0.0" not in readme and "Current release: V45.0.0 (proposed)" not in readme) or ("280 native Codex skills" not in readme and "284 native Codex skills" not in readme):
         issues.append("README does not describe V44.0.0 and 280 native skills.")
     missing = [label for label in HISTORICAL if label not in readme]
     if missing:
