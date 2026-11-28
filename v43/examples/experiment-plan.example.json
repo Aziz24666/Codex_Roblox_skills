@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "experiment_id": "onboarding-flow-test",
+  "name": "Simplified first-session onboarding",
+  "hypothesis": {
+    "change": "Replace the current multi-screen onboarding instructions with a shorter guided first quest.",
+    "expected_outcome": "A larger share of new players will complete the first quest and return the next day.",
+    "rationale": "The current onboarding contains several explanations before the player reaches the core gameplay loop.",
+    "success_criteria": "Day-1 retention improves with no meaningful reduction in playtime or first-quest completion."
+  },
+  "product_type": "in_game_config",
+  "config": {
+    "repository": "InExperienceConfig",
+    "key": "onboarding.flow_variant",
+    "value_type": "string",
+    "control_value": "classic"
+  },
+  "duration_days": 28,
+  "exposure_percent": 100,
+  "variants": [
+    {
+      "variant_id": "control",
+      "label": "Classic onboarding",
+      "is_baseline": true,
+      "weight_percent": 50,
+      "value": "classic"
+    },
+    {
+      "variant_id": "guided",
+      "label": "Guided first quest",
+      "is_baseline": false,
+      "weight_percent": 50,
+      "value": "guided"
+    }
+  ],
+  "metrics": {
+    "goal_metric": "D1_RETENTION",
+    "goal_direction": "increase",
+    "learning_metrics": [
+      "PLAYTIME",
+      "SESSION_TIME"
+    ],
+    "custom_metrics": [
+      {
+        "metric_id": "first_quest_completion",
+        "source": "custom",
+        "source_name": "FirstQuestCompleted",
+        "calculation": "PARTICIPATION_PERCENT",
+        "completion_step": null
+      }
+    ],
+    "guardrails": [
+      {
+        "metric_id": "playtime_per_user",
+        "metric": "PLAYTIME",
+        "harmful_direction": "decrease"
+      },
+      {
+        "metric_id": "first_quest_completion",
+        "metric": "custom:first_quest_completion",
+        "harmful_direction": "decrease"
+      }
+    ]
+  },
+  "instrumentation": {
+    "max_custom_event_names": 100,
+    "custom_fields_reviewed": true,
+    "events": [
+      {
+        "event_name": "OnboardingStarted",
+        "event_type": "counter",
+        "server_only": true,
+        "published_game_only": true,
+        "privacy_reviewed": true,
+        "cardinality_reviewed": true
+      },
+      {
+        "event_name": "FirstQuestCompleted",
+        "event_type": "counter",
+        "server_only": true,
+        "published_game_only": true,
+        "privacy_reviewed": true,
+        "cardinality_reviewed": true
+      }
+    ]
+  },
+  "quality_gates": {
+    "hypothesis_reviewed": true,
+    "sample_feasibility_reviewed": true,
+    "mde_reviewed": true,
+    "targeting_and_assignment_reviewed": true,
+    "instrumentation_preexisting": true,
+    "interaction_reviewed": true,
+    "no_mid_experiment_changes": true,
+    "srm_monitoring_enabled": true,
+    "critical_harm_stop_review_enabled": true,
+    "no_early_success_stop": true,
+    "human_decision_required": true
+  },
+  "operations": {
+    "read_scope_reviewed": true,
+    "write_scope_reviewed": true,
+    "credentials_outside_repository": true,
+    "asynchronous_operation_polling": true,
+    "write_requires_human_approval": true
+  }
+}

@@ -1,0 +1,156 @@
+name: V42 LiveOps, events, and configuration management quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v42-quality-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cross-platform:
+    name: V42 unit tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Compile and test V42
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile tools/repository_audit.py v42/tools/v42.py v42/tools/patch_cumulative_package.py v42/tools/audit_cumulative_package.py v42/tests/test_v42.py
+          python -m unittest discover -s v42/tests -v
+          python -m json.tool v42/schemas/liveops-model.schema.json > /dev/null
+          python -m json.tool v42/examples/liveops-model.example.json > /dev/null
+          python v42/tools/v42.py doctor --root .
+          python v42/tools/v42.py validate --root . --model v42/examples/liveops-model.example.json
+          python v42/tools/v42.py audit --root . --model v42/examples/liveops-model.example.json --output v42/test-output/liveops-audit.example.json
+          python v42/tools/v42.py compare --root . --baseline v42/examples/liveops-model.example.json --candidate v42/examples/liveops-model.example.json --output v42/test-output/config-compatibility.example.json
+
+  cumulative-build:
+    name: Validate and build cumulative V1-V42 package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    needs: cross-platform
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Download the published V41 cumulative baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error "https://github.com/Aziz24666/Codex_Roblox_skills/releases/download/v41.0.0/roblox-codex-game-studio-kit-v41.zip" --output "$RUNNER_TEMP/roblox-codex-game-studio-kit-v41.zip"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v41.zip"
+          mkdir -p "$RUNNER_TEMP/v41-extract"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v41.zip" -d "$RUNNER_TEMP/v41-extract"
+          mv "$RUNNER_TEMP/v41-extract/roblox-codex-game-studio-kit-v41" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v42"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v42" >> "$GITHUB_ENV"
+
+      - name: Validate V42 source, example, schema, and tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile v42/tools/v42.py v42/tools/patch_cumulative_package.py v42/tools/audit_cumulative_package.py v42/tests/test_v42.py
+          python -m unittest discover -s v42/tests -v
+          python -m json.tool v42/schemas/liveops-model.schema.json > /dev/null
+          python -m json.tool v42/examples/liveops-model.example.json > /dev/null
+          python v42/tools/v42.py doctor --root .
+          python v42/tools/v42.py validate --root . --model v42/examples/liveops-model.example.json
+          python v42/tools/v42.py audit --root . --model v42/examples/liveops-model.example.json --output v42/test-output/liveops-audit.example.json
+          python v42/tools/v42.py compare --root . --baseline v42/examples/liveops-model.example.json --candidate v42/examples/liveops-model.example.json --output v42/test-output/config-compatibility.example.json
+
+      - name: Integrate V42 and run cumulative regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v42/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v42"
+          python -m py_compile "$PACKAGE_ROOT/tools/repository_audit.py" "$PACKAGE_ROOT/v42/tools/v42.py" "$PACKAGE_ROOT/v42/tools/patch_cumulative_package.py" "$PACKAGE_ROOT/v42/tools/audit_cumulative_package.py" "$PACKAGE_ROOT/v42/tests/test_v42.py"
+          python -m unittest discover -s "$PACKAGE_ROOT/v42/tests" -v
+          for version in 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41; do python -m unittest discover -s "$PACKAGE_ROOT/v$version/tests" -v; done
+          python "$PACKAGE_ROOT/v42/tools/v42.py" doctor --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v42/tools/v42.py" validate --root "$PACKAGE_ROOT" --model v42/examples/liveops-model.example.json
+          python "$PACKAGE_ROOT/v42/tools/v42.py" audit --root "$PACKAGE_ROOT" --model v42/examples/liveops-model.example.json --output v42/test-output/liveops-audit.example.json
+          python "$PACKAGE_ROOT/v42/tools/v42.py" compare --root "$PACKAGE_ROOT" --baseline v42/examples/liveops-model.example.json --candidate v42/examples/liveops-model.example.json --output v42/test-output/config-compatibility.example.json
+          for version in 37 38 39 40 41 42; do python "$PACKAGE_ROOT/v$version/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"; done
+          python "$PACKAGE_ROOT/tools/repository_audit.py" --root "$PACKAGE_ROOT"
+          grep -Eq "Current release: V(42|43|44)\\.0\\.0" "$PACKAGE_ROOT/README.md"
+          grep -Eq "272 native Codex skills|276 native Codex skills|280 native Codex skills" "$PACKAGE_ROOT/README.md"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "272"
+
+      - name: Build and compare V42 release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          tar -cJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v42.tar.xz" "$name"
+          zip -qr "$RUNNER_TEMP/roblox-codex-game-studio-kit-v42.zip" "$name"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v42.zip"
+          xz -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v42.tar.xz"
+          mkdir -p "$RUNNER_TEMP/check-zip" "$RUNNER_TEMP/check-tar"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v42.zip" -d "$RUNNER_TEMP/check-zip"
+          tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v42.tar.xz" -C "$RUNNER_TEMP/check-tar"
+          diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
+          cd "$RUNNER_TEMP"
+          sha256sum roblox-codex-game-studio-kit-v42.zip roblox-codex-game-studio-kit-v42.tar.xz > SHA256SUMS-RELEASE.txt
+          sha256sum --check SHA256SUMS-RELEASE.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v42
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v42.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v42.tar.xz
+            ${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish V42 GitHub Release
+    if: github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v42:')
+    runs-on: ubuntu-24.04
+    needs: cumulative-build
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: roblox-codex-game-studio-kit-v42
+          path: ${{ runner.temp }}/v42-release-assets
+      - name: Publish versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v42:(v42[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          [[ "$tag" =~ ^v42[.][0-9]+[.][0-9]+$ ]]
+          test "$(tr -d '\r\n' < v42/VERSION)" = "${tag#v}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
+          gh release create "$tag" \
+            "$RUNNER_TEMP/v42-release-assets/roblox-codex-game-studio-kit-v42.zip" \
+            "$RUNNER_TEMP/v42-release-assets/roblox-codex-game-studio-kit-v42.tar.xz" \
+            "$RUNNER_TEMP/v42-release-assets/SHA256SUMS-RELEASE.txt" \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V42.md

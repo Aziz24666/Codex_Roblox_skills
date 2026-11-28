@@ -20,6 +20,15 @@ EXPECTED_SKILLS_V32 = 232
 EXPECTED_SKILLS_V33 = 236
 EXPECTED_SKILLS_V34 = 240
 EXPECTED_SKILLS_V35 = 244
+EXPECTED_SKILLS_V36 = 248
+EXPECTED_SKILLS_V37 = 252
+EXPECTED_SKILLS_V38 = 256
+EXPECTED_SKILLS_V39 = 260
+EXPECTED_SKILLS_V40 = 264
+EXPECTED_SKILLS_V41 = 268
+EXPECTED_SKILLS_V42 = 272
+EXPECTED_SKILLS_V43 = 276
+EXPECTED_SKILLS_V44 = 280
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -112,6 +121,19 @@ def audit(root: Path) -> list[str]:
                         target_path == "INDEX_V35.md" or target_path.startswith("v35/")
                     ):
                         continue
+                    # A current README can be copied into an older cumulative overlay
+                    # before the newer version directories have been installed. Defer
+                    # those future-version links until the corresponding overlay lands.
+                    defer_future_version = False
+                    for newer_version in range(44, 35, -1):
+                        if not (root / f"v{newer_version}" / "VERSION").is_file() and (
+                            target_path == f"INDEX_V{newer_version}.md"
+                            or target_path.startswith(f"v{newer_version}/")
+                        ):
+                            defer_future_version = True
+                            break
+                    if defer_future_version:
+                        continue
                     if not (root / "v34" / "VERSION").is_file() and (
                         target_path == "INDEX_V34.md" or target_path.startswith("v34/")
                     ):
@@ -152,9 +174,36 @@ def audit(root: Path) -> list[str]:
     is_v33 = (root / "v33" / "VERSION").is_file()
     is_v34 = (root / "v34" / "VERSION").is_file()
     is_v35 = (root / "v35" / "VERSION").is_file()
+    is_v36 = (root / "v36" / "VERSION").is_file()
+    is_v37 = (root / "v37" / "VERSION").is_file()
+    is_v38 = (root / "v38" / "VERSION").is_file()
+    is_v39 = (root / "v39" / "VERSION").is_file()
+    is_v40 = (root / "v40" / "VERSION").is_file()
+    is_v41 = (root / "v41" / "VERSION").is_file()
+    is_v42 = (root / "v42" / "VERSION").is_file()
+    is_v43 = (root / "v43" / "VERSION").is_file()
+    is_v44 = (root / "v44" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    if is_v35:
+    if is_v44:
+        expected_skills = EXPECTED_SKILLS_V44
+    elif is_v43:
+        expected_skills = EXPECTED_SKILLS_V43
+    elif is_v42:
+        expected_skills = EXPECTED_SKILLS_V42
+    elif is_v41:
+        expected_skills = EXPECTED_SKILLS_V41
+    elif is_v40:
+        expected_skills = EXPECTED_SKILLS_V40
+    elif is_v39:
+        expected_skills = EXPECTED_SKILLS_V39
+    elif is_v38:
+        expected_skills = EXPECTED_SKILLS_V38
+    elif is_v37:
+        expected_skills = EXPECTED_SKILLS_V37
+    elif is_v36:
+        expected_skills = EXPECTED_SKILLS_V36
+    elif is_v35:
         expected_skills = EXPECTED_SKILLS_V35
     elif is_v34:
         expected_skills = EXPECTED_SKILLS_V34
@@ -291,6 +340,125 @@ def audit(root: Path) -> list[str]:
             "v35/docs/CONTENT_BUDGETS_AND_DEPENDENCIES.md", "v35/docs/ASSET_RELEASE_AND_MIGRATION.md",
             "v35/schemas/asset-catalog.schema.json", "v35/schemas/asset-budget-policy.schema.json",
             "v35/examples/asset-catalog.example.json", "v35/examples/asset-budget-policy.example.json",
+        )
+    if is_v36:
+        required += (
+            "INDEX_V36.md", "v36/VERSION", "v36/INDEX_V36.md", "v36/tools/v36.py",
+            "v36/tools/patch_cumulative_package.py", "v36/tools/audit_cumulative_package.py",
+            "v36/tests/test_v36.py", "v36/docs/ACCESSIBILITY_AND_INTERACTION_REVIEW.md",
+            "v36/docs/LOCALIZATION_AND_RESPONSIVE_UI.md", "v36/docs/QUALITY_MANIFEST_AND_AUDIT.md",
+            "v36/examples/quality-manifest.example.json",
+            ".agents/skills/roblox-accessibility-and-inclusive-interaction-v36/SKILL.md",
+            ".agents/skills/roblox-responsive-ui-and-readability-v36/SKILL.md",
+            ".agents/skills/roblox-localization-and-rtl-readiness-v36/SKILL.md",
+            ".agents/skills/roblox-sensory-feedback-and-motion-settings-v36/SKILL.md",
+        )
+    if is_v37:
+        required += (
+            "INDEX_V37.md", "v37/VERSION", "v37/INDEX_V37.md", "v37/tools/v37.py",
+            "v37/tools/patch_cumulative_package.py", "v37/tools/audit_cumulative_package.py",
+            "v37/tests/test_v37.py", "v37/docs/PROJECT_RECONNAISSANCE_AND_CHANGE_IMPACT.md",
+            "v37/docs/FEATURE_PLANNING_AND_DEPENDENCY_GRAPHS.md",
+            "v37/docs/IMPLEMENTATION_EVIDENCE_AND_HANDOFF.md", "v37/docs/PLAN_AND_REPORT_CLI.md",
+            "v37/schemas/implementation-plan.schema.json", "v37/schemas/implementation-report.schema.json",
+            "v37/examples/implementation-plan.example.json", "v37/examples/implementation-report.example.json",
+            ".agents/skills/roblox-project-reconnaissance-and-architecture-mapping-v37/SKILL.md",
+            ".agents/skills/roblox-feature-decomposition-and-dependency-planning-v37/SKILL.md",
+            ".agents/skills/roblox-scoped-implementation-and-change-impact-v37/SKILL.md",
+            ".agents/skills/roblox-implementation-verification-and-handoff-v37/SKILL.md",
+        )
+    if is_v38:
+        required += (
+            "INDEX_V38.md", "v38/VERSION", "v38/INDEX_V38.md", "v38/tools/v38.py",
+            "v38/tools/patch_cumulative_package.py", "v38/tools/audit_cumulative_package.py",
+            "v38/tests/test_v38.py", "v38/schemas/incident.schema.json",
+            "v38/examples/incident.example.json", "v38/docs/INCIDENT_TRIAGE_AND_SERVICE_HEALTH.md",
+            "v38/docs/MITIGATION_APPROVAL_AND_ROLLBACK.md", "v38/docs/COMMUNICATION_AND_POSTMORTEM.md",
+            "v38/docs/INCIDENT_CLI.md",
+            ".agents/skills/roblox-production-incident-triage-and-severity-assessment/SKILL.md",
+            ".agents/skills/roblox-privacy-safe-service-health-and-impact-analysis/SKILL.md",
+            ".agents/skills/roblox-safe-mitigation-approval-and-recovery/SKILL.md",
+            ".agents/skills/roblox-player-communications-and-postmortem-readiness/SKILL.md",
+        )
+    if is_v39:
+        required += (
+            "INDEX_V39.md", "v39/VERSION", "v39/INDEX_V39.md", "v39/tools/v39.py",
+            "v39/tools/patch_cumulative_package.py", "v39/tools/audit_cumulative_package.py",
+            "v39/tests/test_v39.py", "v39/schemas/economy-model.schema.json",
+            "v39/examples/economy-model.example.json", "v39/docs/ECONOMY_MODEL_DESIGN.md",
+            "v39/docs/INTERPRETING_SIMULATION_RESULTS.md", "v39/docs/ECONOMY_CLI.md",
+            ".agents/skills/roblox-economy-source-and-sink-architecture/SKILL.md",
+            ".agents/skills/roblox-deterministic-economy-simulation/SKILL.md",
+            ".agents/skills/roblox-progression-pacing-and-reward-curves/SKILL.md",
+            ".agents/skills/roblox-economy-fairness-and-abuse-review/SKILL.md",
+        )
+    if is_v40:
+        required += (
+            "INDEX_V40.md", "v40/VERSION", "v40/INDEX_V40.md", "v40/tools/v40.py",
+            "v40/tools/patch_cumulative_package.py", "v40/tools/audit_cumulative_package.py",
+            "v40/tests/test_v40.py", "v40/schemas/persistence-model.schema.json",
+            "v40/examples/persistence-model.example.json", "v40/docs/PERSISTENCE_ARCHITECTURE.md",
+            "v40/docs/MIGRATIONS_AND_RECEIPTS.md", "v40/docs/PERSISTENCE_CLI.md",
+            ".agents/skills/roblox-profile-lifecycle-and-session-ownership/SKILL.md",
+            ".agents/skills/roblox-resilient-data-saving-and-recovery/SKILL.md",
+            ".agents/skills/roblox-safe-profile-schema-migrations/SKILL.md",
+            ".agents/skills/roblox-idempotent-rewards-and-receipt-processing/SKILL.md",
+        )
+    if is_v41:
+        required += (
+            "INDEX_V41.md", "v41/VERSION", "v41/INDEX_V41.md", "v41/tools/v41.py",
+            "v41/tools/patch_cumulative_package.py", "v41/tools/audit_cumulative_package.py",
+            "v41/tests/test_v41.py", "v41/schemas/matchmaking-model.schema.json",
+            "v41/examples/matchmaking-model.example.json", "v41/docs/MATCHMAKING_ARCHITECTURE.md",
+            "v41/docs/PARTIES_AND_LOBBY_LIFECYCLE.md", "v41/docs/TELEPORT_AND_RECOVERY.md",
+            "v41/docs/V41_CLI.md",
+            ".agents/skills/roblox-skill-based-matchmaking-queue-design/SKILL.md",
+            ".agents/skills/roblox-party-and-lobby-lifecycle/SKILL.md",
+            ".agents/skills/roblox-cross-server-matchmaking-coordination/SKILL.md",
+            ".agents/skills/roblox-teleport-reconnect-and-server-handoff/SKILL.md",
+        )
+    if is_v42:
+        required += (
+            "INDEX_V42.md", "v42/VERSION", "v42/INDEX_V42.md", "v42/tools/v42.py",
+            "v42/tools/patch_cumulative_package.py", "v42/tools/audit_cumulative_package.py",
+            "v42/tests/test_v42.py", "v42/schemas/liveops-model.schema.json",
+            "v42/examples/liveops-model.example.json", "v42/docs/LIVEOPS_EVENT_LIFECYCLE.md",
+            "v42/docs/EXPERIENCE_CONFIGS_AND_FEATURE_FLAGS.md",
+            "v42/docs/SAFE_CONFIG_DEPLOYMENT_AND_ROLLBACK.md", "v42/docs/V42_CLI.md",
+            ".agents/skills/roblox-live-event-lifecycle-and-scheduling/SKILL.md",
+            ".agents/skills/roblox-experience-config-and-feature-flag-management/SKILL.md",
+            ".agents/skills/roblox-safe-live-config-rollouts/SKILL.md",
+            ".agents/skills/roblox-liveops-config-compatibility-and-rollback/SKILL.md",
+        )
+    if is_v43:
+        required += (
+            "INDEX_V43.md", "v43/VERSION", "v43/INDEX_V43.md", "v43/tools/v43.py",
+            "v43/tools/patch_cumulative_package.py", "v43/tools/audit_cumulative_package.py",
+            "v43/tests/test_v43.py", "v43/tests/requirements-test.txt", "v43/schemas/experiment-plan.schema.json",
+            "v43/schemas/experiment-results-review.schema.json",
+            "v43/examples/experiment-plan.example.json", "v43/examples/experiment-results.example.json",
+            "v43/docs/EXPERIMENT_DESIGN_AND_METRICS.md", "v43/docs/ROBLOX_EXPERIMENTS_OPEN_CLOUD.md",
+            "v43/docs/ANALYTICS_INSTRUMENTATION.md", "v43/docs/STATISTICAL_REVIEW_AND_DECISIONS.md",
+            "v43/docs/V43_CLI.md",
+            ".agents/skills/roblox-experiment-hypothesis-and-design/SKILL.md",
+            ".agents/skills/roblox-native-experiments-and-open-cloud-lifecycle/SKILL.md",
+            ".agents/skills/roblox-experiment-analytics-instrumentation/SKILL.md",
+            ".agents/skills/roblox-experiment-results-and-decision-review/SKILL.md",
+        )
+    if is_v44:
+        required += (
+            "INDEX_V44.md", "v44/VERSION", "v44/INDEX_V44.md", "v44/tools/v44.py",
+            "v44/tools/patch_cumulative_package.py", "v44/tools/audit_cumulative_package.py",
+            "v44/tests/test_v44.py", "v44/tests/requirements-test.txt",
+            "v44/schemas/feedback-study.schema.json", "v44/schemas/feedback-data.schema.json",
+            "v44/examples/feedback-study.example.json", "v44/examples/feedback-data.example.json",
+            "v44/docs/FEEDBACK_STUDY_DESIGN.md", "v44/docs/PRIVACY_CONSCIOUS_FEEDBACK.md",
+            "v44/docs/QUALITATIVE_CODING_AND_SYNTHESIS.md",
+            "v44/docs/FEEDBACK_TRIAGE_AND_TRACEABILITY.md", "v44/docs/V44_CLI.md",
+            ".agents/skills/roblox-player-feedback-study-design/SKILL.md",
+            ".agents/skills/roblox-privacy-conscious-feedback-collection/SKILL.md",
+            ".agents/skills/roblox-playtest-feedback-thematic-analysis/SKILL.md",
+            ".agents/skills/roblox-feedback-triage-and-action-traceability/SKILL.md",
         )
     for item in required:
         if not (root / item).is_file():

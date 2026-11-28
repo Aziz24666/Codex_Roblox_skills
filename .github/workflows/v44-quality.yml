@@ -1,0 +1,180 @@
+name: V44 Player Feedback and Research Operations Quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v44-quality-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cross-platform:
+    name: V44 tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Install test dependency
+        run: python -m pip install --disable-pip-version-check -r v44/tests/requirements-test.txt
+      - name: Compile, test, and smoke-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile v44/tools/v44.py v44/tools/patch_cumulative_package.py v44/tools/audit_cumulative_package.py v44/tests/test_v44.py
+          python -m unittest discover -s v44/tests -v
+          for file in v44/schemas/feedback-study.schema.json v44/schemas/feedback-data.schema.json v44/examples/feedback-study.example.json v44/examples/feedback-data.example.json; do python -m json.tool "$file" > /dev/null; done
+          python v44/tools/v44.py doctor --root .
+          python v44/tools/v44.py validate-study --root . --study v44/examples/feedback-study.example.json
+          python v44/tools/v44.py audit --root . --study v44/examples/feedback-study.example.json --output v44/test-output/study-audit.json
+          python v44/tools/v44.py validate-data --root . --study v44/examples/feedback-study.example.json --data v44/examples/feedback-data.example.json
+          python v44/tools/v44.py summarize --root . --study v44/examples/feedback-study.example.json --data v44/examples/feedback-data.example.json --output v44/test-output/feedback-summary.json
+
+  cumulative-build:
+    name: Cumulative V1-V44 package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    needs: cross-platform
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r v43/tests/requirements-test.txt -r v44/tests/requirements-test.txt
+      - name: Download published V41 cumulative baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error "https://github.com/Aziz24666/Codex_Roblox_skills/releases/download/v41.0.0/roblox-codex-game-studio-kit-v41.zip" --output "$RUNNER_TEMP/v41.zip"
+          unzip -t "$RUNNER_TEMP/v41.zip"
+          mkdir -p "$RUNNER_TEMP/unpack"
+          unzip -q "$RUNNER_TEMP/v41.zip" -d "$RUNNER_TEMP/unpack"
+          mv "$RUNNER_TEMP/unpack/roblox-codex-game-studio-kit-v41" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v44"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v44" >> "$GITHUB_ENV"
+
+      - name: Test V42, V43, and V44 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile tools/repository_audit.py v42/tools/v42.py v42/tools/patch_cumulative_package.py v42/tools/audit_cumulative_package.py v42/tests/test_v42.py v43/tools/v43.py v43/tools/patch_cumulative_package.py v43/tools/audit_cumulative_package.py v43/tests/test_v43.py v44/tools/v44.py v44/tools/patch_cumulative_package.py v44/tools/audit_cumulative_package.py v44/tests/test_v44.py
+          python -m unittest discover -s v42/tests -v
+          python -m unittest discover -s v43/tests -v
+          python -m unittest discover -s v44/tests -v
+          for file in v42/schemas/liveops-model.schema.json v42/examples/liveops-model.example.json v43/schemas/experiment-plan.schema.json v43/schemas/experiment-results-review.schema.json v43/examples/experiment-plan.example.json v43/examples/experiment-results.example.json v44/schemas/feedback-study.schema.json v44/schemas/feedback-data.schema.json v44/examples/feedback-study.example.json v44/examples/feedback-data.example.json; do python -m json.tool "$file" > /dev/null; done
+
+      - name: Rebuild V42 and V43, then run cumulative regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v42/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v42"
+          python v43/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v43"
+          for version in 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43; do python -m unittest discover -s "$PACKAGE_ROOT/v$version/tests" -v; done
+          python "$PACKAGE_ROOT/v42/tools/v42.py" validate --root "$PACKAGE_ROOT" --model v42/examples/liveops-model.example.json
+          python "$PACKAGE_ROOT/v43/tools/v43.py" validate --root "$PACKAGE_ROOT" --manifest v43/examples/experiment-plan.example.json
+          python "$PACKAGE_ROOT/v43/tools/v43.py" analyze --root "$PACKAGE_ROOT" --manifest v43/examples/experiment-plan.example.json --results v43/examples/experiment-results.example.json --output v43/test-output/experiment-review.json
+          for version in 37 38 39 40 41 42 43; do python "$PACKAGE_ROOT/v$version/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"; done
+          python "$PACKAGE_ROOT/tools/repository_audit.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "276"
+
+      - name: Integrate and audit V44
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v44/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v44"
+          python -m py_compile "$PACKAGE_ROOT/v44/tools/v44.py" "$PACKAGE_ROOT/v44/tools/patch_cumulative_package.py" "$PACKAGE_ROOT/v44/tools/audit_cumulative_package.py" "$PACKAGE_ROOT/v44/tests/test_v44.py"
+          python -m unittest discover -s "$PACKAGE_ROOT/v44/tests" -v
+          python "$PACKAGE_ROOT/v44/tools/v44.py" doctor --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v44/tools/v44.py" validate-study --root "$PACKAGE_ROOT" --study v44/examples/feedback-study.example.json
+          python "$PACKAGE_ROOT/v44/tools/v44.py" validate-data --root "$PACKAGE_ROOT" --study v44/examples/feedback-study.example.json --data v44/examples/feedback-data.example.json
+          python "$PACKAGE_ROOT/v44/tools/v44.py" summarize --root "$PACKAGE_ROOT" --study v44/examples/feedback-study.example.json --data v44/examples/feedback-data.example.json --output v44/test-output/feedback-summary.json
+          for version in 37 38 39 40 41 42 43 44; do python "$PACKAGE_ROOT/v$version/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"; done
+          python "$PACKAGE_ROOT/tools/repository_audit.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "280"
+
+      - name: Remove generated files and re-audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          find "$PACKAGE_ROOT" -type d -name __pycache__ -prune -exec rm -rf {} +
+          find "$PACKAGE_ROOT" -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
+          find "$PACKAGE_ROOT" -type d -name test-output -prune -exec rm -rf {} +
+          find "$PACKAGE_ROOT" -type d -name .pytest_cache -prune -exec rm -rf {} +
+          test -z "$(find "$PACKAGE_ROOT" \( -type d -name __pycache__ -o -type f -name '*.pyc' -o -type d -name test-output \) -print -quit)"
+          python "$PACKAGE_ROOT/tools/repository_audit.py" --root "$PACKAGE_ROOT"
+          for version in 37 38 39 40 41 42 43 44; do python "$PACKAGE_ROOT/v$version/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"; done
+
+      - name: Build and compare release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          tar -cJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v44.tar.xz" "$name"
+          zip -qr "$RUNNER_TEMP/roblox-codex-game-studio-kit-v44.zip" "$name"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v44.zip"
+          xz -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v44.tar.xz"
+          mkdir -p "$RUNNER_TEMP/check-zip" "$RUNNER_TEMP/check-tar"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v44.zip" -d "$RUNNER_TEMP/check-zip"
+          tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v44.tar.xz" -C "$RUNNER_TEMP/check-tar"
+          diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
+          cd "$RUNNER_TEMP"
+          sha256sum roblox-codex-game-studio-kit-v44.zip roblox-codex-game-studio-kit-v44.tar.xz > SHA256SUMS-RELEASE.txt
+          sha256sum --check SHA256SUMS-RELEASE.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v44
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v44.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v44.tar.xz
+            ${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish V44 GitHub Release
+    if: ${{ github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v44:') }}
+    runs-on: ubuntu-24.04
+    needs: cumulative-build
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: roblox-codex-game-studio-kit-v44
+          path: release-assets
+      - name: Publish versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v44:(v44[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          [[ "$tag" =~ ^v44[.][0-9]+[.][0-9]+$ ]]
+          test "$(tr -d '\r\n' < v44/VERSION)" = "${tag#v}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
+          gh release create "$tag" \
+            release-assets/roblox-codex-game-studio-kit-v44.zip \
+            release-assets/roblox-codex-game-studio-kit-v44.tar.xz \
+            release-assets/SHA256SUMS-RELEASE.txt \
+            --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" \
+            --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V44.md

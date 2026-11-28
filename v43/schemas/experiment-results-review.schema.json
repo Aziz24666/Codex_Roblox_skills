@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v43/schemas/experiment-results-review.schema.json",
+  "title": "Offline Roblox experiment results review input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "experiment_state",
+    "observed_at",
+    "elapsed_days",
+    "srm_detected",
+    "critical_harm_flag",
+    "variant_enrolled_users",
+    "treatment_results"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "experiment_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{1,39}$"
+    },
+    "experiment_state": {
+      "enum": [
+        "DRAFT",
+        "SCHEDULED",
+        "RUNNING",
+        "DECISION_NEEDED",
+        "COMPLETED"
+      ]
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "elapsed_days": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 60
+    },
+    "srm_detected": {
+      "type": "boolean"
+    },
+    "critical_harm_flag": {
+      "type": "boolean"
+    },
+    "variant_enrolled_users": {
+      "type": "object",
+      "minProperties": 2,
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "treatment_results": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "variant_id",
+          "goal_metric_delta_percent",
+          "confidence_interval_low_percent",
+          "confidence_interval_high_percent",
+          "guardrails"
+        ],
+        "properties": {
+          "variant_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]{1,39}$"
+          },
+          "goal_metric_delta_percent": {
+            "type": "number"
+          },
+          "confidence_interval_low_percent": {
+            "type": "number"
+          },
+          "confidence_interval_high_percent": {
+            "type": "number"
+          },
+          "guardrails": {
+            "type": "array",
+            "maxItems": 20,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "metric_id",
+                "delta_percent",
+                "confidence_interval_low_percent",
+                "confidence_interval_high_percent"
+              ],
+              "properties": {
+                "metric_id": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_-]{1,39}$"
+                },
+                "delta_percent": {
+                  "type": "number"
+                },
+                "confidence_interval_low_percent": {
+                  "type": "number"
+                },
+                "confidence_interval_high_percent": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

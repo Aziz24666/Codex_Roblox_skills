@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/v42/schemas/liveops-model.schema.json",
+  "title": "Roblox LiveOps events and experience config contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "model_id", "config_contract", "configs", "events", "deployment", "rollback", "consumers"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "model_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
+    "config_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "key_limit", "active_config_limit", "server_only", "runtime_write_access", "staged_before_publish", "draft_hash_guard", "publish_message_required", "snapshot_refresh_policy", "refresh_signal_handling", "fallback_on_initial_failure"],
+      "properties": {
+        "repository": {"const": "InExperienceConfig"},
+        "key_limit": {"type": "integer", "minimum": 1, "maximum": 100},
+        "active_config_limit": {"type": "integer", "minimum": 1, "maximum": 1000},
+        "server_only": {"const": true},
+        "runtime_write_access": {"const": false},
+        "staged_before_publish": {"const": true},
+        "draft_hash_guard": {"const": true},
+        "publish_message_required": {"const": true},
+        "snapshot_refresh_policy": {"enum": ["next_safe_boundary", "immediate_noncompetitive_only"]},
+        "refresh_signal_handling": {"const": "UpdateAvailable_then_Refresh"},
+        "fallback_on_initial_failure": {"enum": ["static_defaults", "disable_optional_features"]}
+      }
+    },
+    "configs": {
+      "type": "array", "minItems": 1, "maxItems": 100,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["key", "value_type", "default_value", "category", "runtime_change_policy", "fallback_policy", "targeting_mode", "condition_count", "condition_order_reviewed", "owner", "server_only", "contains_secret"],
+        "properties": {
+          "key": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"},
+          "value_type": {"enum": ["boolean", "number", "string", "json"]},
+          "default_value": {
+            "oneOf": [
+              {"type": "boolean"},
+              {"type": "number"},
+              {"type": "string", "maxLength": 100000},
+              {"type": "object"}
+            ]
+          },
+          "category": {"enum": ["feature_flag", "balance_tuning", "event_control", "operations"]},
+          "runtime_change_policy": {"enum": ["immediate_noncompetitive_only", "next_safe_boundary", "next_session"]},
+          "fallback_policy": {"enum": ["static_default", "keep_last_known_good", "disable_optional_feature"]},
+          "targeting_mode": {"enum": ["global", "conditional"]},
+          "condition_count": {"type": "integer", "minimum": 0, "maximum": 20},
+          "condition_order_reviewed": {"const": true},
+          "owner": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
+          "server_only": {"const": true},
+          "contains_secret": {"const": false}
+        },
+        "allOf": [
+          {"if": {"properties": {"value_type": {"const": "boolean"}}, "required": ["value_type"]}, "then": {"properties": {"default_value": {"type": "boolean"}}}},
+          {"if": {"properties": {"value_type": {"const": "number"}}, "required": ["value_type"]}, "then": {"properties": {"default_value": {"type": "number"}}}},
+          {"if": {"properties": {"value_type": {"const": "string"}}, "required": ["value_type"]}, "then": {"properties": {"default_value": {"type": "string", "maxLength": 100000}}}},
+          {"if": {"properties": {"value_type": {"const": "json"}}, "required": ["value_type"]}, "then": {"properties": {"default_value": {"type": "object"}}}}
+        ]
+      }
+    },
+    "events": {
+      "type": "array", "maxItems": 100,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["event_id", "title", "schedule_group", "status", "starts_at", "ends_at", "config_keys", "enabled_config_key", "preflight_required", "test_case_ids"],
+        "properties": {
+          "event_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
+          "title": {"type": "string", "minLength": 1, "maxLength": 100},
+          "schedule_group": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
+          "status": {"enum": ["planned", "staged", "scheduled", "active", "completed", "cancelled"]},
+          "starts_at": {"type": "string", "format": "date-time"},
+          "ends_at": {"type": "string", "format": "date-time"},
+          "config_keys": {"type": "array", "minItems": 1, "maxItems": 20, "uniqueItems": true, "items": {"type": "string"}},
+          "enabled_config_key": {"type": "string"},
+          "preflight_required": {"const": true},
+          "test_case_ids": {"type": "array", "maxItems": 20, "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"}}
+        },
+        "allOf": [
+          {"if": {"properties": {"status": {"enum": ["staged", "scheduled", "active"]}}, "required": ["status"]}, "then": {"properties": {"test_case_ids": {"minItems": 1}}}}
+        ]
+      }
+    },
+    "deployment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["strategy", "staged_test_required", "pre_publish_validation_required", "published_readback_required", "human_approval_required", "publish_message_required", "publish_only_after_approval", "draft_hash_guard_required", "api_key_outside_project", "publish_message"],
+      "properties": {
+        "strategy": {"enum": ["Immediate", "GradualRollout"]},
+        "staged_test_required": {"const": true},
+        "pre_publish_validation_required": {"const": true},
+        "published_readback_required": {"const": true},
+        "human_approval_required": {"const": true},
+        "publish_message_required": {"const": true},
+        "publish_only_after_approval": {"const": true},
+        "draft_hash_guard_required": {"const": true},
+        "api_key_outside_project": {"const": true},
+        "publish_message": {"type": "string", "minLength": 10, "maxLength": 200}
+      }
+    },
+    "rollback": {
+      "type": "object", "additionalProperties": false,
+      "required": ["revision_history_required", "restore_creates_staged_draft", "republish_after_restore", "published_readback_required", "human_approval_required", "no_automatic_production_rollback", "rollback_test_required"],
+      "properties": {
+        "revision_history_required": {"const": true},
+        "restore_creates_staged_draft": {"const": true},
+        "republish_after_restore": {"const": true},
+        "published_readback_required": {"const": true},
+        "human_approval_required": {"const": true},
+        "no_automatic_production_rollback": {"const": true},
+        "rollback_test_required": {"const": true}
+      }
+    },
+    "consumers": {
+      "type": "array", "minItems": 1, "maxItems": 256,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["consumer_id", "config_key", "expected_type", "required", "fallback_value", "apply_boundary", "server_only"],
+        "properties": {
+          "consumer_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
+          "config_key": {"type": "string"},
+          "expected_type": {"enum": ["boolean", "number", "string", "json"]},
+          "required": {"type": "boolean"},
+          "fallback_value": {
+            "oneOf": [
+              {"type": "boolean"},
+              {"type": "number"},
+              {"type": "string", "maxLength": 100000},
+              {"type": "object"}
+            ]
+          },
+          "apply_boundary": {"enum": ["immediate_noncompetitive_only", "next_round", "next_event_boundary", "next_session"]},
+          "server_only": {"const": true}
+        },
+        "allOf": [
+          {"if": {"properties": {"expected_type": {"const": "boolean"}}, "required": ["expected_type"]}, "then": {"properties": {"fallback_value": {"type": "boolean"}}}},
+          {"if": {"properties": {"expected_type": {"const": "number"}}, "required": ["expected_type"]}, "then": {"properties": {"fallback_value": {"type": "number"}}}},
+          {"if": {"properties": {"expected_type": {"const": "string"}}, "required": ["expected_type"]}, "then": {"properties": {"fallback_value": {"type": "string", "maxLength": 100000}}}},
+          {"if": {"properties": {"expected_type": {"const": "json"}}, "required": ["expected_type"]}, "then": {"properties": {"fallback_value": {"type": "object"}}}}
+        ]
+      }
+    }
+  }
+}
