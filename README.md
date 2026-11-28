@@ -12,7 +12,8 @@
 Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills; V40 — 264 native Codex skills; V41 — 268 native Codex skills; V42 — 272 native Codex skills; V43 — 276 native Codex skills; V44 — 280 native Codex skills; V45 — 284 native Codex skills.
 
 - **284 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
-- **V45** adds quest/objective graph architecture, branching dialogue with server-validated choices, quest/dialogue state integration, and narrative QA/localization readiness. Its offline CLI checks graph references, reachability, quest cycles, completion/ending paths, and localization-key uniqueness.\n- **V44** adds privacy-conscious playtest study design, structured feedback coding, small-cell-suppressed descriptive summaries, and human-owned theme triage.
+- **V45** adds quest/objective graph architecture, branching dialogue with server-validated choices, quest/dialogue state integration, and narrative QA/localization readiness. Its offline CLI checks graph references, reachability, quest cycles, completion/ending paths, and localization-key uniqueness.
+- **V44** adds privacy-conscious playtest study design, structured feedback coding, small-cell-suppressed descriptive summaries, and human-owned theme triage.
 - **V43** adds Roblox native in-game experiment planning, hypothesis/MDE review, AnalyticsService instrumentation, Open Cloud lifecycle guidance, and offline experiment-plan/result review.
 - **V42** adds LiveOps event scheduling, Roblox Experience Configs, staged feature-flag rollouts, and an offline validator/auditor with config, event, consumer, and deployment compatibility reporting.
 - **V41** adds skill-based matchmaking queues, party/lobby lifecycle, cross-server coordination, reserved-server teleport/reconnect recovery, and an offline matchmaking validator/auditor plus deterministic synthetic-ticket simulator.
@@ -41,7 +42,7 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 2. Read `AGENTS.md` and `INDEX_V45.md`.
 3. Initialize session continuity in the actual game project folder:
 
-       python C:\Path\To\roblox-codex-game-studio-kit-v44\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
+       python C:\Path\To\roblox-codex-game-studio-kit-v45\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
 
 4. For feature work, read `v37/INDEX_V37.md` and follow the V37 reconnaissance → plan → scoped implementation → evidence handoff workflow.
 5. For a production incident, copy `v38/examples/incident.example.json` into `.codex/incidents/incident.json`, replace the example values with verified aggregate-only facts, then run:
@@ -96,7 +97,11 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
 Commands: V45 — doctor, validate, audit. V44 — doctor, validate-study, validate-data, audit, summarize. V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate. V40 — doctor, validate, audit. V41 — doctor, validate, audit, simulate. V42 — doctor, validate, audit, compare. V43 — doctor, validate, audit, compare, analyze.
 
-## V45 quest and dialogue boundaries\n\nV45 validates authored content metadata only. Objective completion, dialogue choice availability, story flags, and durable side effects must remain server-authoritative. Persist stable IDs, explicitly migrate content changes, and make transitions idempotent. The CLI does not inspect Luau, access player profiles, verify translations, execute migrations, run Studio, or approve a release. Test the actual journey on target devices and require human content, engineering, localization, accessibility, and safety review.\n\n## V43 experimentation boundaries
+## V45 quest and dialogue boundaries
+
+V45 validates authored content metadata only. Objective completion, dialogue choice availability, story flags, and durable side effects must remain server-authoritative. Persist stable IDs, explicitly migrate content changes, and make transitions idempotent. The CLI does not inspect Luau, access player profiles, verify translations, execute migrations, run Studio, or approve a release. Test the actual journey on target devices and require human content, engineering, localization, accessibility, and safety review.
+
+## V43 experimentation boundaries
 
 V43 validates local experiment plans and reviews confidence-interval/SRM summaries supplied by an authorized person. It does not calculate statistical significance or MDE, assign players, create or start experiments, retrieve live results, select winners, complete experiments, or publish config. Let experiments run their planned duration; investigate SRM and critical early-harm flags, and require human review before any winning-variant rollout.
 
@@ -132,7 +137,13 @@ Keep analytics aggregate and purpose-bound; do not build individual-spender prof
 
 ## Documentation
 
-- V45 feature index: `INDEX_V45.md`\n- Quest graph architecture: `v45/docs/QUEST_GRAPH_ARCHITECTURE.md`\n- Branching dialogue design: `v45/docs/BRANCHING_DIALOGUE_DESIGN.md`\n- Quest persistence and content migration: `v45/docs/QUEST_PERSISTENCE_AND_CONTENT_MIGRATION.md`\n- Narrative content QA: `v45/docs/NARRATIVE_CONTENT_QA.md`\n- V45 CLI reference: `v45/docs/V45_CLI.md`\n- V43 feature index: `INDEX_V43.md`
+- V45 feature index: `INDEX_V45.md`
+- Quest graph architecture: `v45/docs/QUEST_GRAPH_ARCHITECTURE.md`
+- Branching dialogue design: `v45/docs/BRANCHING_DIALOGUE_DESIGN.md`
+- Quest persistence and content migration: `v45/docs/QUEST_PERSISTENCE_AND_CONTENT_MIGRATION.md`
+- Narrative content QA: `v45/docs/NARRATIVE_CONTENT_QA.md`
+- V45 CLI reference: `v45/docs/V45_CLI.md`
+- V43 feature index: `INDEX_V43.md`
 - Experiment design and metrics: `v43/docs/EXPERIMENT_DESIGN_AND_METRICS.md`
 - Roblox Experiments and Open Cloud: `v43/docs/ROBLOX_EXPERIMENTS_OPEN_CLOUD.md`
 - AnalyticsService instrumentation: `v43/docs/ANALYTICS_INSTRUMENTATION.md`
