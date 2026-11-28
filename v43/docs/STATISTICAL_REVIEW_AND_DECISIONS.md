@@ -38,4 +38,6 @@ For each decision, preserve:
 - Decision: keep control, roll out a reviewed treatment, or run a new experiment.
 - Reviewer, approval, evidence link, and decision date.
 
+Every reported point estimate must fall inside its reported confidence interval. Each treatment must report exactly the guardrails declared before the experiment, with no missing or extra metrics; harmful direction is taken from the plan, not copied from a result payload. Inconsistent intervals or incomplete guardrail coverage invalidate the review.
+
 A statistically significant result is not certainty. Combine quantitative evidence with player feedback and the game's intended design.
