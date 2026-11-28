@@ -7,6 +7,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from jsonschema import Draft202012Validator, FormatChecker
+
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 SPEC = importlib.util.spec_from_file_location("v43", ROOT / "tools" / "v43.py")
@@ -15,6 +17,8 @@ assert SPEC and SPEC.loader
 SPEC.loader.exec_module(v43)
 PLAN = ROOT / "examples" / "experiment-plan.example.json"
 RESULTS = ROOT / "examples" / "experiment-results.example.json"
+PLAN_SCHEMA = ROOT / "schemas" / "experiment-plan.schema.json"
+RESULTS_SCHEMA = ROOT / "schemas" / "experiment-results-review.schema.json"
 
 
 class ManifestValidationTests(unittest.TestCase):
@@ -27,6 +31,47 @@ class ManifestValidationTests(unittest.TestCase):
 
     def test_example_manifest_is_valid(self):
         self.assertEqual([], v43.validate_manifest(self.model))
+
+    def test_example_manifest_conforms_to_json_schema(self):
+        schema = json.loads(PLAN_SCHEMA.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema).validate(self.model)
+
+    def test_whitespace_only_name_rejected(self):
+        data = copy.deepcopy(self.model)
+        data["name"] = " " * 12
+        self.assertInvalid(data, "non-whitespace")
+
+    def test_oversized_config_string_rejected(self):
+        data = copy.deepcopy(self.model)
+        data["config"]["control_value"] = "x" * 100_001
+        data["variants"][0]["value"] = data["config"]["control_value"]
+        self.assertInvalid(data, "does not match config.value_type")
+
+    def test_guardrails_are_required(self):
+        data = copy.deepcopy(self.model)
+        del data["metrics"]["guardrails"]
+        self.assertInvalid(data, "guardrails must declare")
+
+    def test_guardrails_must_be_nonempty(self):
+        data = copy.deepcopy(self.model)
+        data["metrics"]["guardrails"] = []
+        self.assertInvalid(data, "guardrails must declare")
+
+    def test_guardrail_metric_ids_must_be_unique(self):
+        data = copy.deepcopy(self.model)
+        data["metrics"]["guardrails"][1]["metric_id"] = data["metrics"]["guardrails"][0]["metric_id"]
+        self.assertInvalid(data, "Duplicate guardrail metric_id")
+
+    def test_guardrail_metric_must_be_declared(self):
+        data = copy.deepcopy(self.model)
+        data["metrics"]["guardrails"][0]["metric"] = "custom:missing_metric"
+        self.assertInvalid(data, "declared custom")
+
+    def test_guardrail_cannot_duplicate_goal_metric(self):
+        data = copy.deepcopy(self.model)
+        data["metrics"]["guardrails"][0]["metric"] = data["metrics"]["goal_metric"]
+        self.assertInvalid(data, "must not repeat the primary goal metric")
 
     def test_non_object_rejected(self):
         self.assertIn("JSON object", v43.validate_manifest([])[0])
@@ -400,6 +445,17 @@ class ResultsReviewTests(unittest.TestCase):
     def test_example_results_valid(self):
         self.assertEqual([], v43.validate_results(self.model, self.results))
 
+    def test_example_results_conform_to_json_schema(self):
+        schema = json.loads(RESULTS_SCHEMA.read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema, format_checker=FormatChecker()).validate(self.results)
+
+    def test_schema_rejects_result_supplied_harmful_direction(self):
+        schema = json.loads(RESULTS_SCHEMA.read_text(encoding="utf-8"))
+        data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["guardrails"][0]["harmful_direction"] = "decrease"
+        self.assertTrue(list(Draft202012Validator(schema).iter_errors(data)))
+
     def test_success_candidate_requires_completed_full_duration(self):
         report = self.analyze()
         self.assertEqual("candidate_for_human_review", report["status"])
@@ -464,6 +520,15 @@ class ResultsReviewTests(unittest.TestCase):
         data["treatment_results"][0]["guardrails"][0]["confidence_interval_high_percent"] = -3
         self.assertEqual("tradeoff_review_required", self.analyze(data)["status"])
 
+    def test_harmful_direction_is_taken_from_manifest(self):
+        data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["guardrails"][0]["delta_percent"] = -4
+        data["treatment_results"][0]["guardrails"][0]["confidence_interval_low_percent"] = -5
+        data["treatment_results"][0]["guardrails"][0]["confidence_interval_high_percent"] = -3
+        review = self.analyze(data)
+        self.assertEqual("decrease", review["variant_reviews"][0]["guardrail_reviews"][0]["harmful_direction"])
+        self.assertTrue(review["variant_reviews"][0]["guardrail_reviews"][0]["significant_harm"])
+
     def test_guardrail_interval_crossing_zero_not_significant_harm(self):
         data = copy.deepcopy(self.results)
         data["treatment_results"][0]["guardrails"][0]["confidence_interval_low_percent"] = -1
@@ -511,6 +576,38 @@ class ResultsReviewTests(unittest.TestCase):
         data["treatment_results"][0]["confidence_interval_high_percent"] = 1
         self.assertTrue(any("lower bound must not exceed upper bound" in e for e in v43.validate_results(self.model, data)))
 
+    def test_goal_point_estimate_must_lie_within_confidence_interval(self):
+        data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["goal_metric_delta_percent"] = 50
+        self.assertTrue(any("must lie within its confidence interval" in e for e in v43.validate_results(self.model, data)))
+
+    def test_guardrail_point_estimate_must_lie_within_confidence_interval(self):
+        data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["guardrails"][0]["delta_percent"] = 50
+        self.assertTrue(any("must lie within its confidence interval" in e for e in v43.validate_results(self.model, data)))
+
+    def test_empty_guardrails_rejected(self):
+        data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["guardrails"] = []
+        self.assertTrue(any("exactly the 2 guardrails" in e for e in v43.validate_results(self.model, data)))
+
+    def test_missing_guardrail_rejected(self):
+        data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["guardrails"].pop()
+        self.assertTrue(any("missing declared guardrail" in e for e in v43.validate_results(self.model, data)))
+
+    def test_undeclared_guardrail_rejected(self):
+        data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["guardrails"][0]["metric_id"] = "unplanned_guardrail"
+        self.assertTrue(any("not declared in the experiment manifest" in e for e in v43.validate_results(self.model, data)))
+
+    def test_duplicate_guardrail_rejected(self):
+        data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["guardrails"][1]["metric_id"] = data["treatment_results"][0]["guardrails"][0]["metric_id"]
+        errors = v43.validate_results(self.model, data)
+        self.assertTrue(any("must be unique" in e for e in errors))
+        self.assertTrue(any("missing declared guardrail" in e for e in errors))
+
     def test_nan_result_rejected(self):
         data = copy.deepcopy(self.results)
         data["treatment_results"][0]["goal_metric_delta_percent"] = float("nan")
@@ -557,6 +654,14 @@ class InputSafetyTests(unittest.TestCase):
     def test_plan_and_results_examples_are_valid_json(self):
         json.loads(PLAN.read_text(encoding="utf-8"))
         json.loads(RESULTS.read_text(encoding="utf-8"))
+
+    def test_v43_schemas_are_valid_and_examples_conform(self):
+        plan_schema = json.loads((ROOT / "schemas" / "experiment-plan.schema.json").read_text(encoding="utf-8"))
+        results_schema = json.loads((ROOT / "schemas" / "experiment-results-review.schema.json").read_text(encoding="utf-8"))
+        Draft202012Validator.check_schema(plan_schema)
+        Draft202012Validator.check_schema(results_schema)
+        Draft202012Validator(plan_schema).validate(json.loads(PLAN.read_text(encoding="utf-8")))
+        Draft202012Validator(results_schema, format_checker=FormatChecker()).validate(json.loads(RESULTS.read_text(encoding="utf-8")))
 
 
 if __name__ == "__main__":
