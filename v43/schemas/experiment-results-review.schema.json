@@ -93,8 +93,7 @@
                 "metric_id",
                 "delta_percent",
                 "confidence_interval_low_percent",
-                "confidence_interval_high_percent",
-                "harmful_direction"
+                "confidence_interval_high_percent"
               ],
               "properties": {
                 "metric_id": {
@@ -109,12 +108,6 @@
                 },
                 "confidence_interval_high_percent": {
                   "type": "number"
-                },
-                "harmful_direction": {
-                  "enum": [
-                    "increase",
-                    "decrease"
-                  ]
                 }
               }
             }
