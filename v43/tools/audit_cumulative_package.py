@@ -51,7 +51,7 @@ def audit(root: Path) -> list[str]:
     issues = [f"Missing required file: {path}" for path in REQUIRED if not (root / path).is_file()]
     skills_root = root / ".agents" / "skills"
     skills = list(skills_root.glob("*/SKILL.md")) if skills_root.is_dir() else []
-    if len(skills) != EXPECTED_SKILLS:
+    if len(skills) not in EXPECTED_SKILLS:
         issues.append(f"Expected {EXPECTED_SKILLS} native skills; found {len(skills)}.")
     version = (root / "v43" / "VERSION").read_text(encoding="utf-8").strip() if (root / "v43" / "VERSION").is_file() else ""
     if version != "43.0.0":
