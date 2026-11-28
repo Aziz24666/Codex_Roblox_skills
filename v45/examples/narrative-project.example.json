@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "project_id": "starter-narrative",
+  "build_id": "content-45-demo",
+  "default_locale": "en-US",
+  "supported_locales": [
+    "en-US",
+    "fr-FR"
+  ],
+  "quests": [
+    {
+      "quest_id": "meet-the-guide",
+      "title": "Meet the Guide",
+      "summary": "Introduce the player to the village guide and the basic interaction loop.",
+      "repeat_policy": "once",
+      "prerequisites": [],
+      "start_node_id": "approach-guide",
+      "nodes": [
+        {
+          "node_id": "approach-guide",
+          "kind": "objective",
+          "title": "Find the guide",
+          "objective_type": "explore",
+          "next_node_ids": [
+            "talk-to-guide"
+          ]
+        },
+        {
+          "node_id": "talk-to-guide",
+          "kind": "objective",
+          "title": "Speak with the guide",
+          "objective_type": "talk",
+          "next_node_ids": [
+            "quest-complete"
+          ]
+        },
+        {
+          "node_id": "quest-complete",
+          "kind": "complete",
+          "title": "Introduction complete",
+          "objective_type": null,
+          "next_node_ids": []
+        }
+      ]
+    }
+  ],
+  "dialogues": [
+    {
+      "conversation_id": "village-guide",
+      "title": "A first conversation",
+      "start_node_id": "greeting",
+      "nodes": [
+        {
+          "node_id": "greeting",
+          "kind": "line",
+          "speaker": "village-guide",
+          "text_key": "guide.greeting",
+          "text": "Welcome to the village. What would you like to know?",
+          "choices": [
+            {
+              "choice_id": "ask-route",
+              "label_key": "guide.choice.route",
+              "label": "Ask for directions",
+              "next_node_id": "directions"
+            },
+            {
+              "choice_id": "say-goodbye",
+              "label_key": "guide.choice.goodbye",
+              "label": "Say goodbye",
+              "next_node_id": "ending"
+            }
+          ]
+        },
+        {
+          "node_id": "directions",
+          "kind": "line",
+          "speaker": "village-guide",
+          "text_key": "guide.directions",
+          "text": "Follow the marked path to the central square.",
+          "choices": [
+            {
+              "choice_id": "finish-chat",
+              "label_key": "guide.choice.finish",
+              "label": "Thanks. Goodbye.",
+              "next_node_id": "ending"
+            }
+          ]
+        },
+        {
+          "node_id": "ending",
+          "kind": "end",
+          "speaker": "village-guide",
+          "text_key": "guide.ending",
+          "text": "Good luck on your journey.",
+          "choices": []
+        }
+      ]
+    }
+  ]
+}

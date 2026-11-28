@@ -1,0 +1,154 @@
+name: V45 Quest Dialogue and Narrative Quality
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: v45-quality-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  cross-platform:
+    name: V45 tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Install test dependency
+        run: python -m pip install --disable-pip-version-check -r v45/tests/requirements-test.txt
+      - name: Compile, test, and smoke-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile v45/tools/v45.py v45/tools/patch_cumulative_package.py v45/tools/audit_cumulative_package.py v45/tests/test_v45.py
+          python -m unittest discover -s v45/tests -v
+          python -m json.tool v45/schemas/narrative-project.schema.json > /dev/null
+          python -m json.tool v45/examples/narrative-project.example.json > /dev/null
+          python v45/tools/v45.py doctor --root .
+          python v45/tools/v45.py validate --root . --project v45/examples/narrative-project.example.json
+          python v45/tools/v45.py audit --root . --project v45/examples/narrative-project.example.json --output v45/test-output/narrative-audit.json
+  cumulative-build:
+    name: Cumulative V1-V45 package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    needs: cross-platform
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: '3.13'
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check -r v43/tests/requirements-test.txt -r v44/tests/requirements-test.txt -r v45/tests/requirements-test.txt
+      - name: Download published V41 cumulative baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error "https://github.com/Aziz24666/Codex_Roblox_skills/releases/download/v41.0.0/roblox-codex-game-studio-kit-v41.zip" --output "$RUNNER_TEMP/v41.zip"
+          unzip -t "$RUNNER_TEMP/v41.zip"
+          mkdir -p "$RUNNER_TEMP/unpack"
+          unzip -q "$RUNNER_TEMP/v41.zip" -d "$RUNNER_TEMP/unpack"
+          mv "$RUNNER_TEMP/unpack/roblox-codex-game-studio-kit-v41" "$RUNNER_TEMP/roblox-codex-game-studio-kit-v45"
+          echo "PACKAGE_ROOT=$RUNNER_TEMP/roblox-codex-game-studio-kit-v45" >> "$GITHUB_ENV"
+      - name: Test V42 through V45 source
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m py_compile tools/repository_audit.py v42/tools/v42.py v42/tools/patch_cumulative_package.py v42/tools/audit_cumulative_package.py v42/tests/test_v42.py v43/tools/v43.py v43/tools/patch_cumulative_package.py v43/tools/audit_cumulative_package.py v43/tests/test_v43.py v44/tools/v44.py v44/tools/patch_cumulative_package.py v44/tools/audit_cumulative_package.py v44/tests/test_v44.py v45/tools/v45.py v45/tools/patch_cumulative_package.py v45/tools/audit_cumulative_package.py v45/tests/test_v45.py
+          python -m unittest discover -s v42/tests -v
+          python -m unittest discover -s v43/tests -v
+          python -m unittest discover -s v44/tests -v
+          python -m unittest discover -s v45/tests -v
+      - name: Rebuild overlays and run historical regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python v42/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v42"
+          python v43/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v43"
+          python v44/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v44"
+          python v45/tools/patch_cumulative_package.py --package-root "$PACKAGE_ROOT" --source-root "$GITHUB_WORKSPACE/v45"
+          for version in 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45; do python -m unittest discover -s "$PACKAGE_ROOT/v$version/tests" -v; done
+          python "$PACKAGE_ROOT/v45/tools/v45.py" doctor --root "$PACKAGE_ROOT"
+          python "$PACKAGE_ROOT/v45/tools/v45.py" validate --root "$PACKAGE_ROOT" --project v45/examples/narrative-project.example.json
+          python "$PACKAGE_ROOT/v45/tools/v45.py" audit --root "$PACKAGE_ROOT" --project v45/examples/narrative-project.example.json --output v45/test-output/narrative-audit.json
+          for version in 37 38 39 40 41 42 43 44 45; do python "$PACKAGE_ROOT/v$version/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"; done
+          python "$PACKAGE_ROOT/tools/repository_audit.py" --root "$PACKAGE_ROOT"
+          test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "284"
+      - name: Remove generated files and re-audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          find "$PACKAGE_ROOT" -type d -name __pycache__ -prune -exec rm -rf {} +
+          find "$PACKAGE_ROOT" -type f \( -name '*.pyc' -o -name '*.pyo' \) -delete
+          find "$PACKAGE_ROOT" -type d -name test-output -prune -exec rm -rf {} +
+          find "$PACKAGE_ROOT" -type d -name .pytest_cache -prune -exec rm -rf {} +
+          test -z "$(find "$PACKAGE_ROOT" \( -type d -name __pycache__ -o -type f -name '*.pyc' -o -type d -name test-output \) -print -quit)"
+          python "$PACKAGE_ROOT/tools/repository_audit.py" --root "$PACKAGE_ROOT"
+          for version in 37 38 39 40 41 42 43 44 45; do python "$PACKAGE_ROOT/v$version/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"; done
+      - name: Build and compare release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$(dirname "$PACKAGE_ROOT")"
+          name="$(basename "$PACKAGE_ROOT")"
+          tar -cJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v45.tar.xz" "$name"
+          zip -qr "$RUNNER_TEMP/roblox-codex-game-studio-kit-v45.zip" "$name"
+          unzip -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v45.zip"
+          xz -t "$RUNNER_TEMP/roblox-codex-game-studio-kit-v45.tar.xz"
+          mkdir -p "$RUNNER_TEMP/check-zip" "$RUNNER_TEMP/check-tar"
+          unzip -q "$RUNNER_TEMP/roblox-codex-game-studio-kit-v45.zip" -d "$RUNNER_TEMP/check-zip"
+          tar -xJf "$RUNNER_TEMP/roblox-codex-game-studio-kit-v45.tar.xz" -C "$RUNNER_TEMP/check-tar"
+          diff -qr "$RUNNER_TEMP/check-zip/$name" "$RUNNER_TEMP/check-tar/$name"
+          cd "$RUNNER_TEMP"
+          sha256sum roblox-codex-game-studio-kit-v45.zip roblox-codex-game-studio-kit-v45.tar.xz > SHA256SUMS-RELEASE.txt
+          sha256sum --check SHA256SUMS-RELEASE.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: roblox-codex-game-studio-kit-v45
+          path: |
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v45.zip
+            ${{ runner.temp }}/roblox-codex-game-studio-kit-v45.tar.xz
+            ${{ runner.temp }}/SHA256SUMS-RELEASE.txt
+          if-no-files-found: error
+          retention-days: 14
+  publish:
+    name: Publish V45 GitHub Release
+    if: ${{ github.repository == 'Aziz24666/Codex_Roblox_skills' && github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[release-v45:') }}
+    runs-on: ubuntu-24.04
+    needs: cumulative-build
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
+        with:
+          name: roblox-codex-game-studio-kit-v45
+          path: release-assets
+      - name: Publish versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(git log -1 --format=%B "$GITHUB_SHA" | sed -nE 's/.*\[release-v45:(v45[.][0-9]+[.][0-9]+)\].*/\1/p' | head -n1)"
+          [[ "$tag" =~ ^v45[.][0-9]+[.][0-9]+$ ]]
+          test "$(tr -d '\r\n' < v45/VERSION)" = "${tag#v}"
+          if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then exit 1; fi
+          gh release create "$tag" release-assets/roblox-codex-game-studio-kit-v45.zip release-assets/roblox-codex-game-studio-kit-v45.tar.xz release-assets/SHA256SUMS-RELEASE.txt --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$tag — Roblox Codex Game Studio Kit" --notes-file RELEASE_NOTES_V45.md
