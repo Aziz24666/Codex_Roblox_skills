@@ -1,3 +1,3 @@
 # Current toolkit index
 
-The current cumulative release is **V43.0.0** with **276 native Codex skills**. See the V43 feature index for Roblox in-game experiments, hypothesis/MDE planning, AnalyticsService instrumentation, experiment lifecycle, and statistical decision review. All V1–V42 capabilities remain included.
+The current cumulative release is **V44.0.0** with **280 native Codex skills**. See the V44 feature index for player-feedback study design, privacy-conscious collection, qualitative coding, small-cell suppression, and human-owned action traceability. All V1–V43 capabilities remain included.

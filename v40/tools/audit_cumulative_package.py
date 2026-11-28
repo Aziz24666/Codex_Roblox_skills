@@ -4,14 +4,14 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-EXPECTED_SKILLS = {264, 268, 272, 276}
+EXPECTED_SKILLS = {264, 268, 272, 276, 280}
 HISTORICAL = (
     "207 native Codex skills", "210 native Codex skills", "213 native Codex skills",
     "216 native Codex skills", "220 native Codex skills", "224 native Codex skills",
     "228 native Codex skills", "232 native Codex skills", "236 native Codex skills",
     "240 native Codex skills", "244 native Codex skills", "248 native Codex skills",
     "252 native Codex skills", "256 native Codex skills", "260 native Codex skills",
-    "264 native Codex skills", "268 native Codex skills", "272 native Codex skills", "276 native Codex skills",
+    "264 native Codex skills", "268 native Codex skills", "272 native Codex skills", "276 native Codex skills", "280 native Codex skills",
 )
 REQUIRED = (
     "AGENTS.md", "README.md", "LICENSE", "INDEX.md", "INDEX_V37.md", "INDEX_V38.md", "INDEX_V39.md", "INDEX_V40.md",
@@ -41,7 +41,7 @@ def audit(root: Path) -> list[str]:
     if version != "40.0.0":
         issues.append(f"Unexpected V40 version: {version!r}.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    if not any(label in readme for label in ("Current release: V40.0.0", "Current release: V41.0.0", "Current release: V42.0.0", "Current release: V43.0.0")) or not any(label in readme for label in ("264 native Codex skills", "268 native Codex skills", "272 native Codex skills", "276 native Codex skills")):
+    if not any(label in readme for label in ("Current release: V40.0.0", "Current release: V41.0.0", "Current release: V42.0.0", "Current release: V43.0.0", "Current release: V44.0.0")) or not any(label in readme for label in ("264 native Codex skills", "268 native Codex skills", "272 native Codex skills", "276 native Codex skills", "280 native Codex skills")):
         issues.append("README does not describe V40 and 264 native skills.")
     missing = [label for label in HISTORICAL if label not in readme]
     if missing:

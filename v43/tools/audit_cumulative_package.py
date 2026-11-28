@@ -5,7 +5,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-EXPECTED_SKILLS = 276
+EXPECTED_SKILLS = {276, 280}
 HISTORICAL = (
     "207 native Codex skills", "210 native Codex skills", "213 native Codex skills",
     "216 native Codex skills", "220 native Codex skills", "224 native Codex skills",
@@ -13,7 +13,7 @@ HISTORICAL = (
     "240 native Codex skills", "244 native Codex skills", "248 native Codex skills",
     "252 native Codex skills", "256 native Codex skills", "260 native Codex skills",
     "264 native Codex skills", "268 native Codex skills", "272 native Codex skills",
-    "276 native Codex skills",
+    "276 native Codex skills", "280 native Codex skills",
 )
 REQUIRED = (
     "AGENTS.md", "README.md", "LICENSE", "INDEX.md",
@@ -57,7 +57,7 @@ def audit(root: Path) -> list[str]:
     if version != "43.0.0":
         issues.append(f"Unexpected V43 version: {version!r}.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    if "Current release: V43.0.0" not in readme or "276 native Codex skills" not in readme:
+    if "Current release: V43.0.0", "Current release: V44.0.0" not in readme or "276 native Codex skills", "280 native Codex skills" not in readme:
         issues.append("README does not describe V43 and 276 native skills.")
     missing = [label for label in HISTORICAL if label not in readme]
     if missing:

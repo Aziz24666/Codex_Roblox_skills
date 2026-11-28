@@ -1,17 +1,18 @@
 # Roblox Codex Game Studio Kit
 
-[![V43 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v43-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v43-quality.yml)
+[![V43 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v44-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v44-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V43.0.0 — Experimentation and Decision Intelligence.** The cumulative V1–V43 toolkit contains **276 native Codex skills**. Only the current release is required.
+**Current release: V44.0.0 — Player Feedback and Research Operations.** The cumulative V1–V44 toolkit contains **280 native Codex skills**. Only the current release is required.
 
-[Open the V43 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v43.0.0).
+[Open the V43 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v44.0.0).
 
 ## What's included
 
-Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills; V40 — 264 native Codex skills; V41 — 268 native Codex skills; V42 — 272 native Codex skills; V43 — 276 native Codex skills.
+Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills; V40 — 264 native Codex skills; V41 — 268 native Codex skills; V42 — 272 native Codex skills; V43 — 276 native Codex skills; V44 — 280 native Codex skills.
 
-- **276 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
+- **280 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
+- **V44** adds privacy-conscious playtest study design, structured feedback coding, small-cell-suppressed descriptive summaries, and human-owned theme triage.
 - **V43** adds Roblox native in-game experiment planning, hypothesis/MDE review, AnalyticsService instrumentation, Open Cloud lifecycle guidance, and offline experiment-plan/result review.
 - **V42** adds LiveOps event scheduling, Roblox Experience Configs, staged feature-flag rollouts, and an offline validator/auditor with config, event, consumer, and deployment compatibility reporting.
 - **V41** adds skill-based matchmaking queues, party/lobby lifecycle, cross-server coordination, reserved-server teleport/reconnect recovery, and an offline matchmaking validator/auditor plus deterministic synthetic-ticket simulator.
@@ -93,7 +94,7 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
    After an authorized experiment completes, prepare a results review JSON from Creator Hub/Open Cloud results and run `analyze`. V43 is offline: it does not assign players, contact Roblox, calculate MDE/significance/SRM, start experiments, or publish a winning config. Never make a launch decision from incomplete runs or SRM-affected results.
 
-Commands: V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate. V40 — doctor, validate, audit. V41 — doctor, validate, audit, simulate. V42 — doctor, validate, audit, compare. V43 — doctor, validate, audit, compare, analyze.
+Commands: V44 — doctor, validate-study, validate-data, audit, summarize. V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate. V40 — doctor, validate, audit. V41 — doctor, validate, audit, simulate. V42 — doctor, validate, audit, compare. V43 — doctor, validate, audit, compare, analyze.
 
 ## V43 experimentation boundaries
 

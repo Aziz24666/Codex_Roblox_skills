@@ -28,6 +28,7 @@ EXPECTED_SKILLS_V40 = 264
 EXPECTED_SKILLS_V41 = 268
 EXPECTED_SKILLS_V42 = 272
 EXPECTED_SKILLS_V43 = 276
+EXPECTED_SKILLS_V44 = 280
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -124,7 +125,7 @@ def audit(root: Path) -> list[str]:
                     # before the newer version directories have been installed. Defer
                     # those future-version links until the corresponding overlay lands.
                     defer_future_version = False
-                    for newer_version in range(43, 35, -1):
+                    for newer_version in range(44, 35, -1):
                         if not (root / f"v{newer_version}" / "VERSION").is_file() and (
                             target_path == f"INDEX_V{newer_version}.md"
                             or target_path.startswith(f"v{newer_version}/")
@@ -181,9 +182,12 @@ def audit(root: Path) -> list[str]:
     is_v41 = (root / "v41" / "VERSION").is_file()
     is_v42 = (root / "v42" / "VERSION").is_file()
     is_v43 = (root / "v43" / "VERSION").is_file()
+    is_v44 = (root / "v44" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    if is_v43:
+    if is_v44:
+        expected_skills = EXPECTED_SKILLS_V44
+    elif is_v43:
         expected_skills = EXPECTED_SKILLS_V43
     elif is_v42:
         expected_skills = EXPECTED_SKILLS_V42
@@ -440,6 +444,21 @@ def audit(root: Path) -> list[str]:
             ".agents/skills/roblox-native-experiments-and-open-cloud-lifecycle/SKILL.md",
             ".agents/skills/roblox-experiment-analytics-instrumentation/SKILL.md",
             ".agents/skills/roblox-experiment-results-and-decision-review/SKILL.md",
+        )
+    if is_v44:
+        required += (
+            "INDEX_V44.md", "v44/VERSION", "v44/INDEX_V44.md", "v44/tools/v44.py",
+            "v44/tools/patch_cumulative_package.py", "v44/tools/audit_cumulative_package.py",
+            "v44/tests/test_v44.py", "v44/tests/requirements-test.txt",
+            "v44/schemas/feedback-study.schema.json", "v44/schemas/feedback-data.schema.json",
+            "v44/examples/feedback-study.example.json", "v44/examples/feedback-data.example.json",
+            "v44/docs/FEEDBACK_STUDY_DESIGN.md", "v44/docs/PRIVACY_CONSCIOUS_FEEDBACK.md",
+            "v44/docs/QUALITATIVE_CODING_AND_SYNTHESIS.md",
+            "v44/docs/FEEDBACK_TRIAGE_AND_TRACEABILITY.md", "v44/docs/V44_CLI.md",
+            ".agents/skills/roblox-player-feedback-study-design/SKILL.md",
+            ".agents/skills/roblox-privacy-conscious-feedback-collection/SKILL.md",
+            ".agents/skills/roblox-playtest-feedback-thematic-analysis/SKILL.md",
+            ".agents/skills/roblox-feedback-triage-and-action-traceability/SKILL.md",
         )
     for item in required:
         if not (root / item).is_file():
