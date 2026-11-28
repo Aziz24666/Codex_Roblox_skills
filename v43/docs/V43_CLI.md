@@ -17,7 +17,7 @@ python .\v43\tools\v43.py analyze --root C:\Path\To\YourGame --manifest .codex\e
 - validate: validates hypothesis, config contract, variant values/weights, duration, rollout, metrics, instrumentation, privacy/cardinality declarations, and operation/decision gates.
 - audit: writes a design report with sample/MDE and instrumentation warnings.
 - compare: marks config key/type changes as breaking and other plan changes as requiring review.
-- analyze: reviews a results summary using the confidence intervals and SRM state supplied from Roblox. A fully-run `DECISION_NEEDED` or `COMPLETED` experiment can be reviewed. It flags invalid SRM, incomplete duration, inconclusive results, adverse guardrails, and cases ready for a human decision.
+- analyze: reviews a results summary using the confidence intervals and SRM state supplied from Roblox. A fully-run `DECISION_NEEDED` or `COMPLETED` experiment can be reviewed. It requires each treatment's results to include exactly the predeclared guardrails and checks that every point estimate lies within its confidence interval. It flags invalid SRM, incomplete duration, inconclusive results, adverse guardrails, and cases ready for a human decision.
 - 0: command completed without a blocking compatibility result.
 - 1: invalid manifest/results or a breaking comparison.
 - 2: path, input, or runtime error.
