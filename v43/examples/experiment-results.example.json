@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "experiment_id": "onboarding-flow-test",
-  "experiment_state": "COMPLETED",
-  "observed_at": "2027-02-01T12:00:00Z",
+  "experiment_state": "DECISION_NEEDED",
+  "observed_at": "2026-11-28T12:00:00Z",
   "elapsed_days": 28,
   "srm_detected": false,
   "critical_harm_flag": false,

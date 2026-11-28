@@ -2,6 +2,10 @@
 
 ## Decision-readiness gates
 
+Roblox uses Draft, Scheduled, Running, Decision needed, and Completed states. A fully-run experiment in Decision needed is ready for review; it does not need to be manually stopped first.
+
+During the first 24 hours (or until the first daily results land), Playtime, ARPU, and payer conversion rate are early-harm metrics. Roblox checks them every five minutes. The documented critical harm thresholds are -10% for Playtime and -20% for ARPU and payer conversion rate; the platform only classifies harm once at least 10,000 players are enrolled across the treatment and control, and the full one-sided confidence interval is beyond the threshold. Use these signals only to review early stopping, never to choose a winner.
+
 Before a launch decision, confirm:
 - The experiment completed its full planned duration.
 - The eligible audience and sample size are adequate for the MDE.

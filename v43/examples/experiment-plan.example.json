@@ -34,17 +34,19 @@
     }
   ],
   "metrics": {
-    "goal_metric": "DAY_1_RETENTION",
+    "goal_metric": "D1_RETENTION",
     "goal_direction": "increase",
     "learning_metrics": [
-      "PLAYTIME_PER_USER",
-      "AVERAGE_SESSION_TIME"
+      "PLAYTIME",
+      "SESSION_TIME"
     ],
     "custom_metrics": [
       {
         "metric_id": "first_quest_completion",
-        "event_name": "FirstQuestCompleted",
-        "calculation": "PARTICIPATION_PERCENT"
+        "source": "custom",
+        "source_name": "FirstQuestCompleted",
+        "calculation": "PARTICIPATION_PERCENT",
+        "completion_step": null
       }
     ]
   },

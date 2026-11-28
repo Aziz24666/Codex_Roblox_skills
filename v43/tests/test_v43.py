@@ -183,12 +183,12 @@ class ManifestValidationTests(unittest.TestCase):
 
     def test_learning_metrics_cannot_repeat_goal(self):
         data = copy.deepcopy(self.model)
-        data["metrics"]["learning_metrics"].append("DAY_1_RETENTION")
+        data["metrics"]["learning_metrics"].append("D1_RETENTION")
         self.assertInvalid(data, "must not repeat the goal metric")
 
     def test_learning_metric_duplicates_rejected(self):
         data = copy.deepcopy(self.model)
-        data["metrics"]["learning_metrics"].append("PLAYTIME_PER_USER")
+        data["metrics"]["learning_metrics"].append("PLAYTIME")
         self.assertInvalid(data, "must be unique")
 
     def test_custom_metric_limit_three(self):
@@ -200,14 +200,49 @@ class ManifestValidationTests(unittest.TestCase):
     def test_custom_metric_id_unique(self):
         data = copy.deepcopy(self.model)
         second = copy.deepcopy(data["metrics"]["custom_metrics"][0])
-        second["event_name"] = "OnboardingStarted"
+        second["source_name"] = "OnboardingStarted"
         data["metrics"]["custom_metrics"].append(second)
         self.assertInvalid(data, "Duplicate custom metric_id")
 
     def test_custom_metric_event_name_must_be_declared(self):
         data = copy.deepcopy(self.model)
-        data["metrics"]["custom_metrics"][0]["event_name"] = "MissingEvent"
+        data["metrics"]["custom_metrics"][0]["source_name"] = "MissingEvent"
         self.assertInvalid(data, "references undeclared instrumentation event")
+
+    def test_custom_metric_supports_funnel_source(self):
+        data = copy.deepcopy(self.model)
+        data["metrics"]["custom_metrics"][0] = {
+            "metric_id": "onboarding_finish",
+            "source": "funnel",
+            "source_name": "OnboardingFlow",
+            "calculation": "PER_USER_FUNNEL_CONVERSION",
+            "completion_step": 4
+        }
+        data["metrics"]["goal_metric"] = "custom:onboarding_finish"
+        self.assertEqual([], v43.validate_manifest(data))
+
+    def test_custom_metric_supports_economy_source(self):
+        data = copy.deepcopy(self.model)
+        data["metrics"]["custom_metrics"][0] = {
+            "metric_id": "coin_sink",
+            "source": "economy",
+            "source_name": "Coins",
+            "calculation": "AVERAGE_CURRENCY_SINK_DELTA",
+            "completion_step": None
+        }
+        self.assertEqual([], v43.validate_manifest(data))
+
+    def test_custom_metric_goal_reference_must_exist(self):
+        data = copy.deepcopy(self.model)
+        data["metrics"]["goal_metric"] = "custom:missing_metric"
+        self.assertInvalid(data, "custom:<metric_id>")
+
+    def test_funnel_metric_requires_completion_step(self):
+        data = copy.deepcopy(self.model)
+        data["metrics"]["custom_metrics"][0]["source"] = "funnel"
+        data["metrics"]["custom_metrics"][0]["calculation"] = "PER_USER_FUNNEL_CONVERSION"
+        data["metrics"]["custom_metrics"][0]["completion_step"] = None
+        self.assertInvalid(data, "completion_step")
 
     def test_custom_metric_calculation_restricted(self):
         data = copy.deepcopy(self.model)
@@ -374,6 +409,16 @@ class ResultsReviewTests(unittest.TestCase):
         data["experiment_state"] = "RUNNING"
         self.assertEqual("not_decision_ready", self.analyze(data)["status"])
 
+    def test_draft_experiment_not_decision_ready(self):
+        data = copy.deepcopy(self.results)
+        data["experiment_state"] = "DRAFT"
+        self.assertEqual("not_decision_ready", self.analyze(data)["status"])
+
+    def test_decision_needed_after_full_duration_is_reviewable(self):
+        data = copy.deepcopy(self.results)
+        data["experiment_state"] = "DECISION_NEEDED"
+        self.assertEqual("candidate_for_human_review", self.analyze(data)["status"])
+
     def test_scheduled_experiment_not_decision_ready(self):
         data = copy.deepcopy(self.results)
         data["experiment_state"] = "SCHEDULED"
@@ -384,10 +429,10 @@ class ResultsReviewTests(unittest.TestCase):
         data["elapsed_days"] = 14
         self.assertEqual("not_decision_ready", self.analyze(data)["status"])
 
-    def test_stopped_experiment_not_decision_ready(self):
+    def test_unknown_experiment_state_rejected(self):
         data = copy.deepcopy(self.results)
         data["experiment_state"] = "STOPPED"
-        self.assertEqual("not_decision_ready", self.analyze(data)["status"])
+        self.assertTrue(any("experiment_state must be" in error for error in v43.validate_results(self.model, data)))
 
     def test_srm_invalidates_decision(self):
         data = copy.deepcopy(self.results)

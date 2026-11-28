@@ -12,12 +12,12 @@ Use the current server-side AnalyticsService logging methods for progression, cu
 - Log custom events from server scripts in published experiences. Custom events cannot be sent from the client or Studio.
 - Choose stable event names for meaningful player actions, such as OnboardingStarted or FirstQuestCompleted.
 - Prefer a small stable event-name set with reviewed custom-field values rather than creating a new event name for every item, player, level, or content variation.
-- Roblox currently documents a maximum of 100 custom event names per experience. Custom-event aggregations are daily and may take up to 24 hours to appear.
+- Roblox documents a maximum of 100 custom event names per experience. Each economy, funnel, or custom event supports up to three custom fields; after 8,000 combined unique values across those fields, values are grouped as Other. Custom-event aggregations are daily and may take up to 24 hours to appear.
 - Use counters for one-time actions and value events for a measured quantity. Keep value units consistent.
 - Do not log raw user text, account identifiers, secrets, or unnecessary personal data in custom fields.
 
 ## Funnels and custom metrics
-- Use funnel steps for ordered progress such as onboarding. Use the same funnel name and session identifier for steps in a recurring funnel.
+- Use funnel steps for ordered progress such as onboarding. Roblox supports up to 10 unique funnels per experience and 100 steps per funnel. Use the same funnel name and session identifier for steps in a recurring funnel.
 - Register and validate events before starting the experiment; newly created events may not yet be available in the metric selector.
 - Roblox in-game experiments support up to three custom metrics. Select source, calculation, denominator, and filters before start.
 - Keep the event schema stable throughout the experiment. Changing event names, definitions, or funnel behavior mid-test can invalidate comparisons.

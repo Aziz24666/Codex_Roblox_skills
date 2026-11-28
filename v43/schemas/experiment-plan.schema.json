@@ -4,90 +4,348 @@
   "title": "Roblox in-experience experiment plan",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "experiment_id", "name", "hypothesis", "product_type", "config", "duration_days", "exposure_percent", "variants", "metrics", "instrumentation", "quality_gates", "operations"],
+  "required": [
+    "schema_version",
+    "experiment_id",
+    "name",
+    "hypothesis",
+    "product_type",
+    "config",
+    "duration_days",
+    "exposure_percent",
+    "variants",
+    "metrics",
+    "instrumentation",
+    "quality_gates",
+    "operations"
+  ],
   "$defs": {
-    "slug": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,39}$"},
-    "configValue": {"oneOf": [{"type": "boolean"}, {"type": "number"}, {"type": "string", "maxLength": 100000}, {"type": "object"}]},
-    "customEventName": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{1,39}$"
+    },
+    "configValue": {
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "maxLength": 100000
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "customEventName": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+    },
     "strictFlagSet": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["server_only", "published_game_only", "privacy_reviewed", "cardinality_reviewed"],
+      "required": [
+        "server_only",
+        "published_game_only",
+        "privacy_reviewed",
+        "cardinality_reviewed"
+      ],
       "properties": {
-        "server_only": {"const": true},
-        "published_game_only": {"const": true},
-        "privacy_reviewed": {"const": true},
-        "cardinality_reviewed": {"const": true}
+        "server_only": {
+          "const": true
+        },
+        "published_game_only": {
+          "const": true
+        },
+        "privacy_reviewed": {
+          "const": true
+        },
+        "cardinality_reviewed": {
+          "const": true
+        }
       }
     }
   },
   "properties": {
-    "schema_version": {"const": 1},
-    "experiment_id": {"$ref": "#/$defs/slug"},
-    "name": {"type": "string", "minLength": 1, "maxLength": 100},
+    "schema_version": {
+      "const": 1
+    },
+    "experiment_id": {
+      "$ref": "#/$defs/slug"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
     "hypothesis": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["change", "expected_outcome", "rationale", "success_criteria"],
+      "required": [
+        "change",
+        "expected_outcome",
+        "rationale",
+        "success_criteria"
+      ],
       "properties": {
-        "change": {"type": "string", "minLength": 12, "maxLength": 500},
-        "expected_outcome": {"type": "string", "minLength": 12, "maxLength": 500},
-        "rationale": {"type": "string", "minLength": 12, "maxLength": 500},
-        "success_criteria": {"type": "string", "minLength": 12, "maxLength": 500}
+        "change": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 500
+        },
+        "expected_outcome": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 500
+        },
+        "rationale": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 500
+        },
+        "success_criteria": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 500
+        }
       }
     },
-    "product_type": {"const": "in_game_config"},
+    "product_type": {
+      "const": "in_game_config"
+    },
     "config": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["repository", "key", "value_type", "control_value"],
+      "required": [
+        "repository",
+        "key",
+        "value_type",
+        "control_value"
+      ],
       "properties": {
-        "repository": {"const": "InExperienceConfig"},
-        "key": {"type": "string", "minLength": 1, "maxLength": 256, "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"},
-        "value_type": {"enum": ["boolean", "number", "string", "json"]},
-        "control_value": {"$ref": "#/$defs/configValue"}
+        "repository": {
+          "const": "InExperienceConfig"
+        },
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256,
+          "pattern": "^[A-Za-z][A-Za-z0-9_.-]*$"
+        },
+        "value_type": {
+          "enum": [
+            "boolean",
+            "number",
+            "string",
+            "json"
+          ]
+        },
+        "control_value": {
+          "$ref": "#/$defs/configValue"
+        }
       },
       "allOf": [
-        {"if": {"properties": {"value_type": {"const": "boolean"}}, "required": ["value_type"]}, "then": {"properties": {"control_value": {"type": "boolean"}}}},
-        {"if": {"properties": {"value_type": {"const": "number"}}, "required": ["value_type"]}, "then": {"properties": {"control_value": {"type": "number"}}}},
-        {"if": {"properties": {"value_type": {"const": "string"}}, "required": ["value_type"]}, "then": {"properties": {"control_value": {"type": "string", "maxLength": 100000}}}},
-        {"if": {"properties": {"value_type": {"const": "json"}}, "required": ["value_type"]}, "then": {"properties": {"control_value": {"type": "object"}}}}
+        {
+          "if": {
+            "properties": {
+              "value_type": {
+                "const": "boolean"
+              }
+            },
+            "required": [
+              "value_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "control_value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_type": {
+                "const": "number"
+              }
+            },
+            "required": [
+              "value_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "control_value": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_type": {
+                "const": "string"
+              }
+            },
+            "required": [
+              "value_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "control_value": {
+                "type": "string",
+                "maxLength": 100000
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "value_type": {
+                "const": "json"
+              }
+            },
+            "required": [
+              "value_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "control_value": {
+                "type": "object"
+              }
+            }
+          }
+        }
       ]
     },
-    "duration_days": {"type": "integer", "minimum": 14, "maximum": 60},
-    "exposure_percent": {"type": "integer", "minimum": 1, "maximum": 100},
+    "duration_days": {
+      "type": "integer",
+      "minimum": 14,
+      "maximum": 60
+    },
+    "exposure_percent": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
     "variants": {
       "type": "array",
       "minItems": 2,
       "maxItems": 3,
-      "contains": {"type": "object", "required": ["is_baseline"], "properties": {"is_baseline": {"const": true}}},
+      "contains": {
+        "type": "object",
+        "required": [
+          "is_baseline"
+        ],
+        "properties": {
+          "is_baseline": {
+            "const": true
+          }
+        }
+      },
       "minContains": 1,
       "maxContains": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["variant_id", "label", "is_baseline", "weight_percent", "value"],
+        "required": [
+          "variant_id",
+          "label",
+          "is_baseline",
+          "weight_percent",
+          "value"
+        ],
         "properties": {
-          "variant_id": {"$ref": "#/$defs/slug"},
-          "label": {"type": "string", "minLength": 1, "maxLength": 60},
-          "is_baseline": {"type": "boolean"},
-          "weight_percent": {"type": "integer", "minimum": 1, "maximum": 100},
-          "value": {"$ref": "#/$defs/configValue"}
+          "variant_id": {
+            "$ref": "#/$defs/slug"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 60
+          },
+          "is_baseline": {
+            "type": "boolean"
+          },
+          "weight_percent": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "value": {
+            "$ref": "#/$defs/configValue"
+          }
         }
       }
     },
     "metrics": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["goal_metric", "goal_direction", "learning_metrics", "custom_metrics"],
+      "required": [
+        "goal_metric",
+        "goal_direction",
+        "learning_metrics",
+        "custom_metrics"
+      ],
       "properties": {
-        "goal_metric": {"enum": ["DAY_1_RETENTION", "DAY_7_RETENTION", "PLAYTIME_PER_USER", "AVERAGE_SESSION_TIME"]},
-        "goal_direction": {"enum": ["increase", "decrease"]},
+        "goal_metric": {
+          "oneOf": [
+            {
+              "enum": [
+                "D1_RETENTION",
+                "D7_RETENTION",
+                "PLAYTIME",
+                "ARPU",
+                "ARPPU",
+                "PAYER_CONVERSION_RATE",
+                "SESSION_TIME"
+              ]
+            },
+            {
+              "type": "string",
+              "pattern": "^custom:[a-z][a-z0-9_-]{1,39}$"
+            }
+          ]
+        },
+        "goal_direction": {
+          "enum": [
+            "increase",
+            "decrease"
+          ]
+        },
         "learning_metrics": {
           "type": "array",
           "maxItems": 7,
           "uniqueItems": true,
-          "items": {"enum": ["DAY_1_RETENTION", "DAY_7_RETENTION", "PLAYTIME_PER_USER", "AVERAGE_SESSION_TIME"]}
+          "items": {
+            "oneOf": [
+              {
+                "enum": [
+                  "D1_RETENTION",
+                  "D7_RETENTION",
+                  "PLAYTIME",
+                  "ARPU",
+                  "ARPPU",
+                  "PAYER_CONVERSION_RATE",
+                  "SESSION_TIME"
+                ]
+              },
+              {
+                "type": "string",
+                "pattern": "^custom:[a-z][a-z0-9_-]{1,39}$"
+              }
+            ]
+          }
         },
         "custom_metrics": {
           "type": "array",
@@ -95,12 +353,135 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["metric_id", "event_name", "calculation"],
+            "required": [
+              "metric_id",
+              "source",
+              "source_name",
+              "calculation",
+              "completion_step"
+            ],
             "properties": {
-              "metric_id": {"$ref": "#/$defs/slug"},
-              "event_name": {"$ref": "#/$defs/customEventName"},
-              "calculation": {"enum": ["AVERAGE_CUSTOM_VALUE", "AVERAGE_CUSTOM_VALUE_OVER_ALL_USERS", "PARTICIPATION_PERCENT"]}
-            }
+              "metric_id": {
+                "$ref": "#/$defs/slug"
+              },
+              "source": {
+                "enum": [
+                  "custom",
+                  "economy",
+                  "funnel"
+                ]
+              },
+              "source_name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "calculation": {
+                "enum": [
+                  "AVERAGE_CUSTOM_VALUE",
+                  "AVERAGE_CUSTOM_VALUE_OVER_ALL_USERS",
+                  "PARTICIPATION_PERCENT",
+                  "AVERAGE_NET_CURRENCY_DELTA",
+                  "AVERAGE_CURRENCY_SOURCE_DELTA",
+                  "AVERAGE_CURRENCY_SINK_DELTA",
+                  "PER_USER_FUNNEL_CONVERSION",
+                  "PER_INSTANCE_FUNNEL_CONVERSION"
+                ]
+              },
+              "completion_step": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100
+                  }
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "source": {
+                      "const": "custom"
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "calculation": {
+                      "enum": [
+                        "AVERAGE_CUSTOM_VALUE",
+                        "AVERAGE_CUSTOM_VALUE_OVER_ALL_USERS",
+                        "PARTICIPATION_PERCENT"
+                      ]
+                    },
+                    "completion_step": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "source": {
+                      "const": "economy"
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "calculation": {
+                      "enum": [
+                        "AVERAGE_NET_CURRENCY_DELTA",
+                        "AVERAGE_CURRENCY_SOURCE_DELTA",
+                        "AVERAGE_CURRENCY_SINK_DELTA"
+                      ]
+                    },
+                    "completion_step": {
+                      "type": "null"
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "source": {
+                      "const": "funnel"
+                    }
+                  },
+                  "required": [
+                    "source"
+                  ]
+                },
+                "then": {
+                  "properties": {
+                    "calculation": {
+                      "enum": [
+                        "PER_USER_FUNNEL_CONVERSION",
+                        "PER_INSTANCE_FUNNEL_CONVERSION"
+                      ]
+                    },
+                    "completion_step": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100
+                    }
+                  }
+                }
+              }
+            ]
           }
         }
       }
@@ -108,7 +489,11 @@
     "instrumentation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["events", "max_custom_event_names", "custom_fields_reviewed"],
+      "required": [
+        "events",
+        "max_custom_event_names",
+        "custom_fields_reviewed"
+      ],
       "properties": {
         "events": {
           "type": "array",
@@ -116,56 +501,257 @@
           "items": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["event_name", "event_type", "server_only", "published_game_only", "privacy_reviewed", "cardinality_reviewed"],
+            "required": [
+              "event_name",
+              "event_type",
+              "server_only",
+              "published_game_only",
+              "privacy_reviewed",
+              "cardinality_reviewed"
+            ],
             "properties": {
-              "event_name": {"$ref": "#/$defs/customEventName"},
-              "event_type": {"enum": ["counter", "value"]},
-              "server_only": {"const": true},
-              "published_game_only": {"const": true},
-              "privacy_reviewed": {"const": true},
-              "cardinality_reviewed": {"const": true}
+              "event_name": {
+                "$ref": "#/$defs/customEventName"
+              },
+              "event_type": {
+                "enum": [
+                  "counter",
+                  "value"
+                ]
+              },
+              "server_only": {
+                "const": true
+              },
+              "published_game_only": {
+                "const": true
+              },
+              "privacy_reviewed": {
+                "const": true
+              },
+              "cardinality_reviewed": {
+                "const": true
+              }
             }
           }
         },
-        "max_custom_event_names": {"const": 100},
-        "custom_fields_reviewed": {"const": true}
+        "max_custom_event_names": {
+          "const": 100
+        },
+        "custom_fields_reviewed": {
+          "const": true
+        }
       }
     },
     "quality_gates": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["hypothesis_reviewed", "sample_feasibility_reviewed", "mde_reviewed", "targeting_and_assignment_reviewed", "instrumentation_preexisting", "interaction_reviewed", "no_mid_experiment_changes", "srm_monitoring_enabled", "critical_harm_stop_review_enabled", "no_early_success_stop", "human_decision_required"],
+      "required": [
+        "hypothesis_reviewed",
+        "sample_feasibility_reviewed",
+        "mde_reviewed",
+        "targeting_and_assignment_reviewed",
+        "instrumentation_preexisting",
+        "interaction_reviewed",
+        "no_mid_experiment_changes",
+        "srm_monitoring_enabled",
+        "critical_harm_stop_review_enabled",
+        "no_early_success_stop",
+        "human_decision_required"
+      ],
       "properties": {
-        "hypothesis_reviewed": {"const": true},
-        "sample_feasibility_reviewed": {"const": true},
-        "mde_reviewed": {"const": true},
-        "targeting_and_assignment_reviewed": {"const": true},
-        "instrumentation_preexisting": {"const": true},
-        "interaction_reviewed": {"const": true},
-        "no_mid_experiment_changes": {"const": true},
-        "srm_monitoring_enabled": {"const": true},
-        "critical_harm_stop_review_enabled": {"const": true},
-        "no_early_success_stop": {"const": true},
-        "human_decision_required": {"const": true}
+        "hypothesis_reviewed": {
+          "const": true
+        },
+        "sample_feasibility_reviewed": {
+          "const": true
+        },
+        "mde_reviewed": {
+          "const": true
+        },
+        "targeting_and_assignment_reviewed": {
+          "const": true
+        },
+        "instrumentation_preexisting": {
+          "const": true
+        },
+        "interaction_reviewed": {
+          "const": true
+        },
+        "no_mid_experiment_changes": {
+          "const": true
+        },
+        "srm_monitoring_enabled": {
+          "const": true
+        },
+        "critical_harm_stop_review_enabled": {
+          "const": true
+        },
+        "no_early_success_stop": {
+          "const": true
+        },
+        "human_decision_required": {
+          "const": true
+        }
       }
     },
     "operations": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["read_scope_reviewed", "write_scope_reviewed", "credentials_outside_repository", "asynchronous_operation_polling", "write_requires_human_approval"],
+      "required": [
+        "read_scope_reviewed",
+        "write_scope_reviewed",
+        "credentials_outside_repository",
+        "asynchronous_operation_polling",
+        "write_requires_human_approval"
+      ],
       "properties": {
-        "read_scope_reviewed": {"const": true},
-        "write_scope_reviewed": {"const": true},
-        "credentials_outside_repository": {"const": true},
-        "asynchronous_operation_polling": {"const": true},
-        "write_requires_human_approval": {"const": true}
+        "read_scope_reviewed": {
+          "const": true
+        },
+        "write_scope_reviewed": {
+          "const": true
+        },
+        "credentials_outside_repository": {
+          "const": true
+        },
+        "asynchronous_operation_polling": {
+          "const": true
+        },
+        "write_requires_human_approval": {
+          "const": true
+        }
       }
     }
   },
   "allOf": [
-    {"if": {"properties": {"config": {"properties": {"value_type": {"const": "boolean"}}, "required": ["value_type"]}}, "required": ["config"]}, "then": {"properties": {"variants": {"items": {"properties": {"value": {"type": "boolean"}}}}}}},
-    {"if": {"properties": {"config": {"properties": {"value_type": {"const": "number"}}, "required": ["value_type"]}}, "required": ["config"]}, "then": {"properties": {"variants": {"items": {"properties": {"value": {"type": "number"}}}}}}},
-    {"if": {"properties": {"config": {"properties": {"value_type": {"const": "string"}}, "required": ["value_type"]}}, "required": ["config"]}, "then": {"properties": {"variants": {"items": {"properties": {"value": {"type": "string", "maxLength": 100000}}}}}}},
-    {"if": {"properties": {"config": {"properties": {"value_type": {"const": "json"}}, "required": ["value_type"]}}, "required": ["config"]}, "then": {"properties": {"variants": {"items": {"properties": {"value": {"type": "object"}}}}}}}
+    {
+      "if": {
+        "properties": {
+          "config": {
+            "properties": {
+              "value_type": {
+                "const": "boolean"
+              }
+            },
+            "required": [
+              "value_type"
+            ]
+          }
+        },
+        "required": [
+          "config"
+        ]
+      },
+      "then": {
+        "properties": {
+          "variants": {
+            "items": {
+              "properties": {
+                "value": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "config": {
+            "properties": {
+              "value_type": {
+                "const": "number"
+              }
+            },
+            "required": [
+              "value_type"
+            ]
+          }
+        },
+        "required": [
+          "config"
+        ]
+      },
+      "then": {
+        "properties": {
+          "variants": {
+            "items": {
+              "properties": {
+                "value": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "config": {
+            "properties": {
+              "value_type": {
+                "const": "string"
+              }
+            },
+            "required": [
+              "value_type"
+            ]
+          }
+        },
+        "required": [
+          "config"
+        ]
+      },
+      "then": {
+        "properties": {
+          "variants": {
+            "items": {
+              "properties": {
+                "value": {
+                  "type": "string",
+                  "maxLength": 100000
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "config": {
+            "properties": {
+              "value_type": {
+                "const": "json"
+              }
+            },
+            "required": [
+              "value_type"
+            ]
+          }
+        },
+        "required": [
+          "config"
+        ]
+      },
+      "then": {
+        "properties": {
+          "variants": {
+            "items": {
+              "properties": {
+                "value": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   ]
 }

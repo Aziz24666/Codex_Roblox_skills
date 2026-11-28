@@ -18,17 +18,17 @@ Prefer one config key and one treatment. Roblox supports one baseline and up to 
 
 ## Metrics
 
-Choose one primary goal metric. Useful engagement metrics include day-1 retention, day-7 retention, playtime per user, and average session time. Select a small number of learning metrics that explain why a result moved. Up to three custom metrics can be added to an in-game experiment.
+Choose one primary goal metric. Roblox default metrics include D1 retention, D7 retention, Playtime, ARPU, ARPPU, payer conversion rate, and session time. Custom metrics may also be the goal. Select a small number of learning metrics that explain why a result moved. Up to three custom metrics can be added to an in-game experiment.
 
-Custom metrics must be based on AnalyticsService custom, economy, or funnel events that already exist and have data. Newly added events can take time to appear. Define the event and metric before the experiment starts; Roblox does not let you change the metric definition after start.
+Custom metrics must be based on AnalyticsService custom, economy, or funnel events that already exist and have data. For custom events, choose average custom value, average custom value over all users, or participation percentage. For economy metrics, choose average net/source/sink currency delta. For funnels, choose per-user or per-instance funnel conversion and preselect the completion step. Newly added events can take time to appear. Define the metric before scheduling; Roblox does not let you change the metric definition after start.
 
 For each metric, document its population, denominator, unit, time window, and desired direction. A per-user metric and a per-participant metric answer different questions; do not compare them as if they used the same denominator.
 
 ## Sample feasibility and MDE
 
-Review the minimum detectable effect displayed by Roblox for the proposed audience, rollout, duration, and variant split. A small targeted audience or multiple variants can make the detectable effect too large to be useful. The V43 CLI does not calculate or predict MDE.
+Review the minimum detectable effect (MDE) displayed by Roblox, or returned by its Open Cloud calculateMde operation, for the proposed audience, rollout, duration, and variant split. The V43 CLI does not call that API. A small targeted audience or multiple variants can make the detectable effect too large to be useful. The V43 CLI does not calculate or predict MDE.
 
-Roblox in-game experiments have a planned duration between 14 and 60 days. Let the experiment run for its full duration unless critical early harm or a data-integrity issue requires operator review. Do not stop early because a favorable metric is temporarily significant.
+Roblox in-game experiments have a planned duration between 14 and 60 days. Let the experiment run for its full duration unless critical early harm or a data-integrity issue requires operator review. In the first 24 hours (or until first daily results), Roblox checks Playtime, ARPU, and payer conversion every five minutes; critically harmful thresholds are -10% for Playtime and -20% for ARPU and payer conversion. The platform waits for at least 10,000 players across treatment and control and requires the full one-sided confidence interval to be beyond the threshold before flagging critical harm. Treat these as early-stop signals only, not success metrics. Do not stop early because a favorable metric is temporarily significant.
 
 ## Guardrails and interactions
 

@@ -28,7 +28,7 @@ HYPOTHESIS_FIELDS = {"change", "expected_outcome", "rationale", "success_criteri
 CONFIG_FIELDS = {"repository", "key", "value_type", "control_value"}
 VARIANT_FIELDS = {"variant_id", "label", "is_baseline", "weight_percent", "value"}
 METRIC_FIELDS = {"goal_metric", "goal_direction", "learning_metrics", "custom_metrics"}
-CUSTOM_METRIC_FIELDS = {"metric_id", "event_name", "calculation"}
+CUSTOM_METRIC_FIELDS = {"metric_id", "source", "source_name", "calculation", "completion_step"}
 INSTRUMENTATION_FIELDS = {"events", "max_custom_event_names", "custom_fields_reviewed"}
 EVENT_FIELDS = {
     "event_name", "event_type", "server_only", "published_game_only",
@@ -46,15 +46,15 @@ OPERATION_FIELDS = {
     "asynchronous_operation_polling", "write_requires_human_approval",
 }
 VALUE_TYPES = {"boolean", "number", "string", "json"}
-GOAL_METRICS = {
-    "DAY_1_RETENTION", "DAY_7_RETENTION",
-    "PLAYTIME_PER_USER", "AVERAGE_SESSION_TIME",
+PLATFORM_METRICS = {
+    "D1_RETENTION", "D7_RETENTION", "PLAYTIME", "ARPU", "ARPPU",
+    "PAYER_CONVERSION_RATE", "SESSION_TIME",
 }
-LEARNING_METRICS = GOAL_METRICS
+CUSTOM_SOURCES = {"custom", "economy", "funnel"}
 CUSTOM_CALCULATIONS = {
-    "AVERAGE_CUSTOM_VALUE",
-    "AVERAGE_CUSTOM_VALUE_OVER_ALL_USERS",
-    "PARTICIPATION_PERCENT",
+    "AVERAGE_CUSTOM_VALUE", "AVERAGE_CUSTOM_VALUE_OVER_ALL_USERS", "PARTICIPATION_PERCENT",
+    "AVERAGE_NET_CURRENCY_DELTA", "AVERAGE_CURRENCY_SOURCE_DELTA", "AVERAGE_CURRENCY_SINK_DELTA",
+    "PER_USER_FUNNEL_CONVERSION", "PER_INSTANCE_FUNNEL_CONVERSION",
 }
 RESULT_FIELDS = {
     "schema_version", "experiment_id", "experiment_state", "observed_at",
@@ -69,7 +69,7 @@ GUARDRAIL_FIELDS = {
     "metric_id", "delta_percent", "confidence_interval_low_percent",
     "confidence_interval_high_percent", "harmful_direction",
 }
-RESULT_STATES = {"RUNNING", "SCHEDULED", "COMPLETED", "STOPPED"}
+RESULT_STATES = {"DRAFT", "SCHEDULED", "RUNNING", "DECISION_NEEDED", "COMPLETED"}
 
 
 def allowed(value: Any, choices: set[str]) -> bool:
@@ -231,15 +231,8 @@ def validate_manifest(data: Any) -> list[str]:
         metrics = {}
     else:
         errors += check_fields(metrics, METRIC_FIELDS, "metrics")
-        if not allowed(metrics.get("goal_metric"), GOAL_METRICS):
-            errors.append(f"metrics.goal_metric must be one of {', '.join(sorted(GOAL_METRICS))}.")
         if not allowed(metrics.get("goal_direction"), {"increase", "decrease"}):
             errors.append("metrics.goal_direction must be increase or decrease.")
-        learning = metrics.get("learning_metrics")
-        if not isinstance(learning, list) or len(learning) > 7 or not all(allowed(x, LEARNING_METRICS) for x in learning):
-            errors.append("metrics.learning_metrics must contain at most 7 supported engagement metrics.")
-        elif metrics.get("goal_metric") in learning or len(set(learning)) != len(learning):
-            errors.append("metrics.learning_metrics must be unique and must not repeat the goal metric.")
         custom = metrics.get("custom_metrics")
         if not isinstance(custom, list) or len(custom) > 3:
             errors.append("metrics.custom_metrics must contain at most 3 custom metrics (Roblox Experiments limit).")
@@ -257,13 +250,49 @@ def validate_manifest(data: Any) -> list[str]:
                 errors.append(f"Duplicate custom metric_id: {metric_id}.")
             else:
                 metric_ids.add(metric_id)
-            event_name = item.get("event_name")
-            if not isinstance(event_name, str) or not EVENT_NAME.fullmatch(event_name):
-                errors.append(f"{label}.event_name must be 1-64 alphanumeric/underscore characters and start with a letter.")
-            else:
-                event_names.add(event_name)
-            if not allowed(item.get("calculation"), CUSTOM_CALCULATIONS):
+            source = item.get("source")
+            if not allowed(source, CUSTOM_SOURCES):
+                errors.append(f"{label}.source must be custom, economy, or funnel.")
+            source_name = item.get("source_name")
+            if not isinstance(source_name, str) or not 1 <= len(source_name.strip()) <= 100:
+                errors.append(f"{label}.source_name must contain 1-100 non-whitespace characters.")
+            elif source == "custom":
+                if not EVENT_NAME.fullmatch(source_name):
+                    errors.append(f"{label}.source_name must be a valid AnalyticsService event name for custom source.")
+                else:
+                    event_names.add(source_name)
+            step = item.get("completion_step")
+            if source == "funnel":
+                if not is_int(step, 1, 100):
+                    errors.append(f"{label}.completion_step must be an integer from 1 to 100 for funnel metrics.")
+            elif step is not None:
+                errors.append(f"{label}.completion_step must be null for custom and economy metrics.")
+            calculation = item.get("calculation")
+            if not allowed(calculation, CUSTOM_CALCULATIONS):
                 errors.append(f"{label}.calculation must be one of {', '.join(sorted(CUSTOM_CALCULATIONS))}.")
+            elif source == "custom" and calculation not in {
+                "AVERAGE_CUSTOM_VALUE", "AVERAGE_CUSTOM_VALUE_OVER_ALL_USERS", "PARTICIPATION_PERCENT"
+            }:
+                errors.append(f"{label}.calculation is not supported for custom-event metrics.")
+            elif source == "economy" and calculation not in {
+                "AVERAGE_NET_CURRENCY_DELTA", "AVERAGE_CURRENCY_SOURCE_DELTA", "AVERAGE_CURRENCY_SINK_DELTA"
+            }:
+                errors.append(f"{label}.calculation is not supported for economy metrics.")
+            elif source == "funnel" and calculation not in {
+                "PER_USER_FUNNEL_CONVERSION", "PER_INSTANCE_FUNNEL_CONVERSION"
+            }:
+                errors.append(f"{label}.calculation is not supported for funnel metrics.")
+        def metric_ref_is_valid(value: Any) -> bool:
+            if allowed(value, PLATFORM_METRICS):
+                return True
+            return isinstance(value, str) and value.startswith("custom:") and value[7:] in metric_ids
+        if not metric_ref_is_valid(metrics.get("goal_metric")):
+            errors.append(f"metrics.goal_metric must be a supported platform metric or custom:<metric_id> referencing a declared custom metric.")
+        learning = metrics.get("learning_metrics")
+        if not isinstance(learning, list) or len(learning) > 7 or not all(metric_ref_is_valid(x) for x in learning):
+            errors.append("metrics.learning_metrics must contain at most 7 supported platform or declared custom metrics.")
+        elif metrics.get("goal_metric") in learning or len(set(learning)) != len(learning):
+            errors.append("metrics.learning_metrics must be unique and must not repeat the goal metric.")
 
     instrumentation = data.get("instrumentation")
     if not isinstance(instrumentation, dict):
@@ -399,7 +428,7 @@ def validate_results(manifest: dict, results: Any) -> list[str]:
         errors.append("results.experiment_id must match the experiment manifest.")
     state = results.get("experiment_state")
     if not allowed(state, RESULT_STATES):
-        errors.append("results.experiment_state must be RUNNING, SCHEDULED, COMPLETED, or STOPPED.")
+        errors.append("results.experiment_state must be DRAFT, SCHEDULED, RUNNING, DECISION_NEEDED, or COMPLETED.")
     parse_timestamp(results.get("observed_at"), "results.observed_at", errors)
     elapsed = results.get("elapsed_days")
     if not is_number(elapsed) or elapsed < 0 or elapsed > 60:
@@ -485,7 +514,7 @@ def analyze_results(manifest: dict, results: dict) -> dict:
     elif results["critical_harm_flag"]:
         status = "critical_harm_review"
         issues.append("A critical early-harm flag is present. Review safety and player impact with an operator; early-harm observations are not evidence of a successful launch.")
-    elif results["experiment_state"] != "COMPLETED" or results["elapsed_days"] < manifest["duration_days"] or any(count == 0 for count in results["variant_enrolled_users"].values()):
+    elif results["experiment_state"] not in {"DECISION_NEEDED", "COMPLETED"} or results["elapsed_days"] < manifest["duration_days"] or any(count == 0 for count in results["variant_enrolled_users"].values()):
         status = "not_decision_ready"
         issues.append("The experiment has not completed its full planned duration or at least one variant has no enrolled players. Do not declare a winner from early trends or an empty sample.")
     else:

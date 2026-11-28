@@ -13,7 +13,7 @@ Use the current AnalyticsService methods such as LogCustomEvent, LogFunnelStepEv
 - Keep names, value units, funnel step numbers, and session IDs consistent.
 - Use a counter for a discrete action and a value event for a measured quantity.
 - Keep raw text, player identifiers, credentials, and unnecessary personal data out of custom fields.
-- Roblox documents a maximum of 100 custom event names per experience.
+- Roblox documents a maximum of 100 custom event names per experience. Economy, funnel, and custom events support up to three custom fields; values exceeding 8,000 combined unique combinations across those fields are grouped as Other. Roblox supports up to 10 unique funnels and 100 steps per funnel.
 
 ## Funnel and custom metric planning
 

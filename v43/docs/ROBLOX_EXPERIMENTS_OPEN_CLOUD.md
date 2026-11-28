@@ -2,6 +2,8 @@
 
 ## Native experience experiments
 
+Roblox currently labels the Open Cloud experimentation endpoints Experimental. Recheck the current endpoint reference and schemas before automating production workflows.
+
 Use Creator Hub Experiments for in-experience config tests. The platform assigns eligible players to a control or treatment variant and retains their enrollment assignment. Do not add a second custom client-side random assignment mechanism on top of the native experiment.
 
 An in-game experiment varies config values. This V43 plan and validator is deliberately limited to that product type; Roblox matchmaking experiments have a separate configuration contract.
@@ -9,12 +11,13 @@ An in-game experiment varies config values. This V43 plan and validator is delib
 ## Open Cloud scopes
 
 The current experimentation guide documents:
-- Read/list/get/stats operations require the universe:read scope.
-- Create/update/discard/start/schedule/complete operations require universe:write.
+- Read/list/get/stats operations require the `universe:read` scope.
+- The `calculateMde` POST operation is also listed under `universe:read`.
+- Create/update/discard/start/schedule/complete operations require `universe:write`.
 - Every API endpoint is scoped to a universe ID.
 - Keep API credentials outside source control, project prompts, manifests, and logs.
 
-Use the least privilege needed. Keep read-only inspection separate from write operations and require a human to approve every write.
+Use the least privilege needed. Keep read-only inspection separate from write operations and require a human to approve every write. The API reference currently labels the experimentation endpoints Experimental, so verify endpoint schemas and current behavior before relying on them.
 
 ## Asynchronous operations
 
@@ -33,7 +36,7 @@ Never assume an initial HTTP success means the experiment was created, started, 
 7. Complete with a reviewed winning variant ID, or omit the winner to stop without selecting a treatment.
 8. Read back the permanent config value and verify deployed server behavior.
 
-After an experiment is started or scheduled, its configuration becomes immutable. Do not attempt to patch a running experiment's duration, variants, rollout, or targeting. Create a new experiment for a new hypothesis.
+After an experiment is scheduled, its configuration cannot be edited (it can be rescheduled). Once it is running, the config key and referenced global conditions are locked against changes until the experiment completes. Do not attempt to patch a running experiment's duration, variants, rollout, or targeting. Create a new experiment for a new hypothesis.
 
 ## V43 tooling boundary
 
