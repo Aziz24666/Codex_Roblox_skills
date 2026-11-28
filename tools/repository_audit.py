@@ -430,7 +430,7 @@ def audit(root: Path) -> list[str]:
         required += (
             "INDEX_V43.md", "v43/VERSION", "v43/INDEX_V43.md", "v43/tools/v43.py",
             "v43/tools/patch_cumulative_package.py", "v43/tools/audit_cumulative_package.py",
-            "v43/tests/test_v43.py", "v43/schemas/experiment-plan.schema.json",
+            "v43/tests/test_v43.py", "v43/tests/requirements-test.txt", "v43/schemas/experiment-plan.schema.json",
             "v43/schemas/experiment-results-review.schema.json",
             "v43/examples/experiment-plan.example.json", "v43/examples/experiment-results.example.json",
             "v43/docs/EXPERIMENT_DESIGN_AND_METRICS.md", "v43/docs/ROBLOX_EXPERIMENTS_OPEN_CLOUD.md",
