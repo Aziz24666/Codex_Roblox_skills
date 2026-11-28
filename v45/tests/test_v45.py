@@ -23,6 +23,14 @@ class ValidationTests(unittest.TestCase):
   self.assertTrue(any("unreachable nodes" in e for e in v45.validate_project(self.p)))
  def test_quest_cycle(self): self.p["quests"][0]["nodes"][1]["next_node_ids"]=["approach-guide"]; self.assertTrue(any("contains a cycle" in e for e in v45.validate_project(self.p)))
  def test_quest_without_finish_path(self): self.p["quests"][0]["nodes"][1]["next_node_ids"]=[]; self.assertTrue(any("cannot reach a completion" in e for e in v45.validate_project(self.p)))
+ def test_unhashable_quest_kind_is_reported(self):
+  self.p["quests"][0]["nodes"][0]["kind"]=["objective"]; self.assertTrue(v45.validate_project(self.p))
+ def test_unhashable_repeat_policy_is_reported(self):
+  self.p["quests"][0]["repeat_policy"]=[]; self.assertTrue(v45.validate_project(self.p))
+ def test_unhashable_objective_type_is_reported(self):
+  self.p["quests"][0]["nodes"][0]["objective_type"]={}; self.assertTrue(v45.validate_project(self.p))
+ def test_unhashable_dialogue_kind_is_reported(self):
+  self.p["dialogues"][0]["nodes"][0]["kind"]={}; self.assertTrue(v45.validate_project(self.p))
  def test_branch_needs_multiple_edges(self): self.p["quests"][0]["nodes"][0]["kind"]="branch"; self.assertTrue(any("branch nodes must have" in e for e in v45.validate_project(self.p)))
  def test_missing_prerequisite(self): self.p["quests"][0]["prerequisites"]=["not-authored"]; self.assertTrue(any("missing prerequisite" in e for e in v45.validate_project(self.p)))
  def test_prerequisite_cycle(self):
