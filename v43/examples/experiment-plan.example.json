@@ -48,6 +48,18 @@
         "calculation": "PARTICIPATION_PERCENT",
         "completion_step": null
       }
+    ],
+    "guardrails": [
+      {
+        "metric_id": "playtime_per_user",
+        "metric": "PLAYTIME",
+        "harmful_direction": "decrease"
+      },
+      {
+        "metric_id": "first_quest_completion",
+        "metric": "custom:first_quest_completion",
+        "harmful_direction": "decrease"
+      }
     ]
   },
   "instrumentation": {
