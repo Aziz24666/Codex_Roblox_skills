@@ -4,19 +4,9 @@
   "title": "First-session clarity playtest",
   "purpose": "Understand where new testers become confused during the first-session onboarding and identify candidate usability improvements.",
   "method": "moderated_playtest",
-  "build": {
-    "build_id": "2026-10-rc2",
-    "environment": "private_test"
-  },
-  "window": {
-    "starts_at": "2026-10-01T00:00:00Z",
-    "ends_at": "2026-10-14T23:59:59Z"
-  },
-  "target": {
-    "minimum_responses": 5,
-    "maximum_responses": 100,
-    "small_cell_threshold": 3
-  },
+  "build": {"build_id":"2026-10-rc2","environment":"private_test"},
+  "window": {"starts_at":"2026-10-01T00:00:00Z","ends_at":"2026-10-14T23:59:59Z"},
+  "target": {"minimum_responses":5,"maximum_responses":100,"small_cell_threshold":3},
   "notice": {
     "purpose_disclosed": true,
     "voluntary": true,
@@ -28,15 +18,7 @@
     "owner_role": "research_lead"
   },
   "questions": [
-    {
-      "question_id": "tutorial_clarity",
-      "topic": "onboarding",
-      "prompt": "Which step of the first task, if any, was unclear?"
-    },
-    {
-      "question_id": "core_loop",
-      "topic": "core_loop",
-      "prompt": "What did you expect to happen after completing the first objective?"
-    }
+    {"question_id":"tutorial_clarity","topic":"onboarding","prompt":"Which step of the first task, if any, was unclear?"},
+    {"question_id":"core_loop","topic":"core_loop","prompt":"What did you expect to happen after completing the first objective?"}
   ]
 }

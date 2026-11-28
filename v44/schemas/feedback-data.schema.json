@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/roblox-codex/v44/feedback-data.schema.json",
+  "title": "V44 Coded Feedback Dataset",
+  "type":"object","additionalProperties":false,
+  "required":["schema_version","study_id","build_id","records"],
+  "properties":{
+    "schema_version":{"type":"integer","const":1},
+    "study_id":{"type":"string","pattern":"^[a-z][a-z0-9_-]{1,39}$"},
+    "build_id":{"type":"string","minLength":1,"maxLength":60,"pattern":".*\\S.*"},
+    "records":{"type":"array","minItems":1,"maxItems":10000,"items":{
+      "type":"object","additionalProperties":false,
+      "required":["response_ref","collected_at","source","topic","sentiment","impact","stage","tags","cohort"],
+      "properties":{
+        "response_ref":{"type":"string","pattern":"^fb_[a-z0-9]{8,24}$"},
+        "collected_at":{"type":"string","format":"date-time"},
+        "source":{"enum":["moderated_playtest","structured_survey","support_summary"]},
+        "topic":{"enum":["onboarding","core_loop","progression","interface","controls","performance","social","accessibility","monetization","other"]},
+        "sentiment":{"enum":["positive","neutral","mixed","negative"]},
+        "impact":{"enum":["low","medium","high","critical"]},
+        "stage":{"enum":["tutorial","first_session","repeat_session","progression","social","store","technical","other"]},
+        "tags":{"type":"array","uniqueItems":true,"maxItems":5,"items":{"enum":["confusing","friction","delight","feature_request","bug_report","accessibility","blocker"]}},
+        "cohort":{"enum":["new_players","returning_players","mobile","desktop","console","unknown"]}
+      }
+    }}
+  }
+}
