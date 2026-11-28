@@ -91,6 +91,7 @@
   },
   "properties": {
     "schema_version": {
+      "type": "integer",
       "const": 1
     },
     "experiment_id": {
@@ -116,25 +117,25 @@
           "type": "string",
           "minLength": 12,
           "maxLength": 500,
-          "pattern": ".*\\S.*"
+          "pattern": "^(?:[\\s\\S]*\\S){12}[\\s\\S]*$"
         },
         "expected_outcome": {
           "type": "string",
           "minLength": 12,
           "maxLength": 500,
-          "pattern": ".*\\S.*"
+          "pattern": "^(?:[\\s\\S]*\\S){12}[\\s\\S]*$"
         },
         "rationale": {
           "type": "string",
           "minLength": 12,
           "maxLength": 500,
-          "pattern": ".*\\S.*"
+          "pattern": "^(?:[\\s\\S]*\\S){12}[\\s\\S]*$"
         },
         "success_criteria": {
           "type": "string",
           "minLength": 12,
           "maxLength": 500,
-          "pattern": ".*\\S.*"
+          "pattern": "^(?:[\\s\\S]*\\S){12}[\\s\\S]*$"
         }
       }
     },
