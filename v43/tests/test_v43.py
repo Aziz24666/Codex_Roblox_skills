@@ -346,7 +346,7 @@ class ManifestAuditAndCompareTests(unittest.TestCase):
         data["variants"][0]["weight_percent"] = 40
         data["variants"][1]["weight_percent"] = 40
         report = v43.audit_manifest(data)
-        self.assertTrue(any("divide the available sample" in item for item in report["warnings"]))
+        self.assertTrue(any("split the available audience" in item for item in report["warnings"]))
 
     def test_identical_manifests_unchanged(self):
         self.assertEqual("unchanged", v43.compare_manifests(self.model, copy.deepcopy(self.model))["status"])
