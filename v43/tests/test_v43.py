@@ -264,6 +264,7 @@ class ManifestValidationTests(unittest.TestCase):
             "completion_step": 4
         }
         data["metrics"]["goal_metric"] = "custom:onboarding_finish"
+        data["metrics"]["guardrails"][1]["metric"] = "custom:onboarding_finish"
         self.assertEqual([], v43.validate_manifest(data))
 
     def test_custom_metric_supports_economy_source(self):
@@ -275,6 +276,7 @@ class ManifestValidationTests(unittest.TestCase):
             "calculation": "AVERAGE_CURRENCY_SINK_DELTA",
             "completion_step": None
         }
+        data["metrics"]["guardrails"][1]["metric"] = "custom:coin_sink"
         self.assertEqual([], v43.validate_manifest(data))
 
     def test_custom_metric_goal_reference_must_exist(self):
@@ -502,6 +504,7 @@ class ResultsReviewTests(unittest.TestCase):
 
     def test_goal_interval_crossing_zero_is_inconclusive(self):
         data = copy.deepcopy(self.results)
+        data["treatment_results"][0]["goal_metric_delta_percent"] = 0.5
         data["treatment_results"][0]["confidence_interval_low_percent"] = -1
         data["treatment_results"][0]["confidence_interval_high_percent"] = 2
         self.assertEqual("inconclusive", self.analyze(data)["status"])
