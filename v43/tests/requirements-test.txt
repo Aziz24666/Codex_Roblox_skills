@@ -1,0 +1,2 @@
+# Pinned development-only dependency for Draft 2020-12 schema conformance tests.
+jsonschema==4.26.0
