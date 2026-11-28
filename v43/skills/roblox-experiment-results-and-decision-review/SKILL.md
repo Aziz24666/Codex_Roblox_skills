@@ -12,6 +12,9 @@ description: Review Roblox experiment confidence intervals, MDE, sample-ratio mi
 - Treat critical early-harm alerts as an operational reason to review and potentially stop. Early-harm observations are not evidence for a winning launch decision.
 
 ## Read statistical evidence correctly
+- Require each treatment result to report exactly the guardrails predeclared in the experiment plan; missing, duplicate, or unexpected guardrails invalidate the review.
+- Derive harmful direction from the predeclared plan, never from a result export.
+- Verify every reported point estimate is inside its confidence interval; inconsistent summaries must be rejected.
 - Review the confidence interval for each goal and learning metric. Roblox describes a change as statistically significant when the interval for percent change does not overlap zero.
 - A large-looking point estimate with an interval crossing zero is not a statistically significant win.
 - A non-significant result is inconclusive; it does not prove the two variants are identical.
