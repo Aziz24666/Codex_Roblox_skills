@@ -1,17 +1,18 @@
 # Roblox Codex Game Studio Kit
 
-[![V42 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v42-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v42-quality.yml)
+[![V43 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v43-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v43-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V42.0.0 — LiveOps, Events and Configuration Management.** The cumulative V1–V42 toolkit contains **272 native Codex skills**. Only the current release is required.
+**Current release: V43.0.0 — Experimentation and Decision Intelligence.** The cumulative V1–V43 toolkit contains **276 native Codex skills**. Only the current release is required.
 
-[Open the V42 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v42.0.0).
+[Open the V43 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v43.0.0).
 
 ## What's included
 
-Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills; V40 — 264 native Codex skills; V41 — 268 native Codex skills; V42 — 272 native Codex skills.
+Historical cumulative skill totals retained for compatibility: V25 — 207 native Codex skills; V26 — 210 native Codex skills; V27 — 213 native Codex skills; V28 — 216 native Codex skills; V29 — 220 native Codex skills; V30 — 224 native Codex skills; V31 — 228 native Codex skills; V32 — 232 native Codex skills; V33 — 236 native Codex skills; V34 — 240 native Codex skills; V35 — 244 native Codex skills; V36 — 248 native Codex skills; V37 — 252 native Codex skills; V38 — 256 native Codex skills; V39 — 260 native Codex skills; V40 — 264 native Codex skills; V41 — 268 native Codex skills; V42 — 272 native Codex skills; V43 — 276 native Codex skills.
 
-- **272 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
+- **276 native Codex skills** spanning Roblox gameplay, Luau, characters, UI, networking, persistence, procedural content, Studio workflows, testing, performance, release engineering, analytics, LiveOps, safety, moderation, monetization, asset production, accessibility, localization, implementation orchestration, and incident response.
+- **V43** adds Roblox native in-game experiment planning, hypothesis/MDE review, AnalyticsService instrumentation, Open Cloud lifecycle guidance, and offline experiment-plan/result review.
 - **V42** adds LiveOps event scheduling, Roblox Experience Configs, staged feature-flag rollouts, and an offline validator/auditor with config, event, consumer, and deployment compatibility reporting.
 - **V41** adds skill-based matchmaking queues, party/lobby lifecycle, cross-server coordination, reserved-server teleport/reconnect recovery, and an offline matchmaking validator/auditor plus deterministic synthetic-ticket simulator.
 - **V40** adds player-profile lifecycle/session ownership, bounded save/retry/recovery policies, safe schema migration chains, idempotent reward/receipt commits, and an offline persistence-contract validator/auditor.
@@ -35,11 +36,11 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
 ## Start a Roblox development session
 
-1. Download and extract the V41 release, then open the extracted package root in Codex.
-2. Read `AGENTS.md` and `INDEX_V42.md`.
+1. Download and extract the V43 release, then open the extracted package root in Codex.
+2. Read `AGENTS.md` and `INDEX_V43.md`.
 3. Initialize session continuity in the actual game project folder:
 
-       python C:\Path\To\roblox-codex-game-studio-kit-v42\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
+       python C:\Path\To\roblox-codex-game-studio-kit-v43\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"
 
 4. For feature work, read `v37/INDEX_V37.md` and follow the V37 reconnaissance → plan → scoped implementation → evidence handoff workflow.
 5. For a production incident, copy `v38/examples/incident.example.json` into `.codex/incidents/incident.json`, replace the example values with verified aggregate-only facts, then run:
@@ -84,7 +85,19 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
    V42 validates manifests only. It does not call Roblox or publish config. Keep API credentials out of project files; stage and test changes, get human approval, publish through the authorized workflow, and read back the published values.
 
-Commands: V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate. V40 — doctor, validate, audit. V41 — doctor, validate, audit, simulate. V42 — doctor, validate, audit, compare.
+10. For an in-game experiment, copy `v43/examples/experiment-plan.example.json` to `.codex/experiments/experiment-plan.json`, adapt the hypothesis, config values, duration, metrics, and event names, then run:
+
+       python .\\v43\\tools\\v43.py doctor --root C:\\Path\\To\\YourGame
+       python .\\v43\\tools\\v43.py validate --root C:\\Path\\To\\YourGame --manifest .codex\\experiments\\experiment-plan.json
+       python .\\v43\\tools\\v43.py audit --root C:\\Path\\To\\YourGame --manifest .codex\\experiments\\experiment-plan.json --output .codex\\reports\\experiment-audit.json
+
+   After an authorized experiment completes, prepare a results review JSON from Creator Hub/Open Cloud results and run `analyze`. V43 is offline: it does not assign players, contact Roblox, calculate MDE/significance/SRM, start experiments, or publish a winning config. Never make a launch decision from incomplete runs or SRM-affected results.
+
+Commands: V25 — start, checkpoint, handoff, resume, status, verify, recover. V26 — doctor, plan, verify-plan. V27 — doctor, audit, typecheck, rojo-check. V28 — doctor, audit, validate-migration. V29 — doctor, audit, budget, compare, report. V30 — doctor, plan, validate, audit. V31 — doctor, validate-catalog, audit-catalog, evaluate-health. V32 — doctor, audit, validate-policy, validate-case, validate-register. V33 — doctor, audit, validate-plan, validate-report, compare. V34 — doctor, validate-capture, analyze-soak, validate-suite, compare-repeated. V35 — doctor, validate-catalog, audit-catalog, compare-catalogs. V36 — doctor, validate-manifest, audit. V37 — doctor, validate-plan, audit-plan, validate-report, audit-report. V38 — doctor, validate, audit. V39 — doctor, validate, simulate. V40 — doctor, validate, audit. V41 — doctor, validate, audit, simulate. V42 — doctor, validate, audit, compare. V43 — doctor, validate, audit, compare, analyze.
+
+## V43 experimentation boundaries
+
+V43 validates local experiment plans and reviews confidence-interval/SRM summaries supplied by an authorized person. It does not calculate statistical significance or MDE, assign players, create or start experiments, retrieve live results, select winners, complete experiments, or publish config. Let experiments run their planned duration; investigate SRM and critical early-harm flags, and require human review before any winning-variant rollout.
 
 ## V42 LiveOps and configuration boundaries
 
@@ -118,6 +131,12 @@ Keep analytics aggregate and purpose-bound; do not build individual-spender prof
 
 ## Documentation
 
+- V43 feature index: `INDEX_V43.md`
+- Experiment design and metrics: `v43/docs/EXPERIMENT_DESIGN_AND_METRICS.md`
+- Roblox Experiments and Open Cloud: `v43/docs/ROBLOX_EXPERIMENTS_OPEN_CLOUD.md`
+- AnalyticsService instrumentation: `v43/docs/ANALYTICS_INSTRUMENTATION.md`
+- Statistical review and decisions: `v43/docs/STATISTICAL_REVIEW_AND_DECISIONS.md`
+- V43 CLI reference: `v43/docs/V43_CLI.md`
 - V42 feature index: `INDEX_V42.md`
 - LiveOps event lifecycle: `v42/docs/LIVEOPS_EVENT_LIFECYCLE.md`
 - Experience Configs and feature flags: `v42/docs/EXPERIENCE_CONFIGS_AND_FEATURE_FLAGS.md`

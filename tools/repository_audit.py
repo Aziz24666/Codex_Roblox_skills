@@ -27,6 +27,7 @@ EXPECTED_SKILLS_V39 = 260
 EXPECTED_SKILLS_V40 = 264
 EXPECTED_SKILLS_V41 = 268
 EXPECTED_SKILLS_V42 = 272
+EXPECTED_SKILLS_V43 = 276
 EXCLUDED_DIRS = {".git", "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "node_modules", ".venv", "venv"}
 SKILL_METADATA = {
     "name": re.compile(r"(?m)^name\s*:\s*['\"]?([a-z0-9][a-z0-9-]*)['\"]?\s*$"),
@@ -123,7 +124,7 @@ def audit(root: Path) -> list[str]:
                     # before the newer version directories have been installed. Defer
                     # those future-version links until the corresponding overlay lands.
                     defer_future_version = False
-                    for newer_version in range(42, 35, -1):
+                    for newer_version in range(43, 35, -1):
                         if not (root / f"v{newer_version}" / "VERSION").is_file() and (
                             target_path == f"INDEX_V{newer_version}.md"
                             or target_path.startswith(f"v{newer_version}/")
@@ -179,9 +180,12 @@ def audit(root: Path) -> list[str]:
     is_v40 = (root / "v40" / "VERSION").is_file()
     is_v41 = (root / "v41" / "VERSION").is_file()
     is_v42 = (root / "v42" / "VERSION").is_file()
+    is_v43 = (root / "v43" / "VERSION").is_file()
     is_v27 = (root / "v27" / "VERSION").is_file()
     is_v26 = (root / "v26" / "VERSION").is_file()
-    if is_v42:
+    if is_v43:
+        expected_skills = EXPECTED_SKILLS_V43
+    elif is_v42:
         expected_skills = EXPECTED_SKILLS_V42
     elif is_v41:
         expected_skills = EXPECTED_SKILLS_V41
@@ -421,6 +425,21 @@ def audit(root: Path) -> list[str]:
             ".agents/skills/roblox-experience-config-and-feature-flag-management/SKILL.md",
             ".agents/skills/roblox-safe-live-config-rollouts/SKILL.md",
             ".agents/skills/roblox-liveops-config-compatibility-and-rollback/SKILL.md",
+        )
+    if is_v43:
+        required += (
+            "INDEX_V43.md", "v43/VERSION", "v43/INDEX_V43.md", "v43/tools/v43.py",
+            "v43/tools/patch_cumulative_package.py", "v43/tools/audit_cumulative_package.py",
+            "v43/tests/test_v43.py", "v43/schemas/experiment-plan.schema.json",
+            "v43/schemas/experiment-results-review.schema.json",
+            "v43/examples/experiment-plan.example.json", "v43/examples/experiment-results.example.json",
+            "v43/docs/EXPERIMENT_DESIGN_AND_METRICS.md", "v43/docs/ROBLOX_EXPERIMENTS_OPEN_CLOUD.md",
+            "v43/docs/ANALYTICS_INSTRUMENTATION.md", "v43/docs/STATISTICAL_REVIEW_AND_DECISIONS.md",
+            "v43/docs/V43_CLI.md",
+            ".agents/skills/roblox-experiment-hypothesis-and-design/SKILL.md",
+            ".agents/skills/roblox-native-experiments-and-open-cloud-lifecycle/SKILL.md",
+            ".agents/skills/roblox-experiment-analytics-instrumentation/SKILL.md",
+            ".agents/skills/roblox-experiment-results-and-decision-review/SKILL.md",
         )
     for item in required:
         if not (root / item).is_file():

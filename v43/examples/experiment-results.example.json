@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "experiment_id": "onboarding-flow-test",
+  "experiment_state": "COMPLETED",
+  "observed_at": "2027-02-01T12:00:00Z",
+  "elapsed_days": 28,
+  "srm_detected": false,
+  "critical_harm_flag": false,
+  "variant_enrolled_users": {
+    "control": 5000,
+    "guided": 4980
+  },
+  "treatment_results": [
+    {
+      "variant_id": "guided",
+      "goal_metric_delta_percent": 3.2,
+      "confidence_interval_low_percent": 1.1,
+      "confidence_interval_high_percent": 5.3,
+      "guardrails": [
+        {
+          "metric_id": "playtime_per_user",
+          "delta_percent": 0.6,
+          "confidence_interval_low_percent": -0.3,
+          "confidence_interval_high_percent": 1.5,
+          "harmful_direction": "decrease"
+        },
+        {
+          "metric_id": "first_quest_completion",
+          "delta_percent": 4.1,
+          "confidence_interval_low_percent": 2,
+          "confidence_interval_high_percent": 6.2,
+          "harmful_direction": "decrease"
+        }
+      ]
+    }
+  ]
+}

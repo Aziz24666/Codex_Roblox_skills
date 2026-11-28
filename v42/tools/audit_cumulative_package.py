@@ -4,14 +4,14 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-EXPECTED_SKILLS = 272
+EXPECTED_SKILLS = {272, 276}
 HISTORICAL = (
     "207 native Codex skills", "210 native Codex skills", "213 native Codex skills",
     "216 native Codex skills", "220 native Codex skills", "224 native Codex skills",
     "228 native Codex skills", "232 native Codex skills", "236 native Codex skills",
     "240 native Codex skills", "244 native Codex skills", "248 native Codex skills",
     "252 native Codex skills", "256 native Codex skills", "260 native Codex skills",
-    "264 native Codex skills", "268 native Codex skills", "272 native Codex skills",
+    "264 native Codex skills", "268 native Codex skills", "272 native Codex skills", "276 native Codex skills",
 )
 REQUIRED = (
     "AGENTS.md", "README.md", "LICENSE", "INDEX.md", "INDEX_V37.md", "INDEX_V38.md",
@@ -43,13 +43,13 @@ def audit(root: Path) -> list[str]:
     issues = [f"Missing required file: {path}" for path in REQUIRED if not (root / path).is_file()]
     skills_root = root / ".agents" / "skills"
     skills = list(skills_root.glob("*/SKILL.md")) if skills_root.is_dir() else []
-    if len(skills) != EXPECTED_SKILLS:
+    if len(skills) not in EXPECTED_SKILLS:
         issues.append(f"Expected {EXPECTED_SKILLS} native skills; found {len(skills)}.")
     version = (root / "v42" / "VERSION").read_text(encoding="utf-8").strip() if (root / "v42" / "VERSION").is_file() else ""
     if version != "42.0.0":
         issues.append(f"Unexpected V42 version: {version!r}.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    if "Current release: V42.0.0" not in readme or "272 native Codex skills" not in readme:
+    if not any(label in readme for label in ("Current release: V42.0.0", "Current release: V43.0.0")) or not any(label in readme for label in ("272 native Codex skills", "276 native Codex skills")):
         issues.append("README does not describe V42 and 272 native skills.")
     missing = [label for label in HISTORICAL if label not in readme]
     if missing:
@@ -69,7 +69,8 @@ def main() -> int:
         for issue in issues:
             print("FAIL: " + issue)
         return 1
-    print(f"PASS: cumulative V1-V42 package audit ({EXPECTED_SKILLS} native skills).")
+    count = len(list((args.root.expanduser().resolve() / ".agents" / "skills").glob("*/SKILL.md")))
+    print(f"PASS: V42 compatibility audit ({count} native skills).")
     return 0
 
 

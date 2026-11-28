@@ -62,8 +62,8 @@ jobs:
           python "$PACKAGE_ROOT/v38/tools/v38.py" audit --root "$PACKAGE_ROOT" --incident v38/examples/incident.example.json --output v38/test-output/incident-audit.example.json
           python "$PACKAGE_ROOT/v37/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
           python "$PACKAGE_ROOT/v38/tools/audit_cumulative_package.py" --root "$PACKAGE_ROOT"
-          grep -Eq "Current release: V(38|39|40|41|42)\\.0\\.0" "$PACKAGE_ROOT/README.md"
-          grep -Eq "256 native Codex skills|260 native Codex skills|264 native Codex skills|268 native Codex skills|272 native Codex skills" "$PACKAGE_ROOT/README.md"
+          grep -Eq "Current release: V(38|39|40|41|42|43)\\.0\\.0" "$PACKAGE_ROOT/README.md"
+          grep -Eq "256 native Codex skills|260 native Codex skills|264 native Codex skills|268 native Codex skills|272 native Codex skills|276 native Codex skills" "$PACKAGE_ROOT/README.md"
           test "$(find "$PACKAGE_ROOT/.agents/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')" = "256"
 
       - name: Build and compare V38 release archives

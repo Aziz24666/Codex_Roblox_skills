@@ -1,3 +1,3 @@
 # Current toolkit index
 
-The current cumulative release is **V42.0.0** with **272 native Codex skills**. See the [V42 feature index](https://github.com/Aziz24666/Codex_Roblox_skills/blob/main/INDEX_V42.md) for LiveOps event scheduling, Roblox Experience Configs, staged feature-flag rollouts, and config compatibility/rollback. All V1–V41 capabilities remain included.
+The current cumulative release is **V43.0.0** with **276 native Codex skills**. See the V43 feature index for Roblox in-game experiments, hypothesis/MDE planning, AnalyticsService instrumentation, experiment lifecycle, and statistical decision review. All V1–V42 capabilities remain included.
