@@ -1,6 +1,13 @@
 # V43 CLI reference
 
-Run with Python 3.10 or newer. All paths are relative to the selected Roblox project root.
+Run the CLI with Python 3.10 or newer. The CLI itself uses only the Python standard library. To run the V43 tests, install the pinned development dependency first:
+
+~~~powershell
+python -m pip install -r .\v43\tests\requirements-test.txt
+python -m unittest discover -s .\v43\tests -v
+~~~
+
+All CLI paths are relative to the selected Roblox project root.
 
 ## Commands
 
