@@ -32,4 +32,4 @@ Roblox in-game experiments have a planned duration between 14 and 60 days. Let t
 
 ## Guardrails and interactions
 
-Select guardrails that represent meaningful unwanted outcomes, such as a significant decrease in playtime or task completion. Review any simultaneously running experiments for interactions. Avoid changing unrelated gameplay, config conditions, or analytics definitions while the experiment is running.
+Declare at least one guardrail in the experiment plan before scheduling. Each guardrail has a stable metric ID, a platform/custom metric reference, and the direction that represents harm (increase or decrease). Every treatment result must include exactly the declared guardrails; missing, duplicate, or unexpected guardrails invalidate the review. The direction comes from the predeclared plan, never from the result export. Review any simultaneously running experiments for interactions. Avoid changing unrelated gameplay, config conditions, or analytics definitions while the experiment is running.
