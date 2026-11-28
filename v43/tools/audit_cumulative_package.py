@@ -28,7 +28,7 @@ REQUIRED = (
     "v42/VERSION", "v42/tools/v42.py", "v42/tools/audit_cumulative_package.py",
     "v43/VERSION", "v43/INDEX_V43.md", "v43/tools/v43.py",
     "v43/tools/patch_cumulative_package.py", "v43/tools/audit_cumulative_package.py",
-    "v43/tests/test_v43.py",
+    "v43/tests/test_v43.py", "v43/tests/requirements-test.txt",
     "v43/schemas/experiment-plan.schema.json",
     "v43/schemas/experiment-results-review.schema.json",
     "v43/examples/experiment-plan.example.json",
