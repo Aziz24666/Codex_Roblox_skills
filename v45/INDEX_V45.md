@@ -1,6 +1,6 @@
 # Roblox Codex Game Studio Kit — V45
 
-V45.0.0 adds **4 native Codex skills**, bringing the cumulative package to **284 native skills**. V44 remains the latest published release until V45 is reviewed and merged.
+V45.0.0 is the current published release, with **4 new native Codex skills** and **284 native skills** in the cumulative package.
 
 ## V45 — Quest, Dialogue, and Narrative Systems
 

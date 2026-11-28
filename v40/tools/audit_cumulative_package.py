@@ -41,7 +41,7 @@ def audit(root: Path) -> list[str]:
     if version != "40.0.0":
         issues.append(f"Unexpected V40 version: {version!r}.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    if not any(label in readme for label in ("Current release: V40.0.0", "Current release: V41.0.0", "Current release: V42.0.0", "Current release: V43.0.0", "Current release: V44.0.0", "Current release: V45.0.0 (proposed)")) or not any(label in readme for label in ("264 native Codex skills", "268 native Codex skills", "272 native Codex skills", "276 native Codex skills", "280 native Codex skills", "284 native Codex skills")):
+    if not any(label in readme for label in ("Current release: V40.0.0", "Current release: V41.0.0", "Current release: V42.0.0", "Current release: V43.0.0", "Current release: V44.0.0", "Current release: V45.0.0", "Current release: V45.0.0 (proposed)")) or not any(label in readme for label in ("264 native Codex skills", "268 native Codex skills", "272 native Codex skills", "276 native Codex skills", "280 native Codex skills", "284 native Codex skills")):
         issues.append("README does not describe V40 and 264 native skills.")
     missing = [label for label in HISTORICAL if label not in readme]
     if missing:

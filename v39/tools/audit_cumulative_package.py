@@ -28,7 +28,7 @@ def audit(root:Path)->list[str]:
     version=(root/"v39"/"VERSION").read_text(encoding="utf-8").strip() if (root/"v39"/"VERSION").is_file() else ""
     if version!="39.0.0": issues.append(f"Unexpected V39 version: {version!r}.")
     readme=(root/"README.md").read_text(encoding="utf-8") if (root/"README.md").is_file() else ""
-    if not any(x in readme for x in ("Current release: V39.0.0","Current release: V40.0.0","Current release: V41.0.0","Current release: V42.0.0","Current release: V43.0.0", "Current release: V44.0.0", "Current release: V45.0.0 (proposed)")) or not any(x in readme for x in ("260 native Codex skills","264 native Codex skills","268 native Codex skills","272 native Codex skills","276 native Codex skills", "280 native Codex skills", "284 native Codex skills")): issues.append("README does not describe a V39/V40 cumulative package.")
+    if not any(x in readme for x in ("Current release: V39.0.0","Current release: V40.0.0","Current release: V41.0.0","Current release: V42.0.0","Current release: V43.0.0", "Current release: V44.0.0", "Current release: V45.0.0", "Current release: V45.0.0 (proposed)")) or not any(x in readme for x in ("260 native Codex skills","264 native Codex skills","268 native Codex skills","272 native Codex skills","276 native Codex skills", "280 native Codex skills", "284 native Codex skills")): issues.append("README does not describe a V39/V40 cumulative package.")
     missing=[label for label in HISTORICAL if label not in readme]
     if missing: issues.append("README is missing historical skill totals: "+", ".join(missing)+".")
     agents=(root/"AGENTS.md").read_text(encoding="utf-8") if (root/"AGENTS.md").is_file() else ""

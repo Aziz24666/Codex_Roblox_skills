@@ -47,7 +47,7 @@ def audit(root: Path) -> list[str]:
     if "<!-- V37_PROJECT_IMPLEMENTATION_ORCHESTRATION -->" not in agents:
         issues.append("AGENTS.md is missing the V37 project implementation orchestration guidance.")
     readme = (root / "README.md").read_text(encoding="utf-8") if (root / "README.md").is_file() else ""
-    current_release = any(label in readme for label in ("Current release: V37.0.0", "Current release: V38.0.0", "Current release: V39.0.0", "Current release: V40.0.0", "Current release: V41.0.0", "Current release: V42.0.0", "Current release: V43.0.0", "Current release: V44.0.0", "Current release: V45.0.0 (proposed)"))
+    current_release = any(label in readme for label in ("Current release: V37.0.0", "Current release: V38.0.0", "Current release: V39.0.0", "Current release: V40.0.0", "Current release: V41.0.0", "Current release: V42.0.0", "Current release: V43.0.0", "Current release: V44.0.0", "Current release: V45.0.0", "Current release: V45.0.0 (proposed)"))
     current_count = any(label in readme for label in ("252 native Codex skills", "256 native Codex skills", "260 native Codex skills", "264 native Codex skills", "268 native Codex skills", "272 native Codex skills", "276 native Codex skills", "280 native Codex skills", "284 native Codex skills"))
     if not current_release or not current_count:
         issues.append("README.md does not describe a V37-or-newer cumulative package.")

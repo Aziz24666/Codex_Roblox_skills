@@ -3,9 +3,9 @@
 [![V45 Quality](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v45-quality.yml/badge.svg)](https://github.com/Aziz24666/Codex_Roblox_skills/actions/workflows/v45-quality.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Current release: V45.0.0 (proposed) — Quest, Dialogue, and Narrative Systems.** The proposed cumulative V1–V45 toolkit contains **284 native Codex skills**. V44 remains the latest published release until V45 passes review and is merged.
+**Current release: V45.0.0 — Quest, Dialogue, and Narrative Systems.** The cumulative V1–V45 toolkit contains **284 native Codex skills**. Only the current release is required.
 
-[Open the latest published V44 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v44.0.0). [Review pull requests](https://github.com/Aziz24666/Codex_Roblox_skills/pulls).
+[Open the official V45 release](https://github.com/Aziz24666/Codex_Roblox_skills/releases/tag/v45.0.0).
 
 ## What's included
 
@@ -37,8 +37,8 @@ Historical cumulative skill totals retained for compatibility: V25 — 207 nativ
 
 ## Start a Roblox development session
 
-1. Download and extract the latest published release, then open the extracted package root in Codex.
-2. Read `AGENTS.md` and the current feature index (`INDEX_V44.md` in the published V44 package; `INDEX_V45.md` after V45 is released).
+1. Download and extract the V45 release, then open the extracted package root in Codex.
+2. Read `AGENTS.md` and `INDEX_V45.md`.
 3. Initialize session continuity in the actual game project folder:
 
        python C:\Path\To\roblox-codex-game-studio-kit-v44\v25\tools\v25.py start --root C:\Path\To\YourGame --goal "Build and ship my Roblox game"

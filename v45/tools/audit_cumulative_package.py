@@ -24,7 +24,7 @@ def audit(root:Path)->list[str]:
  version=(root/"v45"/"VERSION").read_text(encoding="utf-8").strip() if (root/"v45"/"VERSION").is_file() else ""
  if version!="45.0.0": issues.append(f"Unexpected V45 version: {version!r}.")
  readme=(root/"README.md").read_text(encoding="utf-8") if (root/"README.md").is_file() else ""
- if "Current release: V45.0.0 (proposed)" not in readme or "284 native Codex skills" not in readme: issues.append("README does not describe proposed V45 and 284 skills.")
+ if "Current release: V45.0.0" not in readme or "284 native Codex skills" not in readme: issues.append("README does not describe published V45.0.0 and 284 skills.")
  missing=[x for x in HISTORICAL if x not in readme]
  if missing: issues.append("README is missing historical skill totals: "+", ".join(missing)+".")
  agents=(root/"AGENTS.md").read_text(encoding="utf-8") if (root/"AGENTS.md").is_file() else ""
